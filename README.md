@@ -1,2 +1,125 @@
-# GiveawayCompanion
-Saves you time on games giveaway sites.
+# Giveaway Companion
+## English description
+This script adds useful features on sites with games giveaways. Allows you to quickly complete/skip tasks, join and leave Steam groups in one click, open Steam key activation page.
+
+The script does not do subscriptions/reposts/likes on social networks, but such tasks can be completed automatically if they do not have validation, or if you have previously done the same task and did not cancel the subscription/repost/like.
+
+The script bar looks something like this (the set of buttons depends on the site and page):  
+<img src="images/script_bar.png" title="The script bar" alt="The script bar">
+
+The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawayHelper) and [GiveawayKiller](https://github.com/gekkedev/GiveawayKiller).
+
+**Disclaimer: the usage of this script may violate the Terms of Service of the sites it runs on. Use at your own risk.**
+
+### Supported sites
+<table>
+    <thead>
+        <tr><td rowspan="2" width="200"><strong>Site</strong></td><td colspan="4" align="center"><strong>Features</strong></td></tr>
+        <tr><td align="center"><strong>Tasks</strong></td><td align="center"><strong>Groups</strong></td><td align="center"><strong>Keys</strong></td><td><strong>Other</strong></td></tr>
+    </thead>
+    <tbody>
+        <tr><td>grabfreegame.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>bananagiveaway.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamingimpact.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamecode.win</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamezito.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">❕</td><td align="center">✔</td><td>Most Steam groups are hidden behind URL shorteners, so not all groups will be processed</td></tr>
+        <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamehunt.net</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Opens Steam key activation page when you click a <a href="images/gamehunt_key_activation.png">game image</a> on <a href="https://gamehunt.net/profile">your profile page</a></td></tr>
+        <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Sets tasks timer to zero</td></tr>
+        <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Opens Steam key activation page when you click <a href="images/indiegala_key_activation.png">Steam logo</a> next to a key on <a href="https://www.indiegala.com/profile">your profile page</a></td></tr>
+        <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Automatically "completes" tasks for visiting sites/reposts/likes when you visit a <a href="https://www.orlygift.com/giveaway">giveaway page</a></td></tr>
+    </tbody>
+</table>
+
+### Installation
+1. Install one of the browser extensions to run user scripts.  
+   Tampermonkey ([Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/))  
+   Violentmonkey ([Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/))  
+   Greasemonkey ([Firefox](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/))  
+2. Go [here](/../../raw/master/GiveawayCompanion.user.js).
+3. Confirm installation of the script.
+
+Automatic updating of the script may require your confirmation.
+
+### Filters for uBlock Origin
+Initially the script had the functions of removing ads and other annoying things, but later it was decided to remove this functionality, because the purpose of the script is different.
+
+Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/)) that do the same thing.
+
+| Site               | Filter                                                                           | Subscription   | Action
+| :----------------- | :------------------------------------------------------------------------------- | :------------- | :-------------
+| gamecode.win       | @@\|\|gamecode.win^$generichide                                                  | uBlock filters | Removes ad blocker warning
+| gamecode.win       | gamecode.win##script:inject(abort-current-inline-script.js, $, openNewWindow)    | -              | Removes pop-up ads
+| gamezito.com       | @@\|\|gamezito.com^$generichide                                                  | -              | Removes ad blocker warning
+| marvelousga.com    | @@\|\|marvelousga.com^$generichide                                               | uBlock filters | Removes ad blocker warning
+| marvelousga.com    | marvelousga.com##script:inject(abort-current-inline-script.js, $, openNewWindow) | uBlock filters | Removes pop-up ads
+| indiegala.com      | indiegala.com###giveaway-social-cont                                             | -              | Removes a social block that overrides a giveaway block
+| orlygift.com       | orlygift.com##script:inject(fuckadblock.js-3.2.0)                                | -              | Removes ad blocker warning
+| orlygift.com       | orlygift.com##script:inject(abort-on-property-read.js, Bounceback.disabled)      | -              | Removes a pop-up invitation to Steam group
+
+***
+
+## Русское описание
+
+Данный скрипт добавляет полезные функции на сайтах с раздачами игр. Позволяет быстро выполнять/пропускать задания, вступать в Steam группы и выходить из них в один клик, переходить на страницу активации Steam ключа.
+
+Скрипт не выполняет подписки/репосты/лайки в социальных сетях, но подобные задания могут быть выполнены автоматически, если они не имеют проверки или если вы раньше уже выполняли такое же задание и не отменили подписку/репост/лайк.
+
+Панель скрипта выглядит примерно так (набор кнопок зависит от сайта и страницы):  
+<img src="images/script_bar.png" title="Панель скрипта" alt="Панель скрипта">
+
+Скрипт вдохновлён [Giveaway Helper](https://github.com/Citrinate/giveawayHelper) и [GiveawayKiller](https://github.com/gekkedev/GiveawayKiller).
+
+**Отказ от ответственности: использование данного скрипта может нарушать правила сайтов, на которых он используется. Используйте на свой страх и риск.**
+
+### Поддерживаемые сайты
+<table>
+    <thead>
+        <tr><td rowspan="2" width="200"><strong>Сайт</strong></td><td colspan="4" align="center"><strong>Функции</strong></td></tr>
+        <tr><td align="center"><strong>Задания</strong></td><td align="center"><strong>Группы</strong></td><td align="center"><strong>Ключи</strong></td><td><strong>Прочее</strong></td></tr>
+    </thead>
+    <tbody>
+        <tr><td>grabfreegame.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>bananagiveaway.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamingimpact.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamecode.win</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamezito.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">❕</td><td align="center">✔</td><td>Большинство Steam групп скрыты за сокращателями ссылок, поэтому не все группы будут обработаны</td></tr>
+        <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>gamehunt.net</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/gamehunt_key_activation.png">изображению игры</a> на <a href="https://gamehunt.net/profile">странице вашего профиля</a></td></tr>
+        <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Установка таймера заданий в ноль</td></tr>
+        <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/indiegala_key_activation.png">логотипу Steam</a> рядом с ключом на <a href="https://www.indiegala.com/profile">странице вашего профиля</a></td></tr>
+        <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Автоматически "выполняет" задания на посещение сайтов/репосты/лайки при посещении страницы <a href="https://www.orlygift.com/giveaway">раздач</a></td></tr>
+    </tbody>
+</table>
+
+### Установка
+1. Установить одно из браузерных расширений для выполнения пользовательских скриптов.  
+   Tampermonkey ([Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/))  
+   Violentmonkey ([Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/violentmonkey/))  
+   Greasemonkey ([Firefox](https://addons.mozilla.org/ru/firefox/addon/greasemonkey/))
+2. Перейти [сюда](/../../raw/master/GiveawayCompanion.user.js).
+3. Подтвердить установку скрипта.
+
+При автоматическом обновлении скрипта может потребоваться ваше подтверждение.
+
+### Фильтры для uBlock Origin
+Изначально в скрипте были функции удаления рекламы и прочих назойливых штук, но позже было решено удалить этот функционал, т.к. у скрипта другое предназначение.
+
+Вот несколько фильтров для uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/ublock-origin/)), которые делают то же самое.
+
+| Сайт               | Фильтр                                                                           | Подписка       | Действие
+| :----------------- | :------------------------------------------------------------------------------- | :------------- | :-------------
+| gamecode.win       | @@\|\|gamecode.win^$generichide                                                  | uBlock filters | Удаляет предупреждение о блокировщике рекламы
+| gamecode.win       | gamecode.win##script:inject(abort-current-inline-script.js, $, openNewWindow)    | -              | Удаляет всплывающую рекламу
+| gamezito.com       | @@\|\|gamezito.com^$generichide                                                  | -              | Удаляет предупреждение о блокировщике рекламы
+| marvelousga.com    | @@\|\|marvelousga.com^$generichide                                               | uBlock filters | Удаляет предупреждение о блокировщике рекламы
+| marvelousga.com    | marvelousga.com##script:inject(abort-current-inline-script.js, $, openNewWindow) | uBlock filters | Удаляет всплывающую рекламу
+| indiegala.com      | indiegala.com###giveaway-social-cont                                             | -              | Удаляет социальный блок, который перекрывает блок раздачи
+| orlygift.com       | orlygift.com##script:inject(fuckadblock.js-3.2.0)                                | -              | Удаляет предупреждение о блокировщике рекламы
+| orlygift.com       | orlygift.com##script:inject(abort-on-property-read.js, Bounceback.disabled)      | -              | Удаляет всплывающее приглашение в Steam группу
