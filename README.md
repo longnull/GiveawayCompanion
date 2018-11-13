@@ -24,13 +24,15 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
         <tr><td>gamecode.win</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamezito.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">❕</td><td align="center">✔</td><td>Most Steam groups are hidden behind URL shorteners, so not all groups will be processed</td></tr>
+        <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">✔*</td><td align="center">✔</td><td>* Most Steam groups are hidden behind URL shorteners, so not all groups will be processed</td></tr>
         <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamehunt.net</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Opens Steam key activation page when you click a <a href="images/gamehunt_key_activation.png">game image</a> on <a href="https://gamehunt.net/profile">your profile page</a></td></tr>
         <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Sets tasks timer to zero</td></tr>
         <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Opens Steam key activation page when you click <a href="images/indiegala_key_activation.png">Steam logo</a> next to a key on <a href="https://www.indiegala.com/profile">your profile page</a></td></tr>
         <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Automatically "completes" tasks for visiting sites/reposts/likes when you visit a <a href="https://www.orlygift.com/giveaway">giveaway page</a></td></tr>
+        <tr><td>giveawayhopper.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
     </tbody>
 </table>
 
@@ -45,9 +47,7 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
 Automatic updating of the script may require your confirmation.
 
 ### Filters for uBlock Origin
-Initially the script had the functions of removing ads and other annoying things, but later it was decided to remove this functionality, because the purpose of the script is different.
-
-Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/)) that do the same thing.
+Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/)) that remove various annoying things on games giveaway sites.
 
 | Site               | Filter                                                                           | Subscription   | Action
 | :----------------- | :------------------------------------------------------------------------------- | :------------- | :-------------
@@ -59,11 +59,21 @@ Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webs
 | indiegala.com      | indiegala.com###giveaway-social-cont                                             | -              | Removes a social block that overrides a giveaway block
 | orlygift.com       | orlygift.com##script:inject(fuckadblock.js-3.2.0)                                | -              | Removes ad blocker warning
 | orlygift.com       | orlygift.com##script:inject(abort-on-property-read.js, Bounceback.disabled)      | -              | Removes a pop-up invitation to Steam group
+| gamehunt.net       | gamehunt.net###anusblock                                                         | -              | Removes ad blocker warning
+
+#### Filter list
+Also, filters from the table are available as a [file](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt) that you can import into uBlock Origin and automatically receive updates.
+
+**Importing the filter list into uBlock Origin**
+1. Open uBlock Origin settings.
+2. Go to "Filter lists" tab.
+3. In "Custom" section, mark "Import..." checkbox.
+4. In the appeared text field paste this address: https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt
+5. Click "Apply сhanges" button that appears at the top right.
 
 ***
 
 ## Русское описание
-
 Данный скрипт добавляет полезные функции на сайтах с раздачами игр. Позволяет быстро выполнять/пропускать задания, вступать в Steam группы и выходить из них в один клик, переходить на страницу активации Steam ключа.
 
 Скрипт не выполняет подписки/репосты/лайки в социальных сетях, но подобные задания могут быть выполнены автоматически, если они не имеют проверки или если вы раньше уже выполняли такое же задание и не отменили подписку/репост/лайк.
@@ -88,13 +98,15 @@ Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webs
         <tr><td>gamecode.win</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamezito.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">❕</td><td align="center">✔</td><td>Большинство Steam групп скрыты за сокращателями ссылок, поэтому не все группы будут обработаны</td></tr>
+        <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">✔*</td><td align="center">✔</td><td>* Большинство Steam групп скрыты за сокращателями ссылок, поэтому не все группы будут обработаны</td></tr>
         <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamehunt.net</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/gamehunt_key_activation.png">изображению игры</a> на <a href="https://gamehunt.net/profile">странице вашего профиля</a></td></tr>
         <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Установка таймера заданий в ноль</td></tr>
         <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/indiegala_key_activation.png">логотипу Steam</a> рядом с ключом на <a href="https://www.indiegala.com/profile">странице вашего профиля</a></td></tr>
         <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Автоматически "выполняет" задания на посещение сайтов/репосты/лайки при посещении страницы <a href="https://www.orlygift.com/giveaway">раздач</a></td></tr>
+        <tr><td>giveawayhopper.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
     </tbody>
 </table>
 
@@ -109,9 +121,7 @@ Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webs
 При автоматическом обновлении скрипта может потребоваться ваше подтверждение.
 
 ### Фильтры для uBlock Origin
-Изначально в скрипте были функции удаления рекламы и прочих назойливых штук, но позже было решено удалить этот функционал, т.к. у скрипта другое предназначение.
-
-Вот несколько фильтров для uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/ublock-origin/)), которые делают то же самое.
+Вот несколько фильтров для uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/ublock-origin/)), которые удаляют разные назойливые штуки на сайтах с раздачами игр.
 
 | Сайт               | Фильтр                                                                           | Подписка       | Действие
 | :----------------- | :------------------------------------------------------------------------------- | :------------- | :-------------
@@ -123,3 +133,14 @@ Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webs
 | indiegala.com      | indiegala.com###giveaway-social-cont                                             | -              | Удаляет социальный блок, который перекрывает блок раздачи
 | orlygift.com       | orlygift.com##script:inject(fuckadblock.js-3.2.0)                                | -              | Удаляет предупреждение о блокировщике рекламы
 | orlygift.com       | orlygift.com##script:inject(abort-on-property-read.js, Bounceback.disabled)      | -              | Удаляет всплывающее приглашение в Steam группу
+| gamehunt.net       | gamehunt.net###anusblock                                                         | -              | Удаляет предупреждение о блокировщике рекламы
+
+#### Список фильтров
+Также фильтры из таблицы доступны в виде [файла](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt), который можно импортировать в uBlock Origin и автоматически получать обновления.
+
+**Импортирование списка фильтров в uBlock Origin**
+1. Открыть настройки uBlock Origin.
+2. Перейти на вкладку "Списки фильтров".
+3. В разделе "Пользовательские" отметить галку "Импортировать...".
+4. В появившееся текстовое поле вставить этот адрес: https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt
+5. Нажать появившуюся вверху справа кнопку "Применить изменения".

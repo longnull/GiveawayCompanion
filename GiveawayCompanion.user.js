@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.0
+// @version 1.1
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -22,6 +22,8 @@
 // @match *://*.gamehag.com/*
 // @match *://*.gamehunt.net/*
 // @match *://*.gleam.io/*/*
+// @match *://*.giveawayhopper.com/giveaway/*
+// @match *://*.chubkeys.com/giveaway.php?id=*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
 // @connect bananagiveaway.com
@@ -238,7 +240,7 @@
                 steamKeys: ['#key_display_container:visible:not(:empty)', '#insertkey:visible:not(:empty)', '.card-body:contains("YOUR KEY"):visible', 'div:contains("already have a key"):visible'],
                 conditions: [
                     {
-                        elementAnd: ['.card-body:has(button[id^="task_"]:not([data-disabled]))', '!#getKey:visible', '!.card-body:contains("YOUR KEY"):visible'],
+                        elementAnd: ['.card-body:has(button[id^="task_"]:not([data-disabled]))', '#getKey:not(:visible)', '!.card-body:contains("YOUR KEY"):visible'],
                         buttons: [
                             {
                                 type: 'tasks',
@@ -340,7 +342,7 @@
             {
                 host: 'indiegala.com',
                 element: '#profile_bundle_section',
-                steamKeys: '[id^="serial_n_"]@val',
+                steamKeys: '[id^="serial_n_"]%val',
                 ready(params) {
                     $J(params.self.element).on('click', '.span-key:has([id^="serial_n_"]) img', function() {
                         const key = $J(this).closest('[id^="serial_"]').find('[id^="serial_n_"]').val();
@@ -444,7 +446,7 @@
                 conditions: [
                     {
                         path: /^\/.+?\/giveaway\//,
-                        steamKeys: '.giveaway-key input:visible@val',
+                        steamKeys: '.giveaway-key input:visible%val',
                         steamGroups() {
                             const groups = [];
                             $J('.single-giveaway-task').each(function() {
@@ -603,6 +605,88 @@
                     }
                     return groups;
                 }
+            },
+            {
+                host: 'giveawayhopper.com',
+                steamKeys: '#gameKey:visible:not(:empty)',
+                steamGroups: 'form[action*="steamcommunity.com/groups/"]@action',
+                conditions: [
+                    {
+                        elementAnd: ['.task-item .task-item-btn-verify:not(.btn-primary)', '!#gameKey:visible:not(:empty)'],
+                        buttons: [
+                            {
+                                type: 'tasks',
+                                cancellable: true,
+                                click(params) {
+                                    // giveawayhopper makes synchronous requests and the page hangs when you click "verify" buttons,
+                                    // so we make the requests ourselves and change the style of the buttons
+
+                                    const tasks = $J('.task-item:not(:has(.task-item-btn-verify.btn-primary))');
+
+                                    log.debug(`tasks found : ${tasks.length}`);
+
+                                    if (tasks.length) {
+                                        return new Promise(async (resolve) => {
+                                            for (let i = 0; i < tasks.length; i++) {
+                                                if (params.cancelled) break;
+
+                                                const task = $J(tasks.get(i));
+
+                                                const icon = task.find('.task-item-btn i');
+                                                const verify = task.find('.task-item-btn-verify');
+
+                                                if (icon.length && verify.length) {
+                                                    const match = verify.attr('id').match(/verifyTaskBtn(\d+)/);
+
+                                                    if (match) {
+                                                        const type = icon.hasClass('fa-steam') ? 'steam' : 'chain';
+                                                        const url = `${window.location.origin}/${type}/check/${match[1]}`;
+
+                                                        log.debug(`${i + 1} : making request : ${url}`);
+
+                                                        try {
+                                                            const response = await $J.get(url);
+
+                                                            if (response === 'success') {
+                                                                log.debug(`${i + 1} : task done`);
+
+                                                                verify.removeClass('btn-outline-primary');
+                                                                verify.addClass('btn-primary');
+                                                                verify.html('<i class="icon-check"></i>&nbsp;DONE');
+                                                            } else {
+                                                                log.debug(`${i + 1} : task error : ${response.content}`);
+
+                                                                verify.removeClass('btn-outline-primary');
+                                                                verify.removeClass('btn-primary');
+                                                                verify.addClass('btn-danger');
+                                                                verify.html('<i class="icon-close"></i>&nbsp;ERROR');
+                                                            }
+                                                        } catch (e) { }
+                                                    }
+                                                }
+
+                                                params.button.progress(tasks.length, i + 1);
+                                            }
+
+                                            if (params.cancelled) {
+                                                log.debug('cancelled');
+                                            } else {
+                                                log.debug('all tasks done');
+                                            }
+
+                                            return resolve();
+                                        });
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                host: 'chubkeys.com',
+                steamKeys: 'div:has(.fa-key) h4',
+                steamGroups: '.collapse a[href*="steamcommunity.com/groups/"]',
             }
         ]
     };
@@ -675,7 +759,7 @@
         randomString(length) {
             const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let result = '';
-            for(let i = 0; i < length; i++) {
+            for (let i = 0; i < length; i++) {
                 result += chars[Math.floor(Math.random() * chars.length)];
             }
             return result;
@@ -2338,26 +2422,38 @@
                 const getElementResult = (variable, method, callback) => {
                     if (typeof variable === 'string') {
                         let selector = checkData.matchedSelector ? variable.replace('{{element}}', checkData.matchedSelector) : variable;
-                        const match = selector.match(/(.+)@(text|val|href)$/);
+                        const match = selector.match(/(.+)(%|@)(.+)$/);
 
                         if (match) {
                             selector = match[1];
-                            method = match[2];
+                            method = match[2] + match[3];
                         }
 
-                        $J(selector).each(function () {
-                            switch (method) {
-                                case 'text':
-                                    callback($J(this).text());
-                                    break;
-                                case 'val':
-                                    callback($J(this).val());
-                                    break;
-                                case 'href':
-                                    callback($J(this).attr('href'));
-                                    break;
+                        const els = $J(selector);
+
+                        if (els.length) {
+                            const name = method.substring(1);
+
+                            if (method[0] === '%') {
+                                if (name === 'val') {
+                                    els.each(function() {
+                                        callback($J(this).val());
+                                    });
+                                } else if (name === 'html') {
+                                    els.each(function() {
+                                        callback($J(this).val());
+                                    });
+                                } else {
+                                    els.each(function() {
+                                        callback($J(this).text());
+                                    });
+                                }
+                            } else {
+                                els.each(function() {
+                                    callback($J(this).attr(name));
+                                });
                             }
-                        });
+                        }
                     } else if (typeof variable === 'function') {
                         const res = variable({
                             self: object,
@@ -2377,7 +2473,7 @@
                 if (config.steamGroups && !steam.initFailed && typeof object.steamGroups !== 'undefined' && !object._steamGroupsWorking) {
                     let groups = [];
 
-                    getElementResult(object.steamGroups, 'href', (res) => {
+                    getElementResult(object.steamGroups, '@href', (res) => {
                         const addGroup = (group) => {
                             if (group && !buttons.isSteamGroupAdded(group) && !utils.getResolvedUrl(group)) {
                                 groups.push(group);
@@ -2414,7 +2510,7 @@
                 }
 
                 if (typeof object.steamKeys !== 'undefined') {
-                    getElementResult(object.steamKeys, 'text', (res) => {
+                    getElementResult(object.steamKeys, '%text', (res) => {
                         const addButtons = (keys) => {
                             if (!keys) return;
 
