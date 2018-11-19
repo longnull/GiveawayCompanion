@@ -59,7 +59,7 @@ Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webs
 | indiegala.com      | indiegala.com###giveaway-social-cont                                             | -              | Removes a social block that overrides a giveaway block
 | orlygift.com       | orlygift.com##script:inject(fuckadblock.js-3.2.0)                                | -              | Removes ad blocker warning
 | orlygift.com       | orlygift.com##script:inject(abort-on-property-read.js, Bounceback.disabled)      | -              | Removes a pop-up invitation to Steam group
-| gamehunt.net       | gamehunt.net###anusblock                                                         | -              | Removes ad blocker warning
+| gamehunt.net       | gamehunt.net##script:inject(abort-on-property-read.js, window.adblock)           | -              | Removes ad blocker warning
 
 #### Filter list
 Also, filters from the table are available as a [file](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt) that you can import into uBlock Origin and automatically receive updates.
@@ -133,7 +133,7 @@ Also, filters from the table are available as a [file](https://raw.githubusercon
 | indiegala.com      | indiegala.com###giveaway-social-cont                                             | -              | Удаляет социальный блок, который перекрывает блок раздачи
 | orlygift.com       | orlygift.com##script:inject(fuckadblock.js-3.2.0)                                | -              | Удаляет предупреждение о блокировщике рекламы
 | orlygift.com       | orlygift.com##script:inject(abort-on-property-read.js, Bounceback.disabled)      | -              | Удаляет всплывающее приглашение в Steam группу
-| gamehunt.net       | gamehunt.net###anusblock                                                         | -              | Удаляет предупреждение о блокировщике рекламы
+| gamehunt.net       | gamehunt.net##script:inject(abort-on-property-read.js, window.adblock)           | -              | Удаляет предупреждение о блокировщике рекламы
 
 #### Список фильтров
 Также фильтры из таблицы доступны в виде [файла](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt), который можно импортировать в uBlock Origin и автоматически получать обновления.

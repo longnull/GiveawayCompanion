@@ -1,6 +1,6 @@
 ! Title: Giveaway Companion filters
 ! Description: Removes various annoying things on games giveaway sites
-! Version: 201811131402
+! Version: 201811190925
 ! Expires: 3 days
 ! Homepage: https://github.com/longnull/GiveawayCompanion
 @@||gamezito.com^$generichide
@@ -11,4 +11,4 @@ gamecode.win##script:inject(abort-current-inline-script.js, $, openNewWindow)
 indiegala.com###giveaway-social-cont
 orlygift.com##script:inject(fuckadblock.js-3.2.0)
 orlygift.com##script:inject(abort-on-property-read.js, Bounceback.disabled)
-gamehunt.net###anusblock
+gamehunt.net##script:inject(abort-on-property-read.js, window.adblock)
