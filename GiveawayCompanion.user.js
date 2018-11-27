@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.1
+// @version 1.1.1
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -445,7 +445,7 @@
                 steamKeys: '.response-key .code-text:visible',
                 conditions: [
                     {
-                        path: /^\/.+?\/giveaway\//,
+                        path: /\/giveaway\//,
                         steamKeys: '.giveaway-key input:visible%val',
                         steamGroups() {
                             const groups = [];
@@ -462,7 +462,7 @@
                         },
                         conditions: [
                             {
-                                elementAnd: ['.single-giveaway-task:has(.notdone)', '!.giveaway-content .alert-danger:visible', '!.giveaway-key input:visible'],
+                                elementAnd: ['.single-giveaway-task:has(.notdone):has(.task-actions button)', '!.giveaway-content .alert-danger:visible', '!.giveaway-key input:visible'],
                                 buttons: [
                                     {
                                         type: 'tasks',
@@ -479,28 +479,27 @@
                                                         const action = task.find('.task-actions a');
                                                         const verify = task.find('.task-actions button');
 
-                                                        if (action.length) {
+                                                        if (action.length && verify.length) {
                                                             let href = action.attr('href');
 
-                                                            log.debug(`${i + 1} : completeTask() : action found, making request : ${href}`);
+                                                            log.debug(`${i + 1} : completeTask() : making action request : ${href}`);
 
                                                             try {
                                                                 const response = await $J.get(href);
-                                                                const lnk = $J(response.content).find('.game-tile .game-name a');
+                                                                const lnk = $J(response.content).find('.game-list .game-tile .game-name a');
+
                                                                 if (lnk.length) {
                                                                     href = lnk.attr('href') + '/play';
 
-                                                                    log.debug(`${i + 1} : completeTask() : it looks like a "play game" task, making "play" request to ${href}`);
+                                                                    log.debug(`${i + 1} : completeTask() : it looks like a "play game" task, making "play" request : ${href}`);
 
                                                                     await $J.get(href);
 
-                                                                    log.debug(`${i + 1} : completeTask() : play request done`);
+                                                                    log.debug(`${i + 1} : completeTask() : "play" request done`);
                                                                 }
                                                             } catch (e) {}
-                                                        }
 
-                                                        if (verify.length) {
-                                                            log.debug(`${i + 1} : completeTask() : verify found, clicking...`);
+                                                            log.debug(`${i + 1} : completeTask() : clicking verify button...`);
 
                                                             verify.trigger('click');
                                                         }
