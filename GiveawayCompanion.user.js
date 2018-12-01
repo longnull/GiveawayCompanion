@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.1.1
+// @version 1.2
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -24,6 +24,7 @@
 // @match *://*.gleam.io/*/*
 // @match *://*.giveawayhopper.com/giveaway/*
 // @match *://*.chubkeys.com/giveaway.php?id=*
+// @match *://*.giveaway.su/giveaway/view/*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
 // @connect bananagiveaway.com
@@ -686,6 +687,22 @@
                 host: 'chubkeys.com',
                 steamKeys: 'div:has(.fa-key) h4',
                 steamGroups: '.collapse a[href*="steamcommunity.com/groups/"]',
+            },
+            {
+                host: 'giveaway.su',
+                steamGroups() {
+                    const groups = [];
+                    $J('#actions tr:has(.fa-steam)').each(function() {
+                        const btn = $J(this).find('button[data-type="action.universal"]');
+                        if (btn.length) {
+                            const action = JSON.parse(window.atob(btn.attr('data-action')));
+                            if (action.task.includes('steamcommunity.com/groups/')) {
+                                groups.push(action.task);
+                            }
+                        }
+                    });
+                    return groups;
+                }
             }
         ]
     };
