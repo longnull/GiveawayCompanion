@@ -39,16 +39,16 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
 
 ### Installation
 1. Install one of the browser extensions to run user scripts.  
-   Tampermonkey ([Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/))  
-   Violentmonkey ([Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/))  
-   Greasemonkey ([Firefox](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/))  
+   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/en/extensions/details/tampermonkey-beta/) (old version, the latest version can be installed from the [Chrome Web Store](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) using [this](https://addons.opera.com/en/extensions/details/install-chrome-extensions/) extension)  
+   Violentmonkey: [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/), [Maxthon](https://extension.maxthon.com/detail/index.php?view_id=1680)  
+   Greasemonkey: [Firefox](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)  
 2. Go [here](/../../raw/master/GiveawayCompanion.user.js).
 3. Confirm installation of the script.
 
 Automatic updating of the script may require your confirmation.
 
 ### Filters for uBlock Origin
-Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/)) that remove various annoying things on games giveaway sites.
+Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/), [Opera](https://addons.opera.com/en/extensions/details/ublock/)) that remove various annoying things on games giveaway sites.
 
 | Site               | Filter                                                                           | Subscription   | Action
 | :----------------- | :------------------------------------------------------------------------------- | :------------- | :-------------
@@ -114,16 +114,16 @@ Also, filters from the table are available as a [file](https://raw.githubusercon
 
 ### Установка
 1. Установить одно из браузерных расширений для выполнения пользовательских скриптов.  
-   Tampermonkey ([Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/))  
-   Violentmonkey ([Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/violentmonkey/))  
-   Greasemonkey ([Firefox](https://addons.mozilla.org/ru/firefox/addon/greasemonkey/))
+   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/) (старая версия, последнюю версию можно установить из [магазина Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru) используя [данное](https://addons.opera.com/ru/extensions/details/install-chrome-extensions/) расширение)  
+   Violentmonkey: [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/violentmonkey/), [Maxthon](https://extension.maxthon.com/detail/index.php?view_id=1680)  
+   Greasemonkey: [Firefox](https://addons.mozilla.org/ru/firefox/addon/greasemonkey/))
 2. Перейти [сюда](/../../raw/master/GiveawayCompanion.user.js).
 3. Подтвердить установку скрипта.
 
 При автоматическом обновлении скрипта может потребоваться ваше подтверждение.
 
 ### Фильтры для uBlock Origin
-Вот несколько фильтров для uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/ublock-origin/)), которые удаляют разные назойливые штуки на сайтах с раздачами игр.
+Вот несколько фильтров для uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/ublock-origin/), [Opera](https://addons.opera.com/ru/extensions/details/ublock/)), которые удаляют разные назойливые штуки на сайтах с раздачами игр.
 
 | Сайт               | Фильтр                                                                           | Подписка       | Действие
 | :----------------- | :------------------------------------------------------------------------------- | :------------- | :-------------
