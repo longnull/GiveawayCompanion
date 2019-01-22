@@ -1,0 +1,47 @@
+## Changelog
+### v1.3 (2019-01-22)
+* Giveaway.su: added support for tasks completion without browser extension, the script can completely cheat the verification of tasks (for more information click "i" button on the script bar).
+* Giveaway.su: added support for Steam key activation.
+* Giveaway.su: Steam groups shortened by bit.ly are now also processed.
+* Groups: now loading is performed simultaneously, not one by one.
+* Notifications: added close button.
+* Fixed positioning of the script bar, now it will not go beyond the bounds of the document in gleam.io iframes.
+***
+### v1.2 (2018-12-01)
+* Added support for giveaway.su (groups).
+***
+### v1.1.1 (2018-11-27)
+* Gamehag: the script now works with all languages.
+* Gamehag: the script no longer trying to complete tasks that don't have a "verify" button.
+***
+### v1.1 (2018-11-13)
+* Added support for giveawayhopper.com (tasks, groups, keys).
+* Added support for chubkeys.com (groups, keys).
+***
+### v1.0 (2018-11-05)
+* Initial release.
+
+***
+
+## Список изменений
+### v1.3 (2019-01-22)
+* Giveaway.su: добавлена поддержка выполнения заданий без браузерного расширения, скрипт может полностью обманывать проверку заданий (для дополнительной информации кликните кнопку "i" на панели скрипта).
+* Giveaway.su: добавлена поддержка активации Steam ключей.
+* Giveaway.su: Steam группы, укороченные с помощью bit.ly, теперь тоже обрабатываются.
+* Группы: теперь загрузка происходит одновременно, а не одна за одной.
+* Уведомления: добавлена кнопка закрытия.
+* Исправлено позиционирование панели скрипта, теперь панель не будет выходить за рамки документа во фреймах gleam.io.
+***
+### v1.2 (2018-12-01)
+* Добавлена поддержка giveaway.su (группы).
+***
+### v1.1.1 (2018-11-27)
+* Gamehag: теперь скрипт работает со всеми языками.
+* Gamehag: теперь скрипт не пытается выполнять задания без кнопки "проверить".
+***
+### v1.1 (2018-11-13)
+* Добавлена поддержка giveawayhopper.com (задания, группы, ключи).
+* Добавлена поддержка chubkeys.com (группы, ключи).
+***
+### v1.0 (2018-11-05)
+* Первая версия.

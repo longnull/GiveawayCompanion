@@ -9,6 +9,8 @@ The script bar looks something like this (the set of buttons depends on the site
 
 The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawayHelper) and [GiveawayKiller](https://github.com/gekkedev/GiveawayKiller).
 
+[Changelog](CHANGELOG.md)
+
 **Disclaimer: the usage of this script may violate the Terms of Service of the sites it runs on. Use at your own risk.**
 
 ### Supported sites
@@ -33,7 +35,7 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
         <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Automatically "completes" tasks for visiting sites/reposts/likes when you visit a <a href="https://www.orlygift.com/giveaway">giveaway page</a></td></tr>
         <tr><td>giveawayhopper.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>giveaway.su</td><td></td><td align="center">✔</td><td></td><td></td></tr>
+        <tr><td>giveaway.su</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td>The script cheats the verification of almost all types of tasks, can work without browser extension (for more information click "i" button on the script bar)</td></tr>
     </tbody>
 </table>
 
@@ -84,6 +86,8 @@ Also, filters from the table are available as a [file](https://raw.githubusercon
 
 Скрипт вдохновлён [Giveaway Helper](https://github.com/Citrinate/giveawayHelper) и [GiveawayKiller](https://github.com/gekkedev/GiveawayKiller).
 
+[Список изменений](CHANGELOG.md#%D1%81%D0%BF%D0%B8%D1%81%D0%BE%D0%BA-%D0%B8%D0%B7%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D0%B9)
+
 **Отказ от ответственности: использование данного скрипта может нарушать правила сайтов, на которых он используется. Используйте на свой страх и риск.**
 
 ### Поддерживаемые сайты
@@ -108,7 +112,7 @@ Also, filters from the table are available as a [file](https://raw.githubusercon
         <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Автоматически "выполняет" задания на посещение сайтов/репосты/лайки при посещении страницы <a href="https://www.orlygift.com/giveaway">раздач</a></td></tr>
         <tr><td>giveawayhopper.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>giveaway.su</td><td></td><td align="center">✔</td><td></td><td></td></tr>
+        <tr><td>giveaway.su</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td>Скрипт обманывает проверку почти всех типов заданий, может работать без браузерного расширения (для дополнительной информации кликните кнопку "i" на панели скрипта)</td></tr>
     </tbody>
 </table>
 
