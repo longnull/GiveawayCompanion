@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.3
+// @version 1.3.1
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -26,16 +26,9 @@
 // @match *://*.chubkeys.com/giveaway.php?id=*
 // @match *://*.giveaway.su/giveaway/view/*
 // @connect steamcommunity.com
-// @connect steampowered.com
 // @connect grabfreegame.com
 // @connect bananagiveaway.com
 // @connect gamingimpact.com
-// @connect twitter.com
-// @connect youtube.com
-// @connect instagram.com
-// @connect reddit.com
-// @connect vk.com
-// @connect bit.ly
 // @connect *
 // @grant GM_setValue
 // @grant GM.setValue
@@ -44,14 +37,12 @@
 // @grant GM_xmlhttpRequest
 // @grant GM.xmlHttpRequest
 // @require https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js
-// @require https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js
-// @require https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/8.0.1/bignumber.min.js
 // ==/UserScript==
 
 (async () => {
   'use strict';
 
-  const version = '1.3';
+  const version = '1.3.1';
 
   const config = {
     // Output debug info into console
@@ -709,7 +700,7 @@
                         log.debug('all tasks done');
                       }
 
-                      return resolve();
+                      resolve();
                     });
                   }
                 }
@@ -726,519 +717,24 @@
       {
         host: 'giveaway.su',
         element: 'a[href*="logout"]',
-        buttons: [
-          {
-            type: 'info',
-            info: '[giveaway-su-info]'
-          }
-        ],
-        async universalVerify(button, noCheating = false) {
-          const getResult = (url, steamId32, response) => {
-            log.debug(`universalVerify() : getResult() : task url : ${url}`);
-
-            let match;
-
-            // Steam: subscribe to a forum
-            if (url.match(/steamcommunity\.com\/groups\/[a-zA-Z0-9\-_]+\/discussions/)) {
-              log.debug('universalVerify() : getResult() : Steam: subscribe to a forum');
-
-              if (!response) {
-                log.debug('universalVerify() : getResult() : response not defined');
-
-                return '';
-              }
-
-              const match = response.responseText.match(/"owner":"(\d+)"/);
-
-              if (!match) {
-                log.debug('universalVerify() : getResult() : forum id not found');
-
-                return '';
-              }
-
-              return {
-                data: `<div class="playerAvatar offline"></div>
-                  <a href="https://steamcommunity.com/id/user/" data-miniprofile="${steamId32}"></a>
-                  <div class="forum_subscribe_button" id="forum_General_${match[1]}_subscribe" style="display: none;"></div>
-                  <div class="forum_subscribe_button" id="forum_General_${match[1]}_unsubscribe" style=""></div>`
-              };
-            }
-
-            // Steam: join a group
-            if (url.match(/steamcommunity\.com\/groups\/[a-zA-Z0-9\-_]+/)) {
-              log.debug('universalVerify() : getResult() : Steam: join a group');
-
-              if (!response) {
-                log.debug('universalVerify() : getResult() : response not defined');
-
-                return '';
-              }
-
-              const match = response.responseText.match(/"owner":"(\d+)"/);
-
-              if (!match) {
-                log.debug('universalVerify() : getResult() : group id not found');
-
-                return '';
-              }
-
-              const joined = !response.responseText.includes(`'join_group_form'`);
-              const action = joined
-                ? `<a class="btn_blue_white_innerfade btn_medium" href="https://steamcommunity.com/id/user/friends/?invitegid=${match[1]}"></a>`
-                : `<a href="javascript:document.forms['join_group_form'].submit();" class="btn_green_white_innerfade btn_medium"></a>`;
-
-              return {
-                data: `<div class="playerAvatar offline"></div>
-                  <a href="https://steamcommunity.com/id/user/" data-miniprofile="${steamId32}"></a>
-                  <div class="grouppage_join_area">
-                  ${action}
-                  </div>
-                  <div class="content">
-                  <form method="POST" id="leave_group_form" action="https://steamcommunity.com/id/user/home_process">
-                  <input type="hidden" name="sessionID" value="012345678901234567890123">
-                  <input type="hidden" name="action" value="leaveGroup">
-                  <input type="hidden" name="groupId" value="${match[1]}">
-                  </form>
-                  </div>`,
-                failable: !joined
-              };
-            }
-
-            // Steam: follow a curator
-            if (match = url.match(/steampowered\.com\/curator\/(\d+)/)) {
-              log.debug('universalVerify() : getResult() : Steam: follow a curator');
-
-              return {
-                data: `<div class="playerAvatar offline"></div>
-                  <a href="https://steamcommunity.com/id/user/" data-miniprofile="${steamId32}"></a>
-                  <span id="CuratorFollowBtn_8049466" class="btnv6_green_white_innerfade btn_border_2px btn_medium" onclick="FollowCurator( ${match[1]}, true );" style="display: none"></span>
-                  </div>`
-              };
-            }
-
-            // Steam: add a game to wishlist and follow
-            if (match = url.match(/steampowered\.com\/app\/(\d+)/)) {
-              log.debug('universalVerify() : getResult() : Steam: add a game to wishlist and follow');
-
-              return {
-                data: `<link rel="canonical" href="https://store.steampowered.com/app/${match[1]}/">
-                  <div class="playerAvatar offline"></div>
-                  <a href="https://steamcommunity.com/id/user/" data-miniprofile="${steamId32}"></a>
-                  <a href="https://steamcommunity.com/id/vanderford_kini/wishlist" class="btnv6_blue_hoverfade btn_medium queue_btn_active"></a>
-                  <div class="queue_control_button queue_btn_follow">
-                  <div class="btnv6_blue_hoverfade btn_medium queue_btn_inactive" style="display: none;"></div>
-                  <div class="btnv6_blue_hoverfade btn_medium queue_btn_active" style=""></div>
-                  </div>
-                  <div class="queue_control_button queue_btn_ignore">
-                  <div class="btnv6_blue_hoverfade  btn_medium queue_btn_inactive" style=""></div>
-                  <div class="btnv6_blue_hoverfade  btn_medium queue_btn_active" style="display: none;"></div></div>
-                  </div>`
-              };
-            }
-
-            // Steam: follow a developer/publisher
-            if (url.match(/steampowered\.com\/(?:developer|publisher)\/[a-zA-Z0-9\-_]+/)) {
-              log.debug('universalVerify() : getResult() : Steam: follow a developer/publisher');
-
-              if (!response) {
-                log.debug('universalVerify() : getResult() : response not defined');
-
-                return '';
-              }
-
-              const m = response.responseText.match(/id="CuratorFollowBtn_(\d+)"/);
-
-              if (!m) {
-                log.debug('universalVerify() : getResult() : developer/publisher id not found');
-
-                return '';
-              }
-
-              return {
-                data: `<div class="playerAvatar offline"></div>
-                  <a href="https://steamcommunity.com/id/user/" data-miniprofile="${steamId32}"></a>
-                  <div class="follow_controls">
-                  <div class="follow_btn">
-                  <span id="CuratorFollowBtn_${m[1]}" class="btnv6_green_white_innerfade btn_border_2px btn_medium" onclick="FollowCurator( ${m[1]}, true );" style="display: none"></span>
-                  </div>
-                  </div>`
-              };
-            }
-
-            // Twitter: like and retweet
-            if (match = url.match(/twitter\.com\/([a-zA-Z0-9_]+)\/status\/(\d+)/)) {
-              log.debug('universalVerify() : getResult() : Twitter: like and retweet');
-
-              return {
-                data: `<link rel="canonical" href="https://twitter.com/${match[1]}/status/${match[2]}">
-                  <div class="tweet permalink-tweet js-actionable-user js-actionable-tweet js-original-tweet favorited retweeted has-cards with-social-proof has-content logged-in js-initial-focus focus"`
-              };
-            }
-
-            // Twitter: follow
-            if (match = url.match(/twitter\.com\/([a-zA-Z0-9_]+)/)) {
-              log.debug('universalVerify() : getResult() : Twitter: follow');
-
-              return {
-                data: `<div class="user-actions btn-group following not-muting including " data-screen-name="${match[1]}">`
-              };
-            }
-
-            // YouTube: follow and like
-            if (match = url.match(/youtube\.com\/.*[&\?]v=([a-zA-Z0-9\-_]+)/)) {
-              log.debug('universalVerify() : getResult() : YouTube: follow and like');
-
-              return {
-                data: `"video_id":"${match[1]}","likeStatus":"LIKE","subscribed":true,`
-              };
-            }
-
-            // Instagram: like
-            if (url.match(/instagram\.com\/p\/[a-zA-Z0-9_\-]+/)) {
-              log.debug('universalVerify() : getResult() : Instagram: like');
-
-              return {
-                data: `<link rel="canonical" href="${url}">
-                  "edge_media_to_sponsor_user":{"edges":[]},"viewer_has_liked":true,"owner":`
-              };
-            }
-
-            // Instagram: follow
-            if (match = url.match(/instagram\.com\/([a-zA-Z0-9_\.]+)/)) {
-              log.debug('universalVerify() : getResult() : Instagram: follow');
-
-              return {
-                data: `<link rel="canonical" href="https://www.instagram.com/${match[1]}/">
-                  "followed_by_viewer":true`
-              };
-            }
-
-            // Reddit: subscribe to a subreddit
-            if (match = url.match(/reddit\.com\/r\/([a-zA-Z0-9_\.]+)/)) {
-              log.debug('universalVerify() : getResult() : Reddit: subscribe to a subreddit');
-
-              return {
-                data: `<span class="s1wbv0ui-7 kaQfYb" title="r/${match[1]}">r/${match[1]}</span>
-                  ,"userIsSubscriber":true`
-              };
-            }
-
-            // VK: follow a public page/join a group
-            if (url.match(/vk\.com\/[a-zA-Z0-9_\.]+/)) {
-              log.debug('universalVerify() : getResult() : VK: follow a public page/join a group');
-
-              return {
-                data: `<div id="page_actions_btn">`
-              };
-            }
-
-            log.debug('universalVerify() : getResult() : unknown task');
-
-            return false;
-          };
-
-          const getPage = async (action) => {
-            const params = {
-              method: action.method,
-              url: action.task
-            };
-
-            if (action.method.toLowerCase() !== 'get') {
-              params.headers = {'Content-Type': 'application/x-www-form-urlencoded'};
-            }
-
-            log.debug(`universalVerify() : getPage() : making request : ${action.task}`);
-
-            return await $GM.xmlHttpRequest(params);
-          };
-
-          const btn = $J(button);
-          const action = JSON.parse(window.atob(btn.data('action')));
-
-          let result;
-          let failable = false;
-          let taskUrl = action.task;
-
-          if (noCheating) {
-            log.debug('universalVerify() : no cheating verification');
-
-            const response = await getPage(action);
-
-            // We can't perform a normal verification on Twitter, because they return a blank page
-            if (response.finalUrl.includes('twitter.com/')) {
-              notifications.error(i18n.get('giveaway-su-cant-verify-twitter'));
-              return false;
-            }
-
-            result = response.responseText;
-          } else {
-            // Get SteamID64 of the user account on giveaway.su
-            const steamId64 = $J('[data-steam-id]').attr('data-steam-id');
-
-            // Convert SteamID64 to SteamID32
-            // https://stackoverflow.com/a/23259939
-            // https://github.com/MikeMcl/bignumber.js
-            const steamId32 = new BigNumber(steamId64).minus('76561197960265728').toNumber();
-
-            let res = getResult(action.task, steamId32);
-
-            // Unknown task (maybe URL shortener) or we need additional data from the target site
-            if (res === false || res === '') {
-              const response = await getPage(action);
-
-              // We need additional data and request failed
-              if (res === '' && response.status !== 200) {
-                notifications.error(i18n.get('giveaway-su-target-request-failed', {url: action.task}));
-                return false;
-              }
-
-              res = getResult(response.finalUrl, steamId32, response);
-
-              // Unknown task
-              if (res === false) {
-                notifications.error(i18n.get('giveaway-su-unknown-task', {url: response.finalUrl}));
-                return false;
-              }
-
-              // Required data not found
-              if (res === '') {
-                notifications.error(i18n.get('giveaway-su-data-not-found', {url: response.finalUrl}));
-                return false;
-              }
-
-              taskUrl = response.finalUrl;
-            }
-
-            result = res.data;
-            failable = !!res.failable;
-          }
-
-          action.response = window.btoa(unescape(encodeURIComponent(result)));
-
-          const data = Object.keys(action).map((k) => {
-            return encodeURIComponent(k) + '=' + encodeURIComponent(action[k]);
-          }).join('&');
-
-          const url = `https://giveaway.su/action/check/${action.id}`;
-
-          log.debug(`universalVerify() : making check request : ${url}`);
-
-          let response;
-
-          try {
-            response = await $J.post(url, data);
-          } catch (e) {
-            log.debug('universalVerify() : request failed');
-
-            notifications.error(i18n.get('giveaway-su-verify-request-failed'));
-            return false;
-          }
-
-          if (!response || !response.success) {
-            log.debug('universalVerify() : task verify failed');
-
-            if (!noCheating && !failable) {
-              if (taskUrl.includes('twitter.com/')) {
-                notifications.error(i18n.get('giveaway-su-cheating-failed-twitter'));
-              } else {
-                notifications.error(i18n.get('giveaway-su-cheating-failed', {url: taskUrl}));
-              }
-            }
-
-            return false;
-          }
-
-          log.debug('universalVerify() : task done');
-
-          btn.attr('data-result', response.result);
-
-          return true;
-        },
-        successActionButton(button) {
-          $J(button).removeClass('btn-default').addClass('btn-success disabled').prop('disabled', true)
-              .find('i').removeClass('glyphicon-refresh spin').addClass('glyphicon-ok');
-
-          if ($J('#actions .btn-success[data-type]').length === $J('#actions tr').length) {
-            const button = $J('#getKey a');
-            let actions = 0;
-
-            $J('#actions [data-action-id]').each((i, el) => {
-              actions += parseInt($J(el).data('action-id'));
-            });
-
-            button.attr('href', `${button.attr('href')}&actions=${md5(actions)}`).removeClass('disabled');
-          }
-        },
         steamKeys: '.giveaway-key input%val',
         steamGroups() {
           const groups = [];
+
           $J('#actions tr:has(.fa-steam)').each((i, el) => {
             const btn = $J(el).find('button[data-type="action.universal"]');
+
             if (btn.length) {
               const action = JSON.parse(window.atob(btn.attr('data-action')));
+
               if (action.task.includes('steamcommunity.com/groups/') || action.task.includes('bit.ly/')) {
                 groups.push(action.task);
               }
             }
           });
+
           return groups;
-        },
-        async ready(params) {
-          setTimeout(async () => {
-            const initActions = () => {
-              // Remove "Disable AdBlock" task
-              $J('tr[data-action-id="adjs"]').remove();
-
-              $J('#actions a[data-type="link"]').each((i, el) => {
-                params.self.successActionButton(el);
-              });
-
-              $J('#actions button[data-type="action.universal"]').on('click', async (e) => {
-                const button = $J(e.currentTarget);
-
-                button.prop('disabled', true).find('i').addClass('spin');
-
-                if (await params.self.universalVerify(e.currentTarget, e.ctrlKey)) {
-                  params.self.successActionButton(e.currentTarget);
-                }
-
-                button.prop('disabled', false).find('i').removeClass('spin');
-              });
-
-              $J('.giveaway-actions').css('box-shadow', '0 0 4px 3px rgba(12,255,0,.7)');
-            };
-
-            const replaceActions = () => {
-              const actions = $J('article .giveaway-actions');
-              const html = actions.html();
-
-              actions.empty();
-              actions.html(html);
-
-              log.debug('actions replaced');
-            };
-
-            const article = $J('article .extension');
-
-            if (!article.length) {
-              if (!$J('article .giveaway-actions').length) {
-                return;
-              }
-
-              log.debug('extension detected');
-
-              replaceActions();
-              initActions();
-              return;
-            }
-
-            if (article.hasClass('installed')) {
-              log.debug('extension detected');
-
-              const checkActions = (counter = 0) => {
-                if (!$J('article .giveaway-actions').length) {
-                  if (counter < 20) {
-                    setTimeout(() => {
-                      checkActions(++counter);
-                    }, 500);
-                  }
-                  return;
-                }
-
-                log.debug('actions found');
-
-                replaceActions();
-                initActions();
-              };
-
-              checkActions();
-              return;
-            }
-
-            article.addClass('installed');
-
-            const ver = '4.0.4';
-            const timestamp = article.data('timestamp');
-            const csrf = article.data('csrf');
-            const extension = md5(timestamp + csrf);
-            const secret = article.data('secret');
-            const url = `${window.location.pathname}?extension=${extension}&timestamp=${timestamp}&version=chrome-${ver}&csrf=${csrf}${(secret ? `&secret=${secret}` : '')}`;
-
-            log.debug(`making tasks request : ${url}`);
-
-            let response;
-
-            try {
-              response = await $J.get(url);
-            } catch (e) {
-              log.debug('request failed');
-
-              notifications.error(i18n.get('giveaway-su-tasks-request-failed'));
-              return;
-            }
-
-            $J('article').replaceWith(response);
-            $J('article').attr('extension-version', `chrome-${ver}`);
-
-            initActions();
-          }, 1000);
-        },
-        conditions: [
-          {
-            element: '#actions .btn[data-type]:not(.btn-success):visible',
-            buttons: [
-              {
-                type: 'tasks',
-                cancellable: true,
-                click(params) {
-                  const tasks = $J(params.self.element);
-
-                  log.debug(`tasks found : ${tasks.length}`);
-
-                  if (tasks.length) {
-                    return new Promise(async (resolve) => {
-                      for (let i = 0; i < tasks.length; i++) {
-                        if (params.cancelled) {
-                          log.debug('cancelled');
-
-                          return resolve();
-                        }
-
-                        const el = tasks.get(i);
-                        const button = $J(el);
-                        const type = button.attr('data-type');
-
-                        if (type === 'action.universal') {
-                          log.debug(`${i + 1} : universal task`);
-
-                          button.prop('disabled', true).find('i').addClass('spin');
-
-                          if (await params.site.universalVerify(el, params.event.ctrlKey)) {
-                            params.site.successActionButton(el);
-                          } else {
-                            button.prop('disabled', false).find('i').removeClass('spin');
-                          }
-                        } else if (type === 'discord.server') {
-                          log.debug(`${i + 1} : discord task`);
-
-                          button.trigger('click');
-                        } else {
-                          log.debug(`${i + 1} : not universal task`);
-                        }
-
-                        params.button.progress(tasks.length, i + 1);
-                      }
-
-                      log.debug('all tasks done');
-
-                      resolve();
-                    });
-                  }
-                }
-              }
-            ]
-          }
-        ]
+        }
       }
     ]
   };
@@ -1304,18 +800,7 @@
         'steam-leave-group-request-failed': 'Failed to leave group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.',
         'steam-join-group-failed': 'Failed to join group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is experiencing some issues or you are not logged in.',
         'steam-leave-group-failed': 'Failed to leave group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is experiencing some issues or you are not logged in.',
-        'steam-not-logged': `It seems like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.`,
-        'giveaway-su-tasks-request-failed': 'Failed to load the tasks. The site is probably overloaded.',
-        'giveaway-su-verify-request-failed': 'Failed to verify the task. The site is probably overloaded.',
-        'giveaway-su-target-request-failed': 'Failed to load the <a href="{url}" target="_blank">target site</a>. The site is probably down.',
-        'giveaway-su-unknown-task': `Failed to cheat the verification: <a href="{url}" target="_blank">unknown task type</a>.<br><br>[giveaway-su-no-cheating-verify]`,
-        'giveaway-su-data-not-found': 'Failed to cheat the verification: the required data was not found on the target site.<br><br>[giveaway-su-no-cheating-verify]',
-        'giveaway-su-cheating-failed': `Failed to cheat the verification.<br><br>[giveaway-su-no-cheating-verify]`,
-        'giveaway-su-cheating-failed-twitter': `Failed to cheat the verification.<br><br>[giveaway-su-cant-verify-twitter]`,
-        'giveaway-su-cant-verify-twitter': 'Due to technical limitations of Twitter and user scripts, Giveaway Companion cannot perform a normal task verification. Use the giveaway.su extension to verify such tasks or ignore this giveaway.<br><br>[giveaway-su-extension-warning]',
-        'giveaway-su-no-cheating-verify': 'Giveaway Companion can perform a normal task verification, as the giveaway.su extension does, but then you must manually complete the conditions of the task.<br><br><b>Warning:</b> the page of the <a href="{url}" target="_blank">target site</a>, where your private data may be, will be sent to the giveaway.su server.<br><br>If you agree, start the task verification with the Ctrl key pressed.',
-        'giveaway-su-extension-warning': '<b>Warning:</b> verifying the tasks through the giveaway.su extension, you send pages of target sites, where your private data may be.',
-        'giveaway-su-info': 'Giveaway Companion cheats the verification of almost all types of tasks, you practically don’t need to do anything on target sites.<br><br><b>Supported tasks:</b><ul><li><b>Steam:</b> follow a curator, add a game to your wishlist, follow a game, follow a developer/publisher, subscribe to a forum</li><li><b>Twitter:</b> follow, like, retweet</li><li><b>YouTube:</b> subscribe, like</li><li><b>Instagram:</b> subscribe, like</li><li><b>Reddit:</b> subscribe to a subreddit</li><li><b>VK:</b> follow a public page, join a group</li></ul><br>The tasks for joining Steam groups and Discord servers require real completion, because they use your accounts for verification.<br><br>[giveaway-su-extension-warning] If the tasks list is highlighted in green, it means that Giveaway Companion is active and you do not send any private data, even if the extension is installed.'
+        'steam-not-logged': `It seems like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.`
       },
       ru: {
         'complete-tasks': 'Выполнить задания',
@@ -1331,18 +816,7 @@
         'steam-leave-group-request-failed': 'Не удалось выйти из группы. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.',
         'steam-join-group-failed': 'Не удалось вступить в группу. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a> испытывает проблемы или вы не авторизованы.',
         'steam-leave-group-failed': 'Не удалось выйти из группы. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a> испытывает проблемы или вы не авторизованы.',
-        'steam-not-logged': `Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.`,
-        'giveaway-su-tasks-request-failed': 'Не удалось загрузить задания. Возможно, сайт перегружен.',
-        'giveaway-su-verify-request-failed': 'Не удалось выполнить проверку задания. Возможно, сайт перегружен.',
-        'giveaway-su-target-request-failed': 'Не удалось загрузить <a href="{url}" target="_blank">целевой сайт</a>. Возможно, сайт неактивен.',
-        'giveaway-su-unknown-task': `Не удалось обмануть проверку: <a href="{url}" target="_blank">неизвестный тип задания</a>.<br><br>[giveaway-su-no-cheating-verify]`,
-        'giveaway-su-data-not-found': 'Не удалось обмануть проверку: на целевом сайте не найдены нужные данные.<br><br>[giveaway-su-no-cheating-verify]',
-        'giveaway-su-cheating-failed': `Не удалось обмануть проверку.<br><br>[giveaway-su-no-cheating-verify]`,
-        'giveaway-su-cheating-failed-twitter': `Не удалось обмануть проверку.<br><br>[giveaway-su-cant-verify-twitter]`,
-        'giveaway-su-cant-verify-twitter': `Из-за технических ограничений Twitter и пользовательских скриптов, Giveaway Companion не может выполнить обычную проверку. Используйте расширение giveaway.su для проверки таких заданий или игнорируйте данную раздачу.<br><br>[giveaway-su-extension-warning]`,
-        'giveaway-su-no-cheating-verify': 'Giveaway Companion может выполнить обычную проверку задания, как это делает расширение giveaway.su, но тогда вы должны вручную выполнить условия задания.<br><br><b>Внимание:</b> на сервер giveaway.su будет отправлена <a href="{url}" target="_blank">страница целевого сайта</a>, где могут быть ваши приватные данные.<br><br>Если вы согласны, запустите проверку задания с зажатой клавишей Ctrl.',
-        'giveaway-su-extension-warning': '<b>Внимание:</b> проверяя задания через расширение giveaway.su, вы отправляете страницы целевых сайтов, где могут быть ваши приватные данные.',
-        'giveaway-su-info': 'Giveaway Companion обманывает проверку почти всех типов заданий, вам практически ничего не нужно делать на целевых сайтах.<br><br><b>Поддерживаемые задания:</b><ul><li><b>Steam:</b> подписка на куратора, добавление игры в список желаемого, подписка на игру, подписка на разработчика/издателя, подписка на форум</li><li><b>Twitter:</b> подписка, лайк, ретвит</li><li><b>YouTube:</b> подписка, лайк</li><li><b>Instagram:</b> подписка, лайк</li><li><b>Reddit:</b> подписка на сабреддит</li><li><b>VK:</b> подписка на публичную страницу, вступление в группу</li></ul><br>Задания на вступление в группы Steam и присоединение к серверам Discord требуют реального выполнения, потому что при проверке они используют ваши аккаунты.<br><br>[giveaway-su-extension-warning] Если список заданий подсвечен зелёным, это значит, что Giveaway Companion активен и вы не отправляете никаких приватных данных, даже если установлено расширение.'
+        'steam-not-logged': `Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.`
       }
     }
   };
@@ -1541,7 +1015,7 @@
 
         log.debug('steam.init() : done');
 
-        return resolve(true);
+        resolve(true);
       });
 
       return this._initPromise;
@@ -1908,16 +1382,11 @@
       this._elements.scrollUp = $J(`#${this._css.scrollUpId}`);
       this._elements.scrollDown = $J(`#${this._css.scrollDownId}`);
 
-      $GM.getValue('position', 240).then((position) => {
-        this.position(position);
-      });
-
-      $GM.getValue('maxHeight', 206).then((maxHeight) => {
-        this.maxHeight(maxHeight);
-      });
-
       this.marginTop = parseInt(this._elements.main.css('margin-top'));
       this.marginBottom = parseInt(this._elements.main.css('margin-bottom'));
+
+      this.position(state.position);
+      this.maxHeight(state.maxHeight);
 
       const scroll = () => {
         this._elements.buttons.animate({
@@ -3035,7 +2504,7 @@
     }
   };
 
-  (() => {
+  (async () => {
     const checkStringCondition = (variable, compare) => {
       if (typeof variable === 'string') {
         if (variable === compare) {
@@ -3387,6 +2856,9 @@
 
     // TODO: check version and show notification about changes if the script has been updated
     $GM.setValue('version', version);
+
+    state.position = await $GM.getValue('position', 240);
+    state.maxHeight = await $GM.getValue('maxHeight', 206);
 
     log.info('start');
 

@@ -1,4 +1,8 @@
 ## Changelog
+### v1.3.1 (2019-01-26)
+* Giveaway.su: removed support for tasks completion ([the reason](https://github.com/longnull/GiveawayCompanion/issues/1#issuecomment-457699811)).
+* Fixed a small bug with scroll visibility.
+***
 ### v1.3 (2019-01-22)
 * Giveaway.su: added support for tasks completion without browser extension, the script can completely cheat the verification of tasks (for more information click "i" button on the script bar).
 * Giveaway.su: added support for Steam key activation.
@@ -24,6 +28,10 @@
 ***
 
 ## Список изменений
+### v1.3.1 (2019-01-26)
+* Giveaway.su: удалена поддержка выполнения заданий ([причина](https://github.com/longnull/GiveawayCompanion/issues/1#issuecomment-457699811)).
+* Исправлена ​​небольшая ошибка с видимостью прокрутки.
+***
 ### v1.3 (2019-01-22)
 * Giveaway.su: добавлена поддержка выполнения заданий без браузерного расширения, скрипт может полностью обманывать проверку заданий (для дополнительной информации кликните кнопку "i" на панели скрипта).
 * Giveaway.su: добавлена поддержка активации Steam ключей.
