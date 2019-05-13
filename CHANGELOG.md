@@ -1,4 +1,9 @@
 ## Changelog
+### v1.4 (2019-05-13)
+* Added support for keyjoker.com (groups, keys).
+* GiveawayHopper: updated for new design.
+* Gamehag: added auto completion of survey tasks.
+* Added notification about successful script update.
 ### v1.3.1 (2019-01-26)
 * Giveaway.su: removed support for tasks completion ([the reason](https://github.com/longnull/GiveawayCompanion/issues/1#issuecomment-457699811)).
 * Fixed a small bug with scroll visibility.
@@ -28,6 +33,11 @@
 ***
 
 ## Список изменений
+### v1.4 (2019-05-13)
+* Добавлена поддержка keyjoker.com (группы, ключи).
+* GiveawayHopper: обновлён под новый дизайн.
+* Gamehag: добавлено автовыполнение анкетных заданий.
+* Добавлено уведомление об успешном обновлении скрипта.
 ### v1.3.1 (2019-01-26)
 * Giveaway.su: удалена поддержка выполнения заданий ([причина](https://github.com/longnull/GiveawayCompanion/issues/1#issuecomment-457699811)).
 * Исправлена ​​небольшая ошибка с видимостью прокрутки.

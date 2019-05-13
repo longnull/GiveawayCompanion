@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.3.1
+// @version 1.4
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -25,6 +25,7 @@
 // @match *://*.giveawayhopper.com/giveaway/*
 // @match *://*.chubkeys.com/giveaway.php?id=*
 // @match *://*.giveaway.su/giveaway/view/*
+// @match *://*.keyjoker.com/*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
 // @connect bananagiveaway.com
@@ -42,7 +43,25 @@
 (async () => {
   'use strict';
 
-  const version = '1.3.1';
+  const version = {
+    string: '1.4',
+    changes: {
+      default:
+        `<ul>
+          <li>Added support for <a href="https://www.keyjoker.com" target="_blank">keyjoker.com</a> (groups, keys).</li>
+          <li>GiveawayHopper: updated for new design.</li>
+          <li>Gamehag: added auto completion of survey tasks.</li>
+          <li>Added notification about successful script update.</li>
+        </ul>`,
+      ru:
+        `<ul>
+          <li>Добавлена поддержка <a href="https://www.keyjoker.com" target="_blank">keyjoker.com</a> (группы, ключи).</li>
+          <li>GiveawayHopper: обновлён под новый дизайн.</li>
+          <li>Gamehag: добавлено автовыполнение анкетных заданий.</li>
+          <li>Добавлено уведомление об успешном обновлении скрипта.</li>
+        </ul>`
+    }
+  };
 
   const config = {
     // Output debug info into console
@@ -482,7 +501,7 @@
             },
             conditions: [
               {
-                elementAnd: ['.single-giveaway-task:has(.notdone):has(.task-actions button)', '!.giveaway-content .alert-danger:visible', '!.giveaway-key input:visible'],
+                elementAnd: ['.single-giveaway-task:has(.notdone):has(.task-actions a):has(.task-actions button),.single-giveaway-task:has(.notdone):has(.task-actions .giveaway-survey)', '!.giveaway-content .alert-danger:visible', '!.giveaway-key input:visible'],
                 buttons: [
                   {
                     type: 'tasks',
@@ -522,6 +541,19 @@
                               log.debug(`${i + 1} : completeTask() : clicking verify button...`);
 
                               verify.trigger('click');
+                            } else {
+                              const survey = task.find('.task-actions .giveaway-survey');
+
+                              if (survey.length) {
+                                const id = survey.attr('data-task_id');
+
+                                if (id) {
+                                  log.debug(`${i + 1} : completeTask() : survey task : ${id}`);
+
+                                  unsafeWindow.currentSurveyId = id;
+                                  unsafeWindow.giveawaySurvCompleted();
+                                }
+                              }
                             }
                           };
 
@@ -570,7 +602,7 @@
         element: 'a[href*="logout"]',
         conditions: [
           {
-            path: '/profile',
+            path: /^\/profile/,
             steamKeys: '.card-title',
             ready() {
               $J('.card-deck').on('click', '.card-img-top', (e) => {
@@ -637,7 +669,7 @@
         steamGroups: 'form[action*="steamcommunity.com/groups/"]@action',
         conditions: [
           {
-            elementAnd: ['.task-item .task-item-btn-verify:not(.btn-primary)', '!#gameKey:visible:not(:empty)'],
+            elementAnd: ['.task-item .btn-check:not(.btn-success)', '!#gameKey:visible:not(:empty):not(:contains("XXXX-XXXX-XXXX"))'],
             buttons: [
               {
                 type: 'tasks',
@@ -646,7 +678,7 @@
                   // giveawayhopper makes synchronous requests and the page hangs when you click "verify" buttons,
                   // so we make the requests ourselves and change the style of the buttons
 
-                  const tasks = $J('.task-item:not(:has(.task-item-btn-verify.btn-primary))');
+                  const tasks = $J('.task-item:not(:has(.btn-check.btn-success))');
 
                   log.debug(`tasks found : ${tasks.length}`);
 
@@ -658,15 +690,15 @@
                         }
 
                         const task = $J(tasks.get(i));
-                        const icon = task.find('.task-item-btn i');
-                        const verify = task.find('.task-item-btn-verify');
+                        const icon = task.find('.btn-verify-task i');
+                        const verify = task.find('.btn-check');
 
                         if (icon.length && verify.length) {
                           const match = verify.attr('id').match(/verifyTaskBtn(\d+)/);
 
                           if (match) {
-                            const type = icon.hasClass('fa-steam') ? 'steam' : 'chain';
-                            const url = `${window.location.origin}/${type}/check/${match[1]}`;
+                            const type = icon.hasClass('la-steam') ? 'steam' : 'chain';
+                            const url = `${window.location.origin}/${type}/check/giveaway/${match[1]}`;
 
                             log.debug(`${i + 1} : making request : ${url}`);
 
@@ -676,16 +708,15 @@
                               if (response === 'success') {
                                 log.debug(`${i + 1} : task done`);
 
-                                verify.removeClass('btn-outline-primary');
-                                verify.addClass('btn-primary');
-                                verify.html('<i class="icon-check"></i>&nbsp;DONE');
+                                verify.removeClass('btn-danger');
+                                verify.addClass('btn-success');
+                                verify.html('<i class="la la-check"></i>&nbsp;DONE');
                               } else {
                                 log.debug(`${i + 1} : task error : ${response.content}`);
 
-                                verify.removeClass('btn-outline-primary');
                                 verify.removeClass('btn-primary');
                                 verify.addClass('btn-danger');
-                                verify.html('<i class="icon-close"></i>&nbsp;ERROR');
+                                verify.html('<i class="la la-close"></i>&nbsp;ERROR');
                               }
                             } catch (e) {}
                           }
@@ -735,6 +766,37 @@
 
           return groups;
         }
+      },
+      {
+        host: 'keyjoker.com',
+        element: 'a[href*="logout"]',
+        conditions: [
+          {
+            path: /^\/entries/,
+            steamGroups: '.list-complete-item:has(.fa-steam) a.btn-primary'
+          },
+          {
+            path: /^\/account\/keys/,
+            steamKeys: '[id^="key-"]',
+            ready() {
+              $J('.card-body .col-auto img').on('click', (e) => {
+                const key = steam.extractKeys($J(e.currentTarget).parents('.card-body').find('[id^="key-"]').text());
+
+                if (key) {
+                  steam.openKeyActivationPage(key[0]);
+                }
+              });
+
+              $J('head').append(
+                  `<style>
+                    .card-body .col-auto img {
+                      cursor: pointer;
+                    }
+                  </style>`
+              );
+            }
+          }
+        ]
       }
     ]
   };
@@ -800,7 +862,8 @@
         'steam-leave-group-request-failed': 'Failed to leave group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.',
         'steam-join-group-failed': 'Failed to join group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is experiencing some issues or you are not logged in.',
         'steam-leave-group-failed': 'Failed to leave group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is experiencing some issues or you are not logged in.',
-        'steam-not-logged': `It seems like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.`
+        'steam-not-logged': `It seems like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.`,
+        'gc-updated': `Giveaway Companion has been updated to version ${version.string}.<br><br><b>Changes:</b>`
       },
       ru: {
         'complete-tasks': 'Выполнить задания',
@@ -816,7 +879,8 @@
         'steam-leave-group-request-failed': 'Не удалось выйти из группы. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.',
         'steam-join-group-failed': 'Не удалось вступить в группу. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a> испытывает проблемы или вы не авторизованы.',
         'steam-leave-group-failed': 'Не удалось выйти из группы. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a> испытывает проблемы или вы не авторизованы.',
-        'steam-not-logged': `Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.`
+        'steam-not-logged': `Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.`,
+        'gc-updated': `Giveaway Companion был обновлён до версии ${version.string}.<br><br><b>Изменения:</b>`
       }
     }
   };
@@ -2850,12 +2914,79 @@
 
     if (typeof i18n.langs[lang] === 'object') {
       i18n.lang = i18n.langs[lang];
+      i18n.code = lang;
     } else {
       i18n.lang = i18n.langs.default;
+      i18n.code = 'default';
     }
 
-    // TODO: check version and show notification about changes if the script has been updated
-    $GM.setValue('version', version);
+    const oldVersion = await $GM.getValue('version', false);
+
+    if (oldVersion) {
+      // https://github.com/Rombecchi/version-compare
+      const versionCompare = function(v1, v2, options) {
+        const lexicographical = (options && options.lexicographical) || false;
+        const zeroExtend = (options && options.zeroExtend) || true;
+        let v1parts = (v1 || '0').split('.');
+        let v2parts = (v2 || '0').split('.');
+
+        const isValidPart = function(x) {
+          return (lexicographical ? /^\d+[A-Za-zαß]*$/ : /^\d+[A-Za-zαß]?$/).test(x);
+        };
+
+        if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
+          return NaN;
+        }
+
+        if (zeroExtend) {
+          while (v1parts.length < v2parts.length) {
+            v1parts.push('0');
+          }
+
+          while (v2parts.length < v1parts.length) {
+            v2parts.push('0');
+          }
+        }
+
+        if (!lexicographical) {
+          v1parts = v1parts.map(function(x) {
+            const match = /[A-Za-zαß]/.exec(x);
+            return Number(match ? x.replace(match[0], '.' + x.charCodeAt(match.index)) : x);
+          });
+
+          v2parts = v2parts.map(function(x) {
+            const match = /[A-Za-zαß]/.exec(x);
+            return Number(match ? x.replace(match[0], '.' + x.charCodeAt(match.index)) : x);
+          });
+        }
+
+        for (let i = 0; i < v1parts.length; ++i) {
+          if (v2parts.length == i) {
+            return 1;
+          }
+
+          if (v1parts[i] == v2parts[i]) {
+            continue;
+          } else if (v1parts[i] > v2parts[i]) {
+            return 1;
+          } else {
+            return -1;
+          }
+        }
+
+        if (v1parts.length != v2parts.length) {
+          return -1;
+        }
+
+        return 0;
+      };
+
+      if (versionCompare(oldVersion, version.string) < 0) {
+        notifications.info(i18n.get('gc-updated') + (version.changes[i18n.code] ? version.changes[i18n.code] : version.changes.default), {timeout: 0});
+      }
+    }
+
+    $GM.setValue('version', version.string);
 
     state.position = await $GM.getValue('position', 240);
     state.maxHeight = await $GM.getValue('maxHeight', 206);

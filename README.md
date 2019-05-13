@@ -36,6 +36,7 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
         <tr><td>giveawayhopper.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>giveaway.su</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>keyjoker.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Opens Steam key activation page when you click a <a href="images/keyjoker_key_activation.png">game image</a> on <a href="https://www.keyjoker.com/account/keys">"Keys"</a> page</td></tr>
     </tbody>
 </table>
 
@@ -49,23 +50,8 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
 
 Automatic updating of the script may require your confirmation.
 
-### Filters for uBlock Origin
-Here are some filters for uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/), [Opera](https://addons.opera.com/en/extensions/details/ublock/)) that remove various annoying things on games giveaway sites.
-
-| Site               | Filter                                                                           | Subscription   | Action
-| :----------------- | :------------------------------------------------------------------------------- | :------------- | :-------------
-| gamecode.win       | @@\|\|gamecode.win^$generichide                                                  | uBlock filters | Removes ad blocker warning
-| gamecode.win       | gamecode.win##script:inject(abort-current-inline-script.js, $, openNewWindow)    | -              | Removes pop-up ads
-| gamezito.com       | @@\|\|gamezito.com^$generichide                                                  | -              | Removes ad blocker warning
-| marvelousga.com    | @@\|\|marvelousga.com^$generichide                                               | uBlock filters | Removes ad blocker warning
-| marvelousga.com    | marvelousga.com##script:inject(abort-current-inline-script.js, $, openNewWindow) | uBlock filters | Removes pop-up ads
-| indiegala.com      | indiegala.com###giveaway-social-cont                                             | -              | Removes a social block that overrides a giveaway block
-| orlygift.com       | orlygift.com##script:inject(fuckadblock.js-3.2.0)                                | -              | Removes ad blocker warning
-| orlygift.com       | orlygift.com##script:inject(abort-on-property-read.js, Bounceback.disabled)      | -              | Removes a pop-up invitation to Steam group
-| gamehunt.net       | gamehunt.net##script:inject(abort-on-property-read.js, window.adblock)           | -              | Removes ad blocker warning
-
-#### Filter list
-Also, filters from the table are available as a [file](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt) that you can import into uBlock Origin and automatically receive updates.
+### Filter list for uBlock Origin
+[Filter list](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt) for uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/), [Opera](https://addons.opera.com/en/extensions/details/ublock/)) that remove various annoying things (ad blocker warnings, pop-ups, etc.) on games giveaway sites.
 
 **Importing the filter list into uBlock Origin**
 1. Open uBlock Origin settings.
@@ -113,6 +99,7 @@ Also, filters from the table are available as a [file](https://raw.githubusercon
         <tr><td>giveawayhopper.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>giveaway.su</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
+        <tr><td>keyjoker.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/keyjoker_key_activation.png">изображению игры</a> на странице <a href="https://www.keyjoker.com/account/keys">"Keys"</a></td></tr>
     </tbody>
 </table>
 
@@ -126,23 +113,8 @@ Also, filters from the table are available as a [file](https://raw.githubusercon
 
 При автоматическом обновлении скрипта может потребоваться ваше подтверждение.
 
-### Фильтры для uBlock Origin
-Вот несколько фильтров для uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/ublock-origin/), [Opera](https://addons.opera.com/ru/extensions/details/ublock/)), которые удаляют разные назойливые штуки на сайтах с раздачами игр.
-
-| Сайт               | Фильтр                                                                           | Подписка       | Действие
-| :----------------- | :------------------------------------------------------------------------------- | :------------- | :-------------
-| gamecode.win       | @@\|\|gamecode.win^$generichide                                                  | uBlock filters | Удаляет предупреждение о блокировщике рекламы
-| gamecode.win       | gamecode.win##script:inject(abort-current-inline-script.js, $, openNewWindow)    | -              | Удаляет всплывающую рекламу
-| gamezito.com       | @@\|\|gamezito.com^$generichide                                                  | -              | Удаляет предупреждение о блокировщике рекламы
-| marvelousga.com    | @@\|\|marvelousga.com^$generichide                                               | uBlock filters | Удаляет предупреждение о блокировщике рекламы
-| marvelousga.com    | marvelousga.com##script:inject(abort-current-inline-script.js, $, openNewWindow) | uBlock filters | Удаляет всплывающую рекламу
-| indiegala.com      | indiegala.com###giveaway-social-cont                                             | -              | Удаляет социальный блок, который перекрывает блок раздачи
-| orlygift.com       | orlygift.com##script:inject(fuckadblock.js-3.2.0)                                | -              | Удаляет предупреждение о блокировщике рекламы
-| orlygift.com       | orlygift.com##script:inject(abort-on-property-read.js, Bounceback.disabled)      | -              | Удаляет всплывающее приглашение в Steam группу
-| gamehunt.net       | gamehunt.net##script:inject(abort-on-property-read.js, window.adblock)           | -              | Удаляет предупреждение о блокировщике рекламы
-
-#### Список фильтров
-Также фильтры из таблицы доступны в виде [файла](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt), который можно импортировать в uBlock Origin и автоматически получать обновления.
+### Список фильтров для uBlock Origin
+[Список фильтров](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt) для uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/ublock-origin/), [Opera](https://addons.opera.com/ru/extensions/details/ublock/)), которые удаляют разные назойливые штуки (предупреждения о блокировщике рекламы, всплывающую рекламу и прочее) на сайтах с раздачами игр.
 
 **Импортирование списка фильтров в uBlock Origin**
 1. Открыть настройки uBlock Origin.
