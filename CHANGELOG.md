@@ -1,4 +1,6 @@
 ## Changelog
+### v1.4.1 (2019-06-14)
+* Groups: added a notification of trying to join a private group.
 ### v1.4 (2019-05-13)
 * Added support for keyjoker.com (groups, keys).
 * GiveawayHopper: updated for new design.
@@ -33,6 +35,8 @@
 ***
 
 ## Список изменений
+### v1.4.1 (2019-06-14)
+* Группы: добавлено уведомление о попытке вступления в приватную группу.
 ### v1.4 (2019-05-13)
 * Добавлена поддержка keyjoker.com (группы, ключи).
 * GiveawayHopper: обновлён под новый дизайн.

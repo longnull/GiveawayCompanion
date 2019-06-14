@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.4
+// @version 1.4.1
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -44,21 +44,15 @@
   'use strict';
 
   const version = {
-    string: '1.4',
+    string: '1.4.1',
     changes: {
       default:
         `<ul>
-          <li>Added support for <a href="https://www.keyjoker.com" target="_blank">keyjoker.com</a> (groups, keys).</li>
-          <li>GiveawayHopper: updated for new design.</li>
-          <li>Gamehag: added auto completion of survey tasks.</li>
-          <li>Added notification about successful script update.</li>
+          <li>Groups: added a notification of trying to join a private group.</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Добавлена поддержка <a href="https://www.keyjoker.com" target="_blank">keyjoker.com</a> (группы, ключи).</li>
-          <li>GiveawayHopper: обновлён под новый дизайн.</li>
-          <li>Gamehag: добавлено автовыполнение анкетных заданий.</li>
-          <li>Добавлено уведомление об успешном обновлении скрипта.</li>
+          <li>Группы: добавлено уведомление о попытке вступления в приватную группу.</li>
         </ul>`
     }
   };
@@ -827,7 +821,7 @@
 
       if (typeof vars === 'object') {
         Object.keys(vars).forEach((item) => {
-          str = str.replace(new RegExp(`{${item}}`, 'g'), vars[item]);
+          str = str.replace(new RegExp(`{${item}}`, 'g'), utils.encodeEntities(vars[item]));
         });
       }
 
@@ -858,6 +852,7 @@
         'steam-group-join': 'Join Steam group "{group}" (Ctrl+Click - open the group in new tab)',
         'steam-group-leave': 'Leave Steam group "{group}" (Ctrl+Click - open the group in new tab)',
         'steam-init-request-failed': `Failed to load <a href="https://steamcommunity.com/my/groups" target="_blank">your groups</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.`,
+        'steam-join-group-private': 'Join request sent. To join group <a href="{groupLink}" target="_blank">{groupName}</a>, your join request must be approved by the group administrator.',
         'steam-join-group-request-failed': 'Failed to join group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.',
         'steam-leave-group-request-failed': 'Failed to leave group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.',
         'steam-join-group-failed': 'Failed to join group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is experiencing some issues or you are not logged in.',
@@ -875,6 +870,7 @@
         'steam-group-join': 'Вступить в Steam группу "{group}" (Ctrl+Клик - открыть группу в новой вкладке)',
         'steam-group-leave': 'Выйти из Steam группы "{group}" (Ctrl+Клик - открыть группу в новой вкладке)',
         'steam-init-request-failed': `Не удалось загрузить <a href="https://steamcommunity.com/my/groups" target="_blank">ваши группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.`,
+        'steam-join-group-private': 'Заявка на вступление отправлена. Чтобы вступить в группу <a href="{groupLink}" target="_blank">{groupName}</a>, вашу заявку должен одобрить администратор группы.',
         'steam-join-group-request-failed': 'Не удалось вступить в группу. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.',
         'steam-leave-group-request-failed': 'Не удалось выйти из группы. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.',
         'steam-join-group-failed': 'Не удалось вступить в группу. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a> испытывает проблемы или вы не авторизованы.',
@@ -945,6 +941,23 @@
     },
     getResolvedUrl(url) {
       return this._resolvedUrl[url];
+    },
+    // https://github.com/angular/angular.js/blob/26a5779cddf70944b7548e3a6410d35237a516e5/src/ngSanitize/sanitize.js#L577
+    encodeEntities(value) {
+      const SURROGATE_PAIR_REGEXP = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
+      const NON_ALPHANUMERIC_REGEXP = /([^#-~ |!])/g;
+      return value.
+          replace(/&/g, '&amp;').
+          replace(SURROGATE_PAIR_REGEXP, function(value) {
+            const hi = value.charCodeAt(0);
+            const low = value.charCodeAt(1);
+            return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
+          }).
+          replace(NON_ALPHANUMERIC_REGEXP, function(value) {
+            return '&#' + value.charCodeAt(0) + ';';
+          }).
+          replace(/</g, '&lt;').
+          replace(/>/g, '&gt;');
     }
   };
 
@@ -1091,11 +1104,58 @@
 
       groupName = groupName.toLowerCase();
 
+      const checkGroup = (responseText) => {
+        const responseDom = $J(responseText);
+        const header = responseDom.find('.grouppage_header_name');
+
+        if (header.length) {
+          const name = header.get(0).childNodes[0].nodeValue.trim();
+
+          if (responseDom.find('a[href*="ConfirmLeaveGroup"]').length) {
+            log.debug('steam.joinGroup() : checkGroup() : joined');
+
+            this._userGroups.push(groupName);
+            return 1;
+          } else if (responseDom.find('a[href*="ConfirmCancelJoinRequest"]').length) {
+            log.debug('steam.joinGroup() : checkGroup() : waiting for approval');
+
+            notifications.info(i18n.get('steam-join-group-private', {'groupName': name, 'groupLink': this._groupUrl + groupName}));
+            return 2;
+          }
+
+          log.debug('steam.joinGroup() : checkGroup() : not joined');
+        }
+
+        return 0;
+      };
+
       log.debug(`steam.joinGroup(${groupName})`);
 
       log.debug(`steam.joinGroup() : making request : ${this._groupUrl}${groupName}`);
 
-      const response = await $GM.xmlHttpRequest({
+      let response = await $GM.xmlHttpRequest({
+        method: 'GET',
+        url: this._groupUrl + groupName
+      });
+
+      if (response.status !== 200) {
+        log.debug(`steam.joinGroup() : request failed : ${response.status}`);
+
+        notifications.error(i18n.get('steam-join-group-request-failed'));
+        return false;
+      }
+
+      let checkRes = checkGroup(response.responseText);
+
+      if (checkRes === 1) {
+        return true;
+      } else if (checkRes === 2) {
+        return false;
+      }
+
+      log.debug(`steam.joinGroup() : making join request : ${this._groupUrl}${groupName}`);
+
+      response = await $GM.xmlHttpRequest({
         method: 'POST',
         url: this._groupUrl + groupName,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -1109,18 +1169,15 @@
         return false;
       }
 
-      const responseDom = $J(response.responseText);
+      checkRes = checkGroup(response.responseText);
 
-      if (responseDom.find('.grouppage_header_name').length && responseDom.find('a[href*="ConfirmLeaveGroup"]').length) {
-        log.debug('steam.joinGroup() : joined');
-
-        this._userGroups.push(groupName);
+      if (checkRes === 1) {
         return true;
+      } else if (checkRes === 2) {
+        return false;
       }
 
       notifications.error(i18n.get('steam-join-group-failed'));
-
-      log.debug('steam.joinGroup() : not joined');
 
       return false;
     },
