@@ -1,9 +1,8 @@
 ! Title: Giveaway Companion filters
 ! Description: Removes various annoying things on games giveaway sites
-! Version: 201905131417
+! Version: 201909171347
 ! Expires: 3 days
 ! Homepage: https://github.com/longnull/GiveawayCompanion
-@@||gamezito.com^$generichide
 @@||marvelousga.com^$generichide
 marvelousga.com##script:inject(abort-current-inline-script.js, $, openNewWindow)
 @@||gamecode.win^$generichide

@@ -1,4 +1,8 @@
 ## Changelog
+### v1.4.2 (2019-09-17)
+* Chubkeys: updated for new design and URL.
+* Gamezito: support removed.
+* Groups: notifications updated.
 ### v1.4.1 (2019-06-14)
 * Groups: added a notification of trying to join a private group.
 ### v1.4 (2019-05-13)
@@ -35,6 +39,10 @@
 ***
 
 ## Список изменений
+### v1.4.2 (2019-09-17)
+* Chubkeys: обновлён под новый дизайн и URL.
+* Gamezito: поддержка удалена.
+* Группы: обновлены уведомления.
 ### v1.4.1 (2019-06-14)
 * Группы: добавлено уведомление о попытке вступления в приватную группу.
 ### v1.4 (2019-05-13)

@@ -24,7 +24,6 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
         <tr><td>bananagiveaway.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamingimpact.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamecode.win</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gamezito.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">✔*</td><td align="center">✔</td><td>* Most Steam groups are hidden behind URL shorteners, so not all groups will be processed</td></tr>
         <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
@@ -87,7 +86,6 @@ Automatic updating of the script may require your confirmation.
         <tr><td>bananagiveaway.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamingimpact.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamecode.win</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gamezito.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">✔*</td><td align="center">✔</td><td>* Большинство Steam групп скрыты за сокращателями ссылок, поэтому не все группы будут обработаны</td></tr>
         <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>

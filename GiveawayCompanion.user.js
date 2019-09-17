@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.4.1
+// @version 1.4.2
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -13,7 +13,6 @@
 // @match *://*.bananagiveaway.com/giveaway/*
 // @match *://*.gamingimpact.com/giveaway/*
 // @match *://*.gamecode.win/giveaway/*
-// @match *://*.gamezito.com/giveaway/*
 // @match *://*.marvelousga.com/giveaway/*
 // @match *://*.dupedornot.com/giveaway/*
 // @match *://*.whosgamingnow.net/giveaway/*
@@ -23,7 +22,7 @@
 // @match *://*.gamehunt.net/*
 // @match *://*.gleam.io/*/*
 // @match *://*.giveawayhopper.com/giveaway/*
-// @match *://*.chubkeys.com/giveaway.php?id=*
+// @match *://*.chubkeys.com/giveaway/*
 // @match *://*.giveaway.su/giveaway/view/*
 // @match *://*.keyjoker.com/*
 // @connect steamcommunity.com
@@ -44,15 +43,19 @@
   'use strict';
 
   const version = {
-    string: '1.4.1',
+    string: '1.4.2',
     changes: {
       default:
         `<ul>
-          <li>Groups: added a notification of trying to join a private group.</li>
+          <li>Chubkeys: updated for new design and URL.</li>
+          <li>Gamezito: support removed.</li>
+          <li>Groups: notifications updated.</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Группы: добавлено уведомление о попытке вступления в приватную группу.</li>
+          <li>Chubkeys: обновлён под новый дизайн и URL.</li>
+          <li>Gamezito: поддержка удалена.</li>
+          <li>Группы: обновлены уведомления.</li>
         </ul>`
     }
   };
@@ -259,7 +262,7 @@
         ]
       },
       {
-        host: ['gamezito.com', 'marvelousga.com', 'dupedornot.com'],
+        host: ['marvelousga.com', 'dupedornot.com'],
         element: '!a[href*="login"]',
         steamGroups: '.card-body a[href*="steamcommunity.com/groups/"]',
         steamKeys: ['#key_display_container:visible:not(:empty)', '#insertkey:visible:not(:empty)', '.card-body:contains("YOUR KEY"):visible', 'div:contains("already have a key"):visible'],
@@ -658,7 +661,7 @@
         }
       },
       {
-        host: 'giveawayhopper.com',
+        host: ['giveawayhopper.com', 'chubkeys.com'],
         steamKeys: '#gameKey:visible:not(:empty)',
         steamGroups: 'form[action*="steamcommunity.com/groups/"]@action',
         conditions: [
@@ -669,7 +672,7 @@
                 type: 'tasks',
                 cancellable: true,
                 click(params) {
-                  // giveawayhopper makes synchronous requests and the page hangs when you click "verify" buttons,
+                  // They make synchronous requests and the page hangs when you click "verify" buttons,
                   // so we make the requests ourselves and change the style of the buttons
 
                   const tasks = $J('.task-item:not(:has(.btn-check.btn-success))');
@@ -733,11 +736,6 @@
             ]
           }
         ]
-      },
-      {
-        host: 'chubkeys.com',
-        steamKeys: 'div:has(.fa-key) h4',
-        steamGroups: '.collapse a[href*="steamcommunity.com/groups/"]'
       },
       {
         host: 'giveaway.su',
@@ -852,12 +850,13 @@
         'steam-group-join': 'Join Steam group "{group}" (Ctrl+Click - open the group in new tab)',
         'steam-group-leave': 'Leave Steam group "{group}" (Ctrl+Click - open the group in new tab)',
         'steam-init-request-failed': `Failed to load <a href="https://steamcommunity.com/my/groups" target="_blank">your groups</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.`,
-        'steam-join-group-private': 'Join request sent. To join group <a href="{groupLink}" target="_blank">{groupName}</a>, your join request must be approved by the group administrator.',
-        'steam-join-group-request-failed': 'Failed to join group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.',
-        'steam-leave-group-request-failed': 'Failed to leave group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.',
-        'steam-join-group-failed': 'Failed to join group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is experiencing some issues or you are not logged in.',
-        'steam-leave-group-failed': 'Failed to leave group. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is experiencing some issues or you are not logged in.',
-        'steam-not-logged': `It seems like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.`,
+        'steam-join-group-failed': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably experiencing some issues.',
+        'steam-join-group-join-request-sent': 'Join request sent. To join the <a href="{groupLink}" target="_blank">group</a>, your join request must be approved by the group administrator.',
+        'steam-join-group-not-logged': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. [steam-not-logged]',
+        'steam-join-group-not-found': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. Looks like the group does not exist.',
+        'steam-leave-group-failed': 'Failed to leave the <a href="{groupLink}" target="_blank">group</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably experiencing some issues.',
+        'steam-leave-group-not-logged': 'Failed to leave the <a href="{groupLink}" target="_blank">group</a>. [steam-not-logged]',
+        'steam-not-logged': `It looks like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.`,
         'gc-updated': `Giveaway Companion has been updated to version ${version.string}.<br><br><b>Changes:</b>`
       },
       ru: {
@@ -870,11 +869,12 @@
         'steam-group-join': 'Вступить в Steam группу "{group}" (Ctrl+Клик - открыть группу в новой вкладке)',
         'steam-group-leave': 'Выйти из Steam группы "{group}" (Ctrl+Клик - открыть группу в новой вкладке)',
         'steam-init-request-failed': `Не удалось загрузить <a href="https://steamcommunity.com/my/groups" target="_blank">ваши группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.`,
-        'steam-join-group-private': 'Заявка на вступление отправлена. Чтобы вступить в группу <a href="{groupLink}" target="_blank">{groupName}</a>, вашу заявку должен одобрить администратор группы.',
-        'steam-join-group-request-failed': 'Не удалось вступить в группу. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.',
-        'steam-leave-group-request-failed': 'Не удалось выйти из группы. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.',
-        'steam-join-group-failed': 'Не удалось вступить в группу. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a> испытывает проблемы или вы не авторизованы.',
-        'steam-leave-group-failed': 'Не удалось выйти из группы. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a> испытывает проблемы или вы не авторизованы.',
+        'steam-join-group-failed': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, испытывает какие-то проблемы.',
+        'steam-join-group-join-request-sent': 'Заявка на вступление отправлена. Чтобы вступить в <a href="{groupLink}" target="_blank">группу</a>, вашу заявку должен одобрить администратор группы.',
+        'steam-join-group-not-logged': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. [steam-not-logged]',
+        'steam-join-group-not-found': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. Похоже, группа не существует.',
+        'steam-leave-group-failed': 'Не удалось выйти из <a href="{groupLink}" target="_blank">группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, испытывает какие-то проблемы.',
+        'steam-leave-group-not-logged': 'Не удалось выйти из <a href="{groupLink}" target="_blank">группы</a>. [steam-not-logged]',
         'steam-not-logged': `Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.`,
         'gc-updated': `Giveaway Companion был обновлён до версии ${version.string}.<br><br><b>Изменения:</b>`
       }
@@ -1104,32 +1104,53 @@
 
       groupName = groupName.toLowerCase();
 
-      const checkGroup = (responseText) => {
-        const responseDom = $J(responseText);
-        const header = responseDom.find('.grouppage_header_name');
+      log.debug(`steam.joinGroup(${groupName})`);
 
-        if (header.length) {
-          const name = header.get(0).childNodes[0].nodeValue.trim();
+      const checkGroup = (page) => {
+        page = $J(page);
 
-          if (responseDom.find('a[href*="ConfirmLeaveGroup"]').length) {
-            log.debug('steam.joinGroup() : checkGroup() : joined');
+        if (page.find('.supernav_container').length) {
+          if (!page.find('#account_pulldown').length) {
+            log.debug('steam.joinGroup() : checkGroup() : user are not logged in');
 
-            this._userGroups.push(groupName);
-            return 1;
-          } else if (responseDom.find('a[href*="ConfirmCancelJoinRequest"]').length) {
-            log.debug('steam.joinGroup() : checkGroup() : waiting for approval');
+            notifications.error(i18n.get('steam-join-group-not-logged'), {'groupLink': this._groupUrl + groupName});
 
-            notifications.info(i18n.get('steam-join-group-private', {'groupName': name, 'groupLink': this._groupUrl + groupName}));
-            return 2;
+            return -2;
           }
 
-          log.debug('steam.joinGroup() : checkGroup() : not joined');
+          if (page.find('.grouppage_header_name').length) {
+            if (page.find('a[href*="ConfirmLeaveGroup"]').length) {
+              log.debug('steam.joinGroup() : checkGroup() : joined');
+
+              this._userGroups.push(groupName);
+
+              return 1;
+            } else if (page.find('a[href*="ConfirmCancelJoinRequest"]').length) {
+              log.debug('steam.joinGroup() : checkGroup() : waiting for approval');
+
+              notifications.info(i18n.get('steam-join-group-join-request-sent', {'groupLink': this._groupUrl + groupName}));
+
+              return 2;
+            }
+          } else {
+            log.debug('steam.joinGroup() : checkGroup() : group not found');
+
+            notifications.error(i18n.get('steam-join-group-not-found', {'groupLink': this._groupUrl + groupName}));
+
+            return -3;
+          }
+        } else {
+          log.debug('steam.joinGroup() : checkGroup() : wrong page');
+
+          notifications.error(i18n.get('steam-join-group-failed', {'groupLink': this._groupUrl + groupName}));
+
+          return -1;
         }
+
+        log.debug('steam.joinGroup() : checkGroup() : not joined');
 
         return 0;
       };
-
-      log.debug(`steam.joinGroup(${groupName})`);
 
       log.debug(`steam.joinGroup() : making request : ${this._groupUrl}${groupName}`);
 
@@ -1141,17 +1162,18 @@
       if (response.status !== 200) {
         log.debug(`steam.joinGroup() : request failed : ${response.status}`);
 
-        notifications.error(i18n.get('steam-join-group-request-failed'));
+        notifications.error(i18n.get('steam-join-group-failed', {'groupLink': this._groupUrl + groupName}));
+
         return false;
       }
 
       let checkRes = checkGroup(response.responseText);
 
-      if (checkRes === 1) {
-        return true;
-      } else if (checkRes === 2) {
-        return false;
+      if (checkRes !== 0) {
+        return checkRes === 1;
       }
+
+      await this.getGroupId(groupName, response.responseText);
 
       log.debug(`steam.joinGroup() : making join request : ${this._groupUrl}${groupName}`);
 
@@ -1165,19 +1187,18 @@
       if (response.status !== 200) {
         log.debug(`steam.joinGroup() : request failed : ${response.status}`);
 
-        notifications.error(i18n.get('steam-join-group-request-failed'));
+        notifications.error(i18n.get('steam-join-group-failed', {'groupLink': this._groupUrl + groupName}));
+
         return false;
       }
 
       checkRes = checkGroup(response.responseText);
 
-      if (checkRes === 1) {
-        return true;
-      } else if (checkRes === 2) {
-        return false;
+      if (checkRes !== 0) {
+        return checkRes === 1;
       }
 
-      notifications.error(i18n.get('steam-join-group-failed'));
+      notifications.error(i18n.get('steam-join-group-failed', {'groupLink': this._groupUrl + groupName}));
 
       return false;
     },
@@ -1192,8 +1213,13 @@
 
       const id = await this.getGroupId(groupName);
 
-      if (!id) {
-        notifications.error(i18n.get('steam-leave-group-request-failed'));
+      if (id === -1 || id === false) {
+        notifications.error(i18n.get('steam-leave-group-failed', {'groupLink': this._groupUrl + groupName}));
+
+        return false;
+      } else if (id === -2) {
+        notifications.error(i18n.get('steam-leave-group-not-logged', {'groupLink': this._groupUrl + groupName}));
+
         return false;
       }
 
@@ -1209,36 +1235,45 @@
       if (response.status !== 200) {
         log.debug(`steam.leaveGroup() : request failed : ${response.status}`);
 
-        notifications.error(i18n.get('steam-leave-group-request-failed'));
+        notifications.error(i18n.get('steam-leave-group-failed', {'groupLink': this._groupUrl + groupName}));
+
         return false;
       }
 
-      if (response.finalUrl.includes('/groups') && !response.responseText.includes(id)) {
-        log.debug('steam.leaveGroup() : left');
+      if (!response.finalUrl.includes('/groups')) {
+        log.debug('steam.leaveGroup() : user are not logged in');
 
-        const idx = this._userGroups.indexOf(groupName);
+        notifications.error(i18n.get('steam-leave-group-not-logged', {'groupLink': this._groupUrl + groupName}));
 
-        if (idx !== -1) {
-          this._userGroups.splice(idx, 1);
-        }
-
-        return true;
+        return false;
       }
 
-      notifications.error(i18n.get('steam-leave-group-failed'));
+      if (response.responseText.includes(id)) {
+        log.debug('steam.leaveGroup() : not left');
 
-      log.debug('steam.leaveGroup() : not left');
+        notifications.error(i18n.get('steam-leave-group-failed', {'groupLink': this._groupUrl + groupName}));
 
-      return false;
+        return false;
+      }
+
+      log.debug('steam.leaveGroup() : left');
+
+      const idx = this._userGroups.indexOf(groupName);
+
+      if (idx !== -1) {
+        this._userGroups.splice(idx, 1);
+      }
+
+      return true;
     },
-    async getGroupId(groupName) {
+    async getGroupId(groupName, groupPage) {
       if (!config.steamGroups) {
         return false;
       }
 
-      log.debug(`steam.getGroupId(${groupName})`);
-
       groupName = groupName.toLowerCase();
+
+      log.debug(`steam.getGroupId(${groupName})`);
 
       if (typeof this._idCache[groupName] !== 'undefined') {
         log.debug(`steam.getGroupId() : group id found in the cache : ${this._idCache[groupName]}`);
@@ -1246,32 +1281,52 @@
         return this._idCache[groupName];
       };
 
-      log.debug(`steam.getGroupId() : making request : ${this._groupUrl}${groupName}`);
+      if (groupPage) {
+        if (!(groupPage instanceof $J)) {
+          groupPage = $J(groupPage);
+        }
+      } else {
+        log.debug(`steam.getGroupId() : making request : ${this._groupUrl}${groupName}`);
 
-      const response = await $GM.xmlHttpRequest({
-        method: 'GET',
-        url: this._groupUrl + groupName
-      });
+        const response = await $GM.xmlHttpRequest({
+          method: 'GET',
+          url: this._groupUrl + groupName
+        });
 
-      if (response.status !== 200) {
-        log.debug(`steam.getGroupId() : request failed : ${response.status}`);
+        if (response.status !== 200) {
+          log.debug(`steam.getGroupId() : request failed : ${response.status}`);
 
-        return false;
+          return false;
+        }
+
+        groupPage = $J(response.responseText);
       }
 
-      const id = $J(response.responseText).find('input[name="groupId"]').val();
+      if (groupPage.find('.supernav_container').length) {
+        if (!groupPage.find('#account_pulldown').length) {
+          log.debug('steam.getGroupId() : user are not logged in');
 
-      if (!id) {
-        log.debug('steam.getGroupId() : group id not found');
+          return -2;
+        }
 
-        return false;
+        const id = groupPage.find('input[name="groupId"]').val();
+
+        if (id) {
+          this._idCache[groupName] = id;
+
+          log.debug(`steam.getGroupId() : group id found : ${id}`);
+
+          return id;
+        } else {
+          log.debug('steam.getGroupId() : group id not found');
+        }
+      } else {
+        log.debug('steam.getGroupId() : wrong page');
+
+        return -1;
       }
 
-      log.debug(`steam.getGroupId() : group id found : ${id}`);
-
-      this._idCache[groupName] = id;
-
-      return id;
+      return false;
     },
     isJoinedGroup(groupName) {
       if (!config.steamGroups) {
