@@ -1,4 +1,7 @@
 ## Changelog
+### v1.4.3 (2020-01-15)
+* Gamehunt: replaced by Givekey.ru (the same site on a different domain).
+* Giveawayhopper: support removed (the site is dead).
 ### v1.4.2 (2019-09-17)
 * Chubkeys: updated for new design and URL.
 * Gamezito: support removed.
@@ -39,6 +42,9 @@
 ***
 
 ## Список изменений
+### v1.4.3 (2020-01-15)
+* Gamehunt: заменён на Givekey.ru (тот же сайт на другом домене).
+* Giveawayhopper: поддержка удалена (сайт мёртв).
 ### v1.4.2 (2019-09-17)
 * Chubkeys: обновлён под новый дизайн и URL.
 * Gamezito: поддержка удалена.

@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.4.2
+// @version 1.4.3
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -19,9 +19,8 @@
 // @match *://*.indiegala.com/profile
 // @match *://*.orlygift.com/giveaway
 // @match *://*.gamehag.com/*
-// @match *://*.gamehunt.net/*
+// @match *://*.givekey.ru/*
 // @match *://*.gleam.io/*/*
-// @match *://*.giveawayhopper.com/giveaway/*
 // @match *://*.chubkeys.com/giveaway/*
 // @match *://*.giveaway.su/giveaway/view/*
 // @match *://*.keyjoker.com/*
@@ -43,19 +42,17 @@
   'use strict';
 
   const version = {
-    string: '1.4.2',
+    string: '1.4.3',
     changes: {
       default:
         `<ul>
-          <li>Chubkeys: updated for new design and URL.</li>
-          <li>Gamezito: support removed.</li>
-          <li>Groups: notifications updated.</li>
+          <li>Gamehunt: replaced by Givekey.ru (the same site on a different domain).</li>
+          <li>Giveawayhopper: support removed (the site is dead).</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Chubkeys: обновлён под новый дизайн и URL.</li>
-          <li>Gamezito: поддержка удалена.</li>
-          <li>Группы: обновлены уведомления.</li>
+          <li>Gamehunt: заменён на Givekey.ru (тот же сайт на другом домене).</li>
+          <li>Giveawayhopper: поддержка удалена (сайт мёртв).</li>
         </ul>`
     }
   };
@@ -595,7 +592,7 @@
         ]
       },
       {
-        host: 'gamehunt.net',
+        host: 'givekey.ru',
         element: 'a[href*="logout"]',
         conditions: [
           {
@@ -661,7 +658,7 @@
         }
       },
       {
-        host: ['giveawayhopper.com', 'chubkeys.com'],
+        host: 'chubkeys.com',
         steamKeys: '#gameKey:visible:not(:empty)',
         steamGroups: 'form[action*="steamcommunity.com/groups/"]@action',
         conditions: [
