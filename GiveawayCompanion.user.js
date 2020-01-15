@@ -19,7 +19,7 @@
 // @match *://*.indiegala.com/profile
 // @match *://*.orlygift.com/giveaway
 // @match *://*.gamehag.com/*
-// @match *://*.givekey.ru/*
+// @match *://*.givekey.ru/distribution/*
 // @match *://*.gleam.io/*/*
 // @match *://*.chubkeys.com/giveaway/*
 // @match *://*.giveaway.su/giveaway/view/*
@@ -594,34 +594,8 @@
       {
         host: 'givekey.ru',
         element: 'a[href*="logout"]',
-        conditions: [
-          {
-            path: /^\/profile/,
-            steamKeys: '.card-title',
-            ready() {
-              $J('.card-deck').on('click', '.card-img-top', (e) => {
-                const key = steam.extractKeys($J(e.currentTarget).parent().find('.card-title').text());
-
-                if (key) {
-                  steam.openKeyActivationPage(key[0]);
-                }
-              });
-
-              $J('head').append(
-                  `<style>
-                    .card-img-top {
-                      cursor: pointer;
-                    }
-                  </style>`
-              );
-            }
-          },
-          {
-            path: /^\/distribution\//,
-            steamGroups: 'a.btn[href*="steamcommunity.com/groups/"]',
-            steamKeys: '#info_res:visible'
-          }
-        ]
+        steamGroups: 'a.btn[href*="steamcommunity.com/groups/"]',
+        steamKeys: '#info_res:visible'
       },
       {
         host: 'gleam.io',

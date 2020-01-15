@@ -28,7 +28,7 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
         <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">✔*</td><td align="center">✔</td><td>* Most Steam groups are hidden behind URL shorteners, so not all groups will be processed</td></tr>
         <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>givekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Opens Steam key activation page when you click a <a href="images/gamehunt_key_activation.png">game image</a> on <a href="https://gamehunt.net/profile">your profile page</a></td></tr>
+        <tr><td>givekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Sets tasks timer to zero</td></tr>
         <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Opens Steam key activation page when you click <a href="images/indiegala_key_activation.png">Steam logo</a> next to a key on <a href="https://www.indiegala.com/profile">your profile page</a></td></tr>
         <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Automatically "completes" tasks for visiting sites/reposts/likes when you visit a <a href="https://www.orlygift.com/giveaway">giveaway page</a></td></tr>
@@ -89,7 +89,7 @@ Automatic updating of the script may require your confirmation.
         <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">✔*</td><td align="center">✔</td><td>* Большинство Steam групп скрыты за сокращателями ссылок, поэтому не все группы будут обработаны</td></tr>
         <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>givekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/gamehunt_key_activation.png">изображению игры</a> на <a href="https://gamehunt.net/profile">странице вашего профиля</a></td></tr>
+        <tr><td>givekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Установка таймера заданий в ноль</td></tr>
         <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/indiegala_key_activation.png">логотипу Steam</a> рядом с ключом на <a href="https://www.indiegala.com/profile">странице вашего профиля</a></td></tr>
         <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Автоматически "выполняет" задания на посещение сайтов/репосты/лайки при посещении страницы <a href="https://www.orlygift.com/giveaway">раздач</a></td></tr>
