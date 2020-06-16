@@ -23,24 +23,23 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
         <tr><td>grabfreegame.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>bananagiveaway.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamingimpact.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gamecode.win</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">✔*</td><td align="center">✔</td><td>* Most Steam groups are hidden behind URL shorteners, so not all groups will be processed</td></tr>
         <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>givekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Sets tasks timer to zero</td></tr>
         <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Opens Steam key activation page when you click <a href="images/indiegala_key_activation.png">Steam logo</a> next to a key on <a href="https://www.indiegala.com/profile">your profile page</a></td></tr>
-        <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Automatically "completes" tasks for visiting sites/reposts/likes when you visit a <a href="https://www.orlygift.com/giveaway">giveaway page</a></td></tr>
         <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>giveaway.su</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>keyjoker.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Opens Steam key activation page when you click a <a href="images/keyjoker_key_activation.png">game image</a> on <a href="https://www.keyjoker.com/account/keys">"Keys"</a> page</td></tr>
+        <tr><td>key-hub.eu</td><td align="center">✔</td><td align="center">✔</td><td></td><td>The script goes through the tasks with <code>key-hub.eu/away</code> address, these tasks do not require any additional actions and are considered completed</td></tr>
+        <tr><td>takekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
     </tbody>
 </table>
 
 ### Installation
 1. Install one of the browser extensions to run user scripts.  
-   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/en/extensions/details/tampermonkey-beta/) (old version, the latest version can be installed from the [Chrome Web Store](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) using [this](https://addons.opera.com/en/extensions/details/install-chrome-extensions/) extension)  
+   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/en/extensions/details/tampermonkey-beta/)  
    Violentmonkey: [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/), [Maxthon](https://extension.maxthon.com/detail/index.php?view_id=1680)  
    Greasemonkey: [Firefox](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)  
 2. Go [here](/../../raw/master/GiveawayCompanion.user.js).
@@ -84,26 +83,25 @@ Automatic updating of the script may require your confirmation.
         <tr><td>grabfreegame.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>bananagiveaway.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamingimpact.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gamecode.win</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>dupedornot.com</td><td align="center">✔</td><td align="center">✔*</td><td align="center">✔</td><td>* Большинство Steam групп скрыты за сокращателями ссылок, поэтому не все группы будут обработаны</td></tr>
         <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>givekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Установка таймера заданий в ноль</td></tr>
         <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/indiegala_key_activation.png">логотипу Steam</a> рядом с ключом на <a href="https://www.indiegala.com/profile">странице вашего профиля</a></td></tr>
-        <tr><td>orlygift.com</td><td align="center">✔</td><td></td><td></td><td>Автоматически "выполняет" задания на посещение сайтов/репосты/лайки при посещении страницы <a href="https://www.orlygift.com/giveaway">раздач</a></td></tr>
         <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>giveaway.su</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
         <tr><td>keyjoker.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/keyjoker_key_activation.png">изображению игры</a> на странице <a href="https://www.keyjoker.com/account/keys">"Keys"</a></td></tr>
+        <tr><td>key-hub.eu</td><td align="center">✔</td><td align="center">✔</td><td></td><td>Скрипт проходит по заданиям с адресом <code>key-hub.eu/away</code>, эти задания не требуют больше никаких действий и считаются выполненными</td></tr>
+        <tr><td>takekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
     </tbody>
 </table>
 
 ### Установка
 1. Установить одно из браузерных расширений для выполнения пользовательских скриптов.  
-   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/) (старая версия, последнюю версию можно установить из [магазина Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru) используя [данное](https://addons.opera.com/ru/extensions/details/install-chrome-extensions/) расширение)  
+   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/)  
    Violentmonkey: [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/violentmonkey/), [Maxthon](https://extension.maxthon.com/detail/index.php?view_id=1680)  
-   Greasemonkey: [Firefox](https://addons.mozilla.org/ru/firefox/addon/greasemonkey/))
+   Greasemonkey: [Firefox](https://addons.mozilla.org/ru/firefox/addon/greasemonkey/)
 2. Перейти [сюда](/../../raw/master/GiveawayCompanion.user.js).
 3. Подтвердить установку скрипта.
 

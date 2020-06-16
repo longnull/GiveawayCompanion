@@ -1,4 +1,10 @@
 ## Changelog
+### v1.5 (2020-06-16)
+* Added support for key-hub.eu (tasks, groups).
+* Added support for takekey.ru (groups, keys).
+* Removed support for gamecode.win (dead).
+* Removed support for dupedornot.com (dead).
+* Removed support for orlygift.com ("We’ll take a break" for too long).
 ### v1.4.3 (2020-01-15)
 * Gamehunt: replaced by Givekey.ru (the same site on a different domain).
 * Giveawayhopper: support removed (the site is dead).
@@ -42,6 +48,12 @@
 ***
 
 ## Список изменений
+### v1.5 (2020-06-16)
+* Добавлена поддержка key-hub.eu (задания, группы).
+* Добавлена поддержка takekey.ru (группы, ключи).
+* Удалена поддержка gamecode.win (мёртв).
+* Удалена поддержка dupedornot.com (мёртв).
+* Удалена поддержка orlygift.com ("We’ll take a break" слишком долго).
 ### v1.4.3 (2020-01-15)
 * Gamehunt: заменён на Givekey.ru (тот же сайт на другом домене).
 * Giveawayhopper: поддержка удалена (сайт мёртв).

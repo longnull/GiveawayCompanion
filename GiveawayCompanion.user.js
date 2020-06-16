@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.4.3
+// @version 1.5
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -12,18 +12,17 @@
 // @match *://*.grabfreegame.com/giveaway/*
 // @match *://*.bananagiveaway.com/giveaway/*
 // @match *://*.gamingimpact.com/giveaway/*
-// @match *://*.gamecode.win/giveaway/*
 // @match *://*.marvelousga.com/giveaway/*
-// @match *://*.dupedornot.com/giveaway/*
 // @match *://*.whosgamingnow.net/giveaway/*
 // @match *://*.indiegala.com/profile
-// @match *://*.orlygift.com/giveaway
 // @match *://*.gamehag.com/*
 // @match *://*.givekey.ru/distribution/*
 // @match *://*.gleam.io/*/*
 // @match *://*.chubkeys.com/giveaway/*
 // @match *://*.giveaway.su/giveaway/view/*
 // @match *://*.keyjoker.com/*
+// @match *://*.key-hub.eu/giveaway/*
+// @match *://*.takekey.ru/distribution/*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
 // @connect bananagiveaway.com
@@ -42,17 +41,23 @@
   'use strict';
 
   const version = {
-    string: '1.4.3',
+    string: '1.5',
     changes: {
       default:
         `<ul>
-          <li>Gamehunt: replaced by Givekey.ru (the same site on a different domain).</li>
-          <li>Giveawayhopper: support removed (the site is dead).</li>
+          <li>Added support for key-hub.eu (tasks, groups).</li>
+          <li>Added support for takekey.ru (groups, keys).</li>
+          <li>Removed support for gamecode.win (dead).</li>
+          <li>Removed support for dupedornot.com (dead).</li>
+          <li>Removed support for orlygift.com ("We’ll take a break" for too long).</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Gamehunt: заменён на Givekey.ru (тот же сайт на другом домене).</li>
-          <li>Giveawayhopper: поддержка удалена (сайт мёртв).</li>
+          <li>Добавлена поддержка key-hub.eu (задания, группы).</li>
+          <li>Добавлена поддержка takekey.ru (группы, ключи).</li>
+          <li>Удалена поддержка gamecode.win (мёртв).</li>
+          <li>Удалена поддержка dupedornot.com (мёртв).</li>
+          <li>Удалена поддержка orlygift.com ("We’ll take a break" слишком долго).</li>
         </ul>`
     }
   };
@@ -195,71 +200,7 @@
         ]
       },
       {
-        host: 'gamecode.win',
-        element: 'a[href*="logout"]',
-        steamKeys: ['#insertKey:visible:not(:empty)', 'div:has(h5:contains("Here is your key")) h5:last-child'],
-        steamGroups: '.card-body a[href*="steamcommunity.com/groups/"]',
-        conditions: [
-          {
-            element: '.card-body [id^="listOfTasks_btnVerify_"]:not(:contains("VERIFIED"))',
-            buttons: [
-              {
-                type: 'tasks',
-                cancellable: true,
-                click(params) {
-                  const tasks = $J(params.self.element);
-
-                  log.debug(`tasks found : ${tasks.length}`);
-
-                  if (tasks.length) {
-                    return new Promise((resolve) => {
-                      const click = () => {
-                        log.debug(`${i + 1} : clicking...`);
-
-                        $J(tasks.get(i)).prop('disabled', false).trigger('click');
-                      };
-
-                      const ajaxComplete = (e, xhr, settings) => {
-                        if (settings.url.includes('/ajax/social/')) {
-                          log.debug(`${i + 1} : ajaxComplete() : /ajax/social/`);
-
-                          i++;
-                          params.button.progress(tasks.length, i);
-
-                          if (i >= tasks.length) {
-                            log.debug('all tasks done');
-
-                            unsafeWindow.$(document).unbind('ajaxComplete', ajaxComplete);
-                            utils.scrollTo('#btnGetKey');
-                            return resolve();
-                          }
-
-                          if (params.cancelled) {
-                            log.debug('cancelled');
-
-                            unsafeWindow.$(document).unbind('ajaxComplete', ajaxComplete);
-                            return resolve();
-                          }
-
-                          click();
-                        }
-                      };
-
-                      let i = 0;
-
-                      unsafeWindow.$(document).ajaxComplete(ajaxComplete);
-
-                      click();
-                    });
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        host: ['marvelousga.com', 'dupedornot.com'],
+        host: ['marvelousga.com'],
         element: '!a[href*="login"]',
         steamGroups: '.card-body a[href*="steamcommunity.com/groups/"]',
         steamKeys: ['#key_display_container:visible:not(:empty)', '#insertkey:visible:not(:empty)', '.card-body:contains("YOUR KEY"):visible', 'div:contains("already have a key"):visible'],
@@ -387,84 +328,6 @@
                 }
               </style>`
           );
-        }
-      },
-      {
-        host: 'orlygift.com',
-        elementAnd: ['a[href*="logout"]', '#tasks li:not(.claimed)'],
-        check(params) {
-          params.self._scope = unsafeWindow.angular.element($J('#tasks .box').get(0)).scope();
-          return typeof params.self._scope !== 'undefined';
-        },
-        ready(params) {
-          const types = [
-            'ad',
-            'steam_curator',
-            'link',
-            'youtube',
-            'orlydealz',
-            'orlyaccess',
-            'facebook_like',
-            'facebook_share',
-            'twitter_follow',
-            'twitter_tweet'
-          ];
-
-          const tasks = [];
-
-          for (const task of params.self._scope.taskController.tasks) {
-            if (!task.claimed && types.indexOf(task.type) >= 0) {
-              log.debug(`task found : ${task.id} : ${task.type} : ${task.description} : ${task.url}`);
-
-              tasks.push(task);
-            }
-          }
-
-          log.debug(`tasks found : ${tasks.length}`);
-
-          if (tasks.length) {
-            let i = 0;
-            let verifying = false;
-            let status;
-
-            const completeTask = async () => {
-              const task = tasks[i];
-              if (!verifying) {
-                log.debug(`${i + 1} : task verify : ${task.id} : ${task.type} : ${task.description} : ${task.url}`);
-
-                if (task.type === 'link') {
-                  try {
-                    log.debug(`${i + 1} : task type is "link", making request : ${window.location.origin}/api/task/open/${task.id}`);
-
-                    await $J.get(`${window.location.origin}/api/task/open/${task.id}`);
-
-                    log.debug(`${i + 1} : request done`);
-                  } catch (e) {}
-                }
-
-                params.self._scope.taskController.onVerify(task);
-                status = task.status ? task.status.title : null;
-                verifying = true;
-              } else {
-                if (task.status && task.status.title !== status) {
-                  log.debug(`${i + 1} : task status changed, next task`);
-
-                  i++;
-                  verifying = false;
-
-                  if (i === tasks.length) {
-                    log.debug('all tasks done');
-
-                    return;
-                  }
-                }
-              }
-
-              setTimeout(completeTask, 500);
-            };
-
-            completeTask();
-          }
         }
       },
       {
@@ -760,6 +623,63 @@
             }
           }
         ]
+      },
+      {
+        host: 'key-hub.eu',
+        element: 'a[href*="logout"]',
+        steamGroups: ['.task a[href*="steamcommunity.com/gid/"]', '.task a[href*="steamcommunity.com/groups/"]'],
+        conditions: [
+          {
+            element: '.task:not(:has(.task-result.fa-check-circle[style*="display: flex"])) a[href*="/away?data="]',
+            buttons: [
+              {
+                type: 'tasks',
+                cancellable: true,
+                click(params) {
+                  const tasks = $J(params.self.element);
+
+                  log.debug(`tasks found : ${tasks.length}`);
+
+                  if (tasks.length) {
+                    return new Promise(async (resolve) => {
+                      for (let i = 0; i < tasks.length; i++) {
+                        if (params.cancelled) {
+                          break;
+                        }
+
+                        const url = $J(tasks.get(i)).attr('href');
+
+                        log.debug(`${i + 1} : making request : ${url}`);
+
+                        try {
+                          await $J.get(url);
+                        } catch (e) {}
+
+                        log.debug(`${i + 1} : task done`);
+
+                        params.button.progress(tasks.length, i + 1);
+                      }
+
+                      if (params.cancelled) {
+                        log.debug('cancelled');
+                      } else {
+                        log.debug('all tasks done');
+                      }
+
+                      resolve();
+                    });
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        host: 'takekey.ru',
+        element: 'a[href*="logout"]',
+        steamGroups: ['#usl a.btn[href*="steamcommunity.com/gid/"]', '#usl a.btn[href*="steamcommunity.com/groups/"]'],
+        steamKeys: ['#swal2-content', '.alert.alert-danger']
       }
     ]
   };
@@ -894,7 +814,7 @@
       log.debug(`utils.resolveUrl() : making request : ${url}`);
 
       const response = await $GM.xmlHttpRequest({
-        method: 'HEAD',
+        method: 'GET',
         url: url
       });
 
@@ -1833,6 +1753,11 @@
           }
 
           group = ext;
+
+          if (this.isSteamGroupAdded(group)) {
+            return false;
+          }
+
           this._steamGroups.push(options.steamGroup);
         }
 
@@ -2329,14 +2254,19 @@
             }
             #${this._css.containerId} .${this._css.notificationTitleClass} {
               font-size: 14px;
-              font-weight: 700;
+              font-weight: bold;
               margin-bottom: 4px;
               overflow: hidden;
               text-overflow: ellipsis;
             }
             #${this._css.containerId} .${this._css.notificationMessageClass} {
               font-size: 14px;
+              font-weight: normal !important;
+              line-height: 20px;
               overflow-wrap: break-word;
+            }
+            #${this._css.containerId} .${this._css.notificationMessageClass} li {
+              font-weight: normal !important;
             }
             #${this._css.containerId} .${this._css.notificationClass} a {
               color: #ffa241;
