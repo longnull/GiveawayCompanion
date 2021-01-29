@@ -1,4 +1,6 @@
 ## Changelog
+### v1.5.1 (2021-01-29)
+* Gamehag: fixed completion of "Play one of our free games" tasks.
 ### v1.5 (2020-06-16)
 * Added support for key-hub.eu (tasks, groups).
 * Added support for takekey.ru (groups, keys).
@@ -48,6 +50,8 @@
 ***
 
 ## Список изменений
+### v1.5.1 (2021-01-29)
+* Gamehag: исправлено выполнение заданий "Play one of our free games".
 ### v1.5 (2020-06-16)
 * Добавлена поддержка key-hub.eu (задания, группы).
 * Добавлена поддержка takekey.ru (группы, ключи).

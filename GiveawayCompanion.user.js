@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.5
+// @version 1.5.1
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -41,23 +41,15 @@
   'use strict';
 
   const version = {
-    string: '1.5',
+    string: '1.5.1',
     changes: {
       default:
         `<ul>
-          <li>Added support for key-hub.eu (tasks, groups).</li>
-          <li>Added support for takekey.ru (groups, keys).</li>
-          <li>Removed support for gamecode.win (dead).</li>
-          <li>Removed support for dupedornot.com (dead).</li>
-          <li>Removed support for orlygift.com ("We’ll take a break" for too long).</li>
+          <li>Gamehag: fixed completion of "Play one of our free games" tasks.</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Добавлена поддержка key-hub.eu (задания, группы).</li>
-          <li>Добавлена поддержка takekey.ru (группы, ключи).</li>
-          <li>Удалена поддержка gamecode.win (мёртв).</li>
-          <li>Удалена поддержка dupedornot.com (мёртв).</li>
-          <li>Удалена поддержка orlygift.com ("We’ll take a break" слишком долго).</li>
+          <li>Gamehag: исправлено выполнение заданий "Play one of our free games".</li>
         </ul>`
     }
   };
@@ -381,17 +373,29 @@
                               log.debug(`${i + 1} : completeTask() : making action request : ${href}`);
 
                               try {
-                                const response = await $J.get(href);
-                                const lnk = $J(response.content).find('.game-list .game-tile .game-name a');
+                                let response = await $J.get(href);
+                                let lnk = $J(response.content).find('.game-list .col:not(:first-child) .game-tile .actions .btn-primary');
 
                                 if (lnk.length) {
-                                  href = lnk.attr('href') + '/play';
+                                  href = lnk.attr('href');
 
-                                  log.debug(`${i + 1} : completeTask() : it looks like a "play game" task, making "play" request : ${href}`);
+                                  log.debug(`${i + 1} : completeTask() : it looks like a "play game" task, making "/play" request : ${href}`);
 
-                                  await $J.get(href);
+                                  response = await $J.get(href);
 
-                                  log.debug(`${i + 1} : completeTask() : "play" request done`);
+                                  log.debug(`${i + 1} : completeTask() : "/play" request done`);
+
+                                  lnk = $J(response).find('#single-game-play');
+
+                                  if (lnk.length) {
+                                    href = lnk.attr('href');
+  
+                                    log.debug(`${i + 1} : completeTask() : making "/redirect" request : ${href}`);
+  
+                                    await $J.get(href);
+
+                                    log.debug(`${i + 1} : completeTask() : "/redirect" request done`);
+                                  }
                                 }
                               } catch (e) {}
 
