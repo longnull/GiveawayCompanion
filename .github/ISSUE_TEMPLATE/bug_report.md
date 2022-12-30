@@ -8,4 +8,4 @@ labels: bug
 
 
 - Browser: 
-- Extension: Tampermonkey/Violentmonkey/Greasemonkey
+- Extension: Tampermonkey/Violentmonkey

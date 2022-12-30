@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.5.1
+// @version 1.6
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -12,17 +12,15 @@
 // @match *://*.grabfreegame.com/giveaway/*
 // @match *://*.bananagiveaway.com/giveaway/*
 // @match *://*.gamingimpact.com/giveaway/*
-// @match *://*.marvelousga.com/giveaway/*
 // @match *://*.whosgamingnow.net/giveaway/*
-// @match *://*.indiegala.com/profile
 // @match *://*.gamehag.com/*
-// @match *://*.givekey.ru/distribution/*
 // @match *://*.gleam.io/*/*
 // @match *://*.chubkeys.com/giveaway/*
 // @match *://*.giveaway.su/giveaway/view/*
 // @match *://*.keyjoker.com/*
 // @match *://*.key-hub.eu/giveaway/*
-// @match *://*.takekey.ru/distribution/*
+// @match *://*.givee.club/*/event/*
+// @match *://*.opquests.com/*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
 // @connect bananagiveaway.com
@@ -41,15 +39,31 @@
   'use strict';
 
   const version = {
-    string: '1.5.1',
+    string: '1.6',
     changes: {
       default:
         `<ul>
-          <li>Gamehag: fixed completion of "Play one of our free games" tasks.</li>
+          <li>New type of tasks: add a game to wishlist on Steam.</li>
+          <li>New type of tasks: follow a game on Steam.</li>
+          <li>Added support for givee.club.</li>
+          <li>Added support for opquests.com.</li>
+          <li>Key-hub.eu: added support for "add a game to wishlist on Steam" tasks.</li>
+          <li>Removed support for marvelousga.com.</li>
+          <li>Removed support for indiegala.com.</li>
+          <li>Removed support for givekey.ru.</li>
+          <li>Removed support for takekey.ru.</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Gamehag: исправлено выполнение заданий "Play one of our free games".</li>
+          <li>Новый тип заданий: добавить игру в список желаемого Steam.</li>
+          <li>Новый тип заданий: подписаться на игру в Steam.</li>
+          <li>Добавлена поддержка givee.club.</li>
+          <li>Добавлена поддержка opquests.com.</li>
+          <li>Key-hub.eu: добавлена поддержка заданий "добавить игру в список желаемого Steam".</li>
+          <li>Удалена поддержка marvelousga.com.</li>
+          <li>Удалена поддержка indiegala.com.</li>
+          <li>Удалена поддержка givekey.ru.</li>
+          <li>Удалена поддержка takekey.ru.</li>
         </ul>`
     }
   };
@@ -59,6 +73,10 @@
     debug: false,
     // Enable Steam groups functionality
     steamGroups: true,
+    // Enable Steam application wishlist functionality
+    steamAppWishlist: true,
+    // Enable Steam application follow functionality
+    steamAppFollow: true,
     // Size of the buttons (pixels)
     buttonsSize: 40,
     notifications: {
@@ -192,92 +210,6 @@
         ]
       },
       {
-        host: ['marvelousga.com'],
-        element: '!a[href*="login"]',
-        steamGroups: '.card-body a[href*="steamcommunity.com/groups/"]',
-        steamKeys: ['#key_display_container:visible:not(:empty)', '#insertkey:visible:not(:empty)', '.card-body:contains("YOUR KEY"):visible', 'div:contains("already have a key"):visible'],
-        conditions: [
-          {
-            elementAnd: ['.card-body:has(button[id^="task_"]:not([data-disabled]))', '#getKey:not(:visible)', '!.card-body:contains("YOUR KEY"):visible'],
-            buttons: [
-              {
-                type: 'tasks',
-                cancellable: true,
-                click(params) {
-                  const tasks = $J(params.self.elementAnd[0]);
-
-                  log.debug(`tasks found : ${tasks.length}`);
-
-                  if (tasks.length) {
-                    return new Promise((resolve) => {
-                      const completeTask = (task, verify = false) => {
-                        let el = [];
-
-                        if (!verify) {
-                          log.debug(`${i + 1} : completeTask() : clicking action...`);
-
-                          el = unsafeWindow.$(task).find('a[id^="task_"]');
-                        }
-
-                        if (!el.length) {
-                          log.debug(`${i + 1} : completeTask() : clicking verify...`);
-
-                          el = unsafeWindow.$(task).find('button[id^="task_"]');
-                        }
-
-                        if (el.length) {
-                          el.trigger('click');
-                        }
-                      };
-
-                      const ajaxComplete = (e, xhr, settings) => {
-                        if (settings.url.includes('/ajax/verifyTasks/')) {
-                          log.debug(`${i + 1} : ajaxComplete() : /ajax/verifyTasks/`);
-
-                          if (params.cancelled) {
-                            log.debug('cancelled');
-
-                            unsafeWindow.$(document).unbind('ajaxComplete', ajaxComplete);
-                            return resolve();
-                          }
-
-                          if (settings.url.includes('clickedLink')) {
-                            log.debug(`${i + 1} : ajaxComplete() : /clickedLink`);
-
-                            completeTask(tasks.get(i), true);
-                          } else {
-                            log.debug(`${i + 1} : ajaxComplete() : not /clickedLink`);
-
-                            i++;
-                            params.button.progress(tasks.length, i);
-
-                            if (i >= tasks.length) {
-                              log.debug('all tasks done');
-
-                              unsafeWindow.$(document).unbind('ajaxComplete', ajaxComplete);
-                              utils.scrollTo('#get_key_container');
-                              return resolve();
-                            }
-
-                            completeTask(tasks.get(i));
-                          }
-                        }
-                      };
-
-                      let i = 0;
-
-                      unsafeWindow.$(document).ajaxComplete(ajaxComplete);
-
-                      completeTask(tasks.get(i));
-                    });
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
         host: 'whosgamingnow.net',
         element: 'a[href*="logout"]',
         steamKeys: '.SteamKey:visible',
@@ -299,28 +231,6 @@
             ]
           }
         ]
-      },
-      {
-        host: 'indiegala.com',
-        element: '#profile_bundle_section',
-        steamKeys: '[id^="serial_n_"]%val',
-        ready(params) {
-          $J(params.self.element).on('click', '.span-key:has([id^="serial_n_"]) img', (e) => {
-            const key = $J(e.currentTarget).closest('[id^="serial_"]').find('[id^="serial_n_"]').val();
-
-            if (key) {
-              steam.openKeyActivationPage(key);
-            }
-          });
-
-          $J('head').append(
-              `<style>
-                .span-key img[src*="steam-icon"] {
-                  cursor: pointer;
-                }
-              </style>`
-          );
-        }
       },
       {
         host: 'gamehag.com',
@@ -389,9 +299,9 @@
 
                                   if (lnk.length) {
                                     href = lnk.attr('href');
-  
+
                                     log.debug(`${i + 1} : completeTask() : making "/redirect" request : ${href}`);
-  
+
                                     await $J.get(href);
 
                                     log.debug(`${i + 1} : completeTask() : "/redirect" request done`);
@@ -457,12 +367,6 @@
             ]
           }
         ]
-      },
-      {
-        host: 'givekey.ru',
-        element: 'a[href*="logout"]',
-        steamGroups: 'a.btn[href*="steamcommunity.com/groups/"]',
-        steamKeys: '#info_res:visible'
       },
       {
         host: 'gleam.io',
@@ -618,11 +522,11 @@
               });
 
               $J('head').append(
-                  `<style>
-                    .card-body .col-auto img {
-                      cursor: pointer;
-                    }
-                  </style>`
+                `<style>
+                  .card-body .col-auto img {
+                    cursor: pointer;
+                  }
+                </style>`
               );
             }
           }
@@ -632,6 +536,7 @@
         host: 'key-hub.eu',
         element: 'a[href*="logout"]',
         steamGroups: ['.task a[href*="steamcommunity.com/gid/"]', '.task a[href*="steamcommunity.com/groups/"]'],
+        steamAppWishlist: '.task a[href*="store.steampowered.com/app/"]',
         conditions: [
           {
             element: '.task:not(:has(.task-result.fa-check-circle[style*="display: flex"])) a[href*="/away?data="]',
@@ -680,19 +585,163 @@
         ]
       },
       {
-        host: 'takekey.ru',
+        host: 'givee.club',
         element: 'a[href*="logout"]',
-        steamGroups: ['#usl a.btn[href*="steamcommunity.com/gid/"]', '#usl a.btn[href*="steamcommunity.com/groups/"]'],
-        steamKeys: ['#swal2-content', '.alert.alert-danger']
+        steamGroups: '.event-actions tr:has(.fa-steam-symbol) .event-action-label a:not([href*="#"])',
+        steamAppWishlist: ['.event-actions tr:has(.fa-plus-circle) .event-action-label a:not([href*="#"])', '.event-actions tr:has(.fa-plus-circle) .event-action-label a[href="#"]@data-steam-wishlist-appid'],
+        conditions: [
+          {
+            element: '.event-action-buttons .glyphicon-refresh',
+            buttons: [
+              {
+                type: 'tasks',
+                cancellable: true,
+                click(params) {
+                  const tasks = $J(params.self.element);
+
+                  log.debug(`tasks found : ${tasks.length}`);
+
+                  if (tasks.length) {
+                    return new Promise(async (resolve) => {
+                      for (let i = 0; i < tasks.length; i++) {
+                        if (params.cancelled) {
+                          break;
+                        }
+
+                        log.debug(`${i + 1} : click`);
+
+                        const task = tasks.get(i);
+
+                        task.click();
+                        await utils.waitForElement('.event-action-checking .glyphicon-refresh', false, false, task.parent);
+
+                        log.debug(`${i + 1} : task done`);
+
+                        params.button.progress(tasks.length, i + 1);
+                      }
+
+                      if (params.cancelled) {
+                        log.debug('cancelled');
+                      } else {
+                        log.debug('all tasks done');
+                      }
+
+                      resolve();
+                    });
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        host: 'opquests.com',
+        element: 'form[action*="logout"]',
+        conditions: [
+          {
+            path: /^\/quests\//,
+            steamGroups: '.items-center a[href*="steamcommunity.com/groups/"]',
+            steamAppWishlist: '.items-center:has(.fa-list):has(.submit-loader) a[href*="store.steampowered.com/app/"]',
+            steamAppFollow: '.items-center:has(.fa-gamepad):has(.submit-loader) a[href*="store.steampowered.com/app/"]',
+            conditions: [
+              {
+                element: '.items-center .submit-loader',
+                buttons: [
+                  {
+                    type: 'tasks',
+                    cancellable: true,
+                    click(params) {
+                      const tasks = $J(params.self.element);
+
+                      log.debug(`tasks found : ${tasks.length}`);
+
+                      if (tasks.length) {
+                        return new Promise(async (resolve) => {
+                          const m = window.location.pathname.match(/\/quests\/(\d+)/);
+
+                          log.debug('making confirm request');
+
+                          try {
+                            await $J.get(`https://opquests.com/quests/${m[1]}?confirm=1`);
+                          } catch (e) {}
+
+                          let done = 0;
+
+                          for (let i = 0; i < tasks.length; i++) {
+                            if (params.cancelled) {
+                              break;
+                            }
+
+                            const task = $J(tasks.get(i));
+                            const token = task.parent().find('input[name="_token"]').val();
+                            const taskId = task.parent().find('input[name="task_id"]').val();
+
+                            log.debug(`${i + 1} : making request`);
+
+                            try {
+                              await $J.post('https://opquests.com/entries', {_token: token, task_id: taskId});
+                            } catch (e) {}
+
+                            params.button.progress(tasks.length, i + 1);
+
+                            done++;
+
+                            log.debug(`${i + 1} : done`);
+                          }
+
+                          if (params.cancelled) {
+                            log.debug('cancelled');
+                          } else {
+                            log.debug('all tasks done');
+                          }
+
+                          if (done) {
+                            notifications.success(i18n.get('reload-to-see-changes'), {timeout: 0});
+                          }
+
+                          resolve();
+                        });
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            path: /^\/keys/,
+            steamKeys: ['button[data-clipboard-text]@data-clipboard-text', '.w-full .mb-2'],
+            ready() {
+              const imgs = $J('.items-center .p-4 img');
+
+              if (imgs.length) {
+                imgs.on('click', (e) => {
+                  steam.openKeyActivationPage($J(e.currentTarget).parents('.items-center').find('.mb-2:nth-child(2)').text().trim());
+                });
+
+                $J('head').append(
+                  `<style>
+                    .items-center .p-4 img {
+                      cursor: pointer;
+                    }
+                  </style>`
+                );
+              }
+            }
+          },
+        ]
       }
     ]
   };
 
-  // Icons from https://materialdesignicons.com
+  // https://materialdesignicons.com
   const icons = {
     checkmark: '<svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg>',
     key: '<svg viewBox="0 0 24 24"><path d="M7,14A2,2 0 0,1 5,12A2,2 0 0,1 7,10A2,2 0 0,1 9,12A2,2 0 0,1 7,14M12.65,10C11.83,7.67 9.61,6 7,6A6,6 0 0,0 1,12A6,6 0 0,0 7,18C9.61,18 11.83,16.33 12.65,14H17V18H21V14H23V10H12.65Z" /></svg>',
-    steam: '<svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C7.4,22 3.55,18.92 2.36,14.73L6.19,16.31C6.45,17.6 7.6,18.58 8.97,18.58C10.53,18.58 11.8,17.31 11.8,15.75V15.62L15.2,13.19H15.28C17.36,13.19 19.05,11.5 19.05,9.42C19.05,7.34 17.36,5.65 15.28,5.65C13.2,5.65 11.5,7.34 11.5,9.42V9.47L9.13,12.93L8.97,12.92C8.38,12.92 7.83,13.1 7.38,13.41L2,11.2C2.43,6.05 6.73,2 12,2M8.28,17.17C9.08,17.5 10,17.13 10.33,16.33C10.66,15.53 10.28,14.62 9.5,14.29L8.22,13.76C8.71,13.58 9.26,13.57 9.78,13.79C10.31,14 10.72,14.41 10.93,14.94C11.15,15.46 11.15,16.04 10.93,16.56C10.5,17.64 9.23,18.16 8.15,17.71C7.65,17.5 7.27,17.12 7.06,16.67L8.28,17.17M17.8,9.42C17.8,10.81 16.67,11.94 15.28,11.94C13.9,11.94 12.77,10.81 12.77,9.42A2.5,2.5 0 0,1 15.28,6.91C16.67,6.91 17.8,8.04 17.8,9.42M13.4,9.42C13.4,10.46 14.24,11.31 15.29,11.31C16.33,11.31 17.17,10.46 17.17,9.42C17.17,8.38 16.33,7.53 15.29,7.53C14.24,7.53 13.4,8.38 13.4,9.42Z" /></svg>',
+    group: '<svg viewBox="0 0 24 24"><path d="M19 17V19H7V17S7 13 13 13 19 17 19 17M16 8A3 3 0 1 0 13 11A3 3 0 0 0 16 8M19.2 13.06A5.6 5.6 0 0 1 21 17V19H24V17S24 13.55 19.2 13.06M18 5A2.91 2.91 0 0 0 17.11 5.14A5 5 0 0 1 17.11 10.86A2.91 2.91 0 0 0 18 11A3 3 0 0 0 18 5M8 10H5V7H3V10H0V12H3V15H5V12H8Z" /></svg>',
+    wishlist: '<svg viewBox="0 0 24 24"><path d="M17,14H19V17H22V19H19V22H17V19H14V17H17V14M5,3H19C20.11,3 21,3.89 21,5V12.8C20.39,12.45 19.72,12.2 19,12.08V5H5V19H12.08C12.2,19.72 12.45,20.39 12.8,21H5C3.89,21 3,20.11 3,19V5C3,3.89 3.89,3 5,3M7,7H17V9H7V7M7,11H17V12.08C16.15,12.22 15.37,12.54 14.68,13H7V11M7,15H12V17H7V15Z" /></svg>',
+    follow: '<svg viewBox="0 0 24 24"><path d="M23.5 17L18.5 22L15 18.5L16.5 17L18.5 19L22 15.5L23.5 17M22 13.5L22 13.8C21.37 13.44 20.67 13.19 19.94 13.07C19.75 12.45 19.18 12 18.5 12H17V7H12V5.5C12 4.67 11.33 4 10.5 4C9.67 4 9 4.67 9 5.5V7H4L4 9.12C5.76 9.8 7 11.5 7 13.5C7 15.5 5.75 17.2 4 17.88V20H6.12C6.8 18.25 8.5 17 10.5 17C11.47 17 12.37 17.3 13.12 17.8L13 19C13 20.09 13.29 21.12 13.8 22H13.2V21.7C13.2 20.21 12 19 10.5 19C9 19 7.8 20.21 7.8 21.7V22H4C2.9 22 2 21.1 2 20V16.2H2.3C3.79 16.2 5 15 5 13.5C5 12 3.79 10.8 2.3 10.8H2V7C2 5.9 2.9 5 4 5H7.04C7.28 3.3 8.74 2 10.5 2C12.26 2 13.72 3.3 13.96 5H17C18.1 5 19 5.9 19 7V10.04C20.7 10.28 22 11.74 22 13.5Z" /></svg>',
     cancel: '<svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.63,15.55 5.68,16.91L16.91,5.68C15.55,4.63 13.85,4 12,4M12,20A8,8 0 0,0 20,12C20,10.15 19.37,8.45 18.32,7.09L7.09,18.32C8.45,19.37 10.15,20 12,20Z" /></svg>',
     success: '<svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z" /></svg>',
     info: '<svg viewBox="0 0 24 24"><path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>',
@@ -736,41 +785,63 @@
     lang: null,
     langs: {
       default: {
-        'complete-tasks': 'Complete the tasks',
+        'confirm-tasks': 'Confirm tasks',
         'cancel': 'Cancel',
         'useful-info': 'Useful information',
         'reload-to-see-changes': '<a href="javascript:window.location.reload(false)">Reload</a> the page to see changes.',
         'steam-activate-key': 'Open Steam key activation page ({key})',
-        'steam-loading-groups': 'Loading Steam groups...',
-        'steam-group-join': 'Join Steam group "{group}" (Ctrl+Click - open the group in new tab)',
-        'steam-group-leave': 'Leave Steam group "{group}" (Ctrl+Click - open the group in new tab)',
-        'steam-init-request-failed': `Failed to load <a href="https://steamcommunity.com/my/groups" target="_blank">your groups</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.`,
+        'steam-loading-tasks': 'Loading Steam tasks...',
+        'steam-group-join': 'Join Steam group "{group}" (Ctrl+Click - open the group in a new tab)',
+        'steam-group-leave': 'Leave Steam group "{group}" (Ctrl+Click - open the group in a new tab)',
+        'steam-init-groups-request-failed': 'Failed to load <a href="https://steamcommunity.com/my/groups" target="_blank">your groups</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.',
+        'steam-init-store-request-failed': 'Failed to get information from your Steam account. <a href="https://store.steampowered.com" target="_blank">Steam Store</a> is probably down.',
         'steam-join-group-failed': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably experiencing some issues.',
         'steam-join-group-join-request-sent': 'Join request sent. To join the <a href="{groupLink}" target="_blank">group</a>, your join request must be approved by the group administrator.',
-        'steam-join-group-not-logged': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. [steam-not-logged]',
+        'steam-join-group-not-logged': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. [steam-community-not-logged]',
         'steam-join-group-not-found': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. Looks like the group does not exist.',
         'steam-leave-group-failed': 'Failed to leave the <a href="{groupLink}" target="_blank">group</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably experiencing some issues.',
-        'steam-leave-group-not-logged': 'Failed to leave the <a href="{groupLink}" target="_blank">group</a>. [steam-not-logged]',
-        'steam-not-logged': `It looks like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.`,
+        'steam-leave-group-not-logged': 'Failed to leave the <a href="{groupLink}" target="_blank">group</a>. [steam-community-not-logged]',
+        'steam-app-wishlist-add': 'Add game #{appId} to Steam wishlist (Ctrl+Click - open the game in a new tab)',
+        'steam-app-wishlist-remove': 'Remove game #{appId} from Steam wishlist (Ctrl+Click - open the game in a new tab)',
+        'steam-app-wishlist-add-failed': 'Failed to add to Steam wishlist. [steam-store-issues]',
+        'steam-app-wishlist-remove-failed': 'Failed to remove from Steam wishlist. [steam-store-issues]',
+        'steam-app-follow': 'Follow game #{appId} on Steam (Ctrl+Click - open the game in a new tab)',
+        'steam-app-unfollow': 'Unfollow game #{appId} on Steam (Ctrl+Click - open the game in a new tab)',
+        'steam-app-follow-failed': 'Failed to follow a game on Steam. [steam-store-issues]',
+        'steam-app-unfollow-failed': 'Failed to unfollow a game on Steam. [steam-store-issues]',
+        'steam-community-not-logged': 'It looks like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.',
+        'steam-store-not-logged': 'It looks like you are not logged in to <a href="https://store.steampowered.com" target="_blank">Steam Store</a>.',
+        'steam-store-issues': 'Perhaps you are not logged in to <a href="https://store.steampowered.com" target="_blank">Steam Store</a> or Steam is experiencing some issues.',
         'gc-updated': `Giveaway Companion has been updated to version ${version.string}.<br><br><b>Changes:</b>`
       },
       ru: {
-        'complete-tasks': 'Выполнить задания',
+        'confirm-tasks': 'Подтвердить задания',
         'cancel': 'Отмена',
         'useful-info': 'Полезная информация',
         'reload-to-see-changes': '<a href="javascript:window.location.reload(false)">Обновите</a> страницу, чтобы увидеть изменения.',
         'steam-activate-key': 'Открыть страницу активации Steam ключа ({key})',
-        'steam-loading-groups': 'Загрузка Steam групп...',
+        'steam-loading-tasks': 'Загрузка заданий Steam...',
         'steam-group-join': 'Вступить в Steam группу "{group}" (Ctrl+Клик - открыть группу в новой вкладке)',
         'steam-group-leave': 'Выйти из Steam группы "{group}" (Ctrl+Клик - открыть группу в новой вкладке)',
-        'steam-init-request-failed': `Не удалось загрузить <a href="https://steamcommunity.com/my/groups" target="_blank">ваши группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.`,
+        'steam-init-groups-request-failed': 'Не удалось загрузить <a href="https://steamcommunity.com/my/groups" target="_blank">ваши группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.',
+        'steam-init-store-request-failed': 'Не удалось загрузить информацию из вашего аккаунта Steam. <a href="https://store.steampowered.com" target="_blank">Магазин Steam</a>, возможно, неактивен.',
         'steam-join-group-failed': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, испытывает какие-то проблемы.',
         'steam-join-group-join-request-sent': 'Заявка на вступление отправлена. Чтобы вступить в <a href="{groupLink}" target="_blank">группу</a>, вашу заявку должен одобрить администратор группы.',
-        'steam-join-group-not-logged': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. [steam-not-logged]',
+        'steam-join-group-not-logged': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. [steam-community-not-logged]',
         'steam-join-group-not-found': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. Похоже, группа не существует.',
         'steam-leave-group-failed': 'Не удалось выйти из <a href="{groupLink}" target="_blank">группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, испытывает какие-то проблемы.',
-        'steam-leave-group-not-logged': 'Не удалось выйти из <a href="{groupLink}" target="_blank">группы</a>. [steam-not-logged]',
-        'steam-not-logged': `Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.`,
+        'steam-leave-group-not-logged': 'Не удалось выйти из <a href="{groupLink}" target="_blank">группы</a>. [steam-community-not-logged]',
+        'steam-app-wishlist-add': 'Добавить в список желаемого Steam игру #{appId} (Ctrl+Клик - открыть игру в новой вкладке)',
+        'steam-app-wishlist-remove': 'Удалить из списка желаемого Steam игру #{appId} (Ctrl+Клик - открыть игру в новой вкладке)',
+        'steam-app-wishlist-add-failed': 'Не удалось добавить в список желаемого Steam. [steam-store-issues]',
+        'steam-app-wishlist-remove-failed': 'Не удалось удалить из списка желаемого Steam. [steam-store-issues]',
+        'steam-app-follow': 'Подписаться в Steam на игру #{appId} (Ctrl+Клик - открыть игру в новой вкладке)',
+        'steam-app-unfollow': 'Отписаться в Steam от игры #{appId} (Ctrl+Клик - открыть игру в новой вкладке)',
+        'steam-app-follow-failed': 'Не удалось подписаться на Steam игру. [steam-store-issues]',
+        'steam-app-unfollow-failed': 'Не удалось отписаться от Steam игры. [steam-store-issues]',
+        'steam-community-not-logged': 'Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.',
+        'steam-store-not-logged': 'Похоже, вы не авторизованы в <a href="https://store.steampowered.com" target="_blank">Магазине Steam</a>.',
+        'steam-store-issues': 'Возможно, вы не авторизованы в <a href="https://store.steampowered.com" target="_blank">Магазине Steam</a> или Steam испытывает какие-то проблемы.',
         'gc-updated': `Giveaway Companion был обновлён до версии ${version.string}.<br><br><b>Изменения:</b>`
       }
     }
@@ -853,6 +924,46 @@
           }).
           replace(/</g, '&lt;').
           replace(/>/g, '&gt;');
+    },
+    async waitForElement(selectors, waitForExistence = true, visible = false, parent = document, interval = 250, seconds = 0) {
+      const isVisible = (e) => {
+        return !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
+      };
+
+      return new Promise((resolve) => {
+        if (!Array.isArray(selectors)) {
+          selectors = [selectors];
+        }
+
+        seconds = seconds * 1000;
+
+        const startTime = Date.now();
+        const check = () => {
+          let found = true;
+          let el;
+
+          for (const s of selectors) {
+            el = parent.querySelector(s);
+
+            if ((waitForExistence && (!el || (visible && !isVisible(el)))) || (!waitForExistence && el)) {
+              found = false;
+              break;
+            }
+          }
+
+          if (found) {
+            return resolve(el);
+          }
+
+          if (seconds > 0 && Date.now() - startTime > seconds) {
+            return resolve(false);
+          }
+
+          setTimeout(check, interval);
+        };
+
+        check();
+      });
     }
   };
 
@@ -878,13 +989,23 @@
   const steam = {
     initFailed: false,
     _sessionId: null,
+    _userId: null,
     _processUrl: null,
     _userGroups: [],
+    _userWishlistedApps: [],
+    _userFollowedApps: [],
+    _userOwnedApps: [],
     _idCache: {},
     _activateKeyUrl: 'https://store.steampowered.com/account/registerkey?key=',
     _userGroupsUrl: 'https://steamcommunity.com/my/groups',
+    _userDataUrl: 'https://store.steampowered.com/dynamicstore/userdata/?v=275&id=',
     _groupUrl: 'https://steamcommunity.com/groups/',
+    _appUrl: 'https://store.steampowered.com/app/',
+    _addToWishlistUrl: 'https://store.steampowered.com/api/addtowishlist',
+    _removeFromWishlistUrl: 'https://store.steampowered.com/api/removefromwishlist',
+    _followAppUrl: 'https://store.steampowered.com/explore/followgame/',
     _groupRegex: /steamcommunity\.com\/groups\/([a-zA-Z0-9\-_]{2,32})/,
+    _appRegex: /store\.steampowered\.com\/app\/(\d+)/,
     _keyRegex: /[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}(-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5})?/g,
     _initPromise: null,
     openGroupPage(group) {
@@ -904,6 +1025,15 @@
       log.debug(`steam.activateKey("${key}")`);
 
       window.open(this._activateKeyUrl + key, '_blank');
+    },
+    openAppPage(id) {
+      if (typeof id !== 'string' && typeof id !== 'number') {
+        return;
+      }
+
+      log.debug(`steam.openAppPage(${id})`);
+
+      window.open(this._appUrl + id, '_blank');
     },
     extractKeys(txt) {
       if (typeof txt !== 'string') {
@@ -931,6 +1061,19 @@
 
       return false;
     },
+    extractAppId(url) {
+      if (typeof url !== 'string') {
+        return false;
+      }
+
+      const match = url.match(this._appRegex);
+
+      if (match) {
+        return match[1];
+      }
+
+      return false;
+    },
     async init() {
       if (!config.steamGroups || this.initFailed) {
         return false;
@@ -944,21 +1087,46 @@
 
       this._initPromise = new Promise(async (resolve) => {
         log.debug('steam.init()');
-
         log.debug(`steam.init() : making request : ${this._userGroupsUrl}`);
 
-        const response = await $GM.xmlHttpRequest({
-          method: 'GET',
-          url: this._userGroupsUrl
-        });
+        let response;
 
-        if (response.status !== 200) {
-          log.debug(`steam.init() : request failed : ${response.status}`);
+        for (let i = 0; i < 2; i++) {
+          response = await $GM.xmlHttpRequest({
+            method: 'GET',
+            url: this._userGroupsUrl
+          });
 
-          notifications.error(i18n.get('steam-init-request-failed'));
+          if (response.status !== 200) {
+            log.debug(`steam.init() : request failed : ${response.status}`);
 
-          this.initFailed = true;
-          return resolve(false);
+            notifications.error(i18n.get('steam-init-groups-request-failed'));
+
+            this.initFailed = true;
+            return resolve(false);
+          }
+
+          if (response.finalUrl.includes('/login/')) {
+            log.debug('steam.init() : redirected to login');
+
+            if (i == 0) {
+              log.debug('steam.init() : making request : https://login.steampowered.com/jwt/refresh');
+
+              response = await $GM.xmlHttpRequest({
+                method: 'GET',
+                url: 'https://login.steampowered.com/jwt/refresh?redir=https%3A%2F%2Fsteamcommunity.com%2Fmy%2Fgroups'
+              });
+            } else {
+              log.debug('steam.init() : user not logged');
+
+              notifications.error(i18n.get('steam-community-not-logged'));
+
+              this.initFailed = true;
+              return resolve(false);
+            }
+          } else {
+            break;
+          }
         }
 
         const responseDom = $J(response.responseText);
@@ -968,7 +1136,7 @@
         if (!userUrl || !this._sessionId) {
           log.debug('steam.init() : user data not found');
 
-          notifications.error(i18n.get('steam-not-logged'));
+          notifications.error(i18n.get('steam-community-not-logged'));
 
           this.initFailed = true;
           return resolve(false);
@@ -984,6 +1152,30 @@
             this._userGroups.push(m.toLowerCase());
           }
         });
+
+        this._userId = responseDom.find('a[data-miniprofile]').attr('data-miniprofile');
+
+        log.debug(`steam.init() : making request : ${this._userDataUrl + this._userId}`);
+
+        response = await $GM.xmlHttpRequest({
+          method: 'GET',
+          url: this._userDataUrl + this._userId + '&t=' + Date.now()
+        });
+
+        if (response.status !== 200) {
+          log.debug(`steam.init() : request failed : ${response.status}`);
+
+          notifications.error(i18n.get('steam-init-store-request-failed'));
+
+          this.initFailed = true;
+          return resolve(false);
+        }
+
+        const json = JSON.parse(response.responseText);
+
+        this._userWishlistedApps = json.rgWishlist;
+        this._userFollowedApps = json.rgFollowedApps;
+        this._userOwnedApps = json.rgOwnedApps;
 
         log.debug('steam.init() : done');
 
@@ -1001,82 +1193,21 @@
 
       log.debug(`steam.joinGroup(${groupName})`);
 
-      const checkGroup = (page) => {
-        page = $J(page);
+      let groupInfo = await this.getGroupInfo(groupName);
 
-        if (page.find('.supernav_container').length) {
-          if (!page.find('#account_pulldown').length) {
-            log.debug('steam.joinGroup() : checkGroup() : user are not logged in');
-
-            notifications.error(i18n.get('steam-join-group-not-logged'), {'groupLink': this._groupUrl + groupName});
-
-            return -2;
-          }
-
-          if (page.find('.grouppage_header_name').length) {
-            if (page.find('a[href*="ConfirmLeaveGroup"]').length) {
-              log.debug('steam.joinGroup() : checkGroup() : joined');
-
-              this._userGroups.push(groupName);
-
-              return 1;
-            } else if (page.find('a[href*="ConfirmCancelJoinRequest"]').length) {
-              log.debug('steam.joinGroup() : checkGroup() : waiting for approval');
-
-              notifications.info(i18n.get('steam-join-group-join-request-sent', {'groupLink': this._groupUrl + groupName}));
-
-              return 2;
-            }
-          } else {
-            log.debug('steam.joinGroup() : checkGroup() : group not found');
-
-            notifications.error(i18n.get('steam-join-group-not-found', {'groupLink': this._groupUrl + groupName}));
-
-            return -3;
-          }
-        } else {
-          log.debug('steam.joinGroup() : checkGroup() : wrong page');
-
-          notifications.error(i18n.get('steam-join-group-failed', {'groupLink': this._groupUrl + groupName}));
-
-          return -1;
-        }
-
-        log.debug('steam.joinGroup() : checkGroup() : not joined');
-
-        return 0;
-      };
-
-      log.debug(`steam.joinGroup() : making request : ${this._groupUrl}${groupName}`);
-
-      let response = await $GM.xmlHttpRequest({
-        method: 'GET',
-        url: this._groupUrl + groupName
-      });
-
-      if (response.status !== 200) {
-        log.debug(`steam.joinGroup() : request failed : ${response.status}`);
-
+      if (!groupInfo) {
         notifications.error(i18n.get('steam-join-group-failed', {'groupLink': this._groupUrl + groupName}));
 
         return false;
       }
-
-      let checkRes = checkGroup(response.responseText);
-
-      if (checkRes !== 0) {
-        return checkRes === 1;
-      }
-
-      await this.getGroupId(groupName, response.responseText);
 
       log.debug(`steam.joinGroup() : making join request : ${this._groupUrl}${groupName}`);
 
-      response = await $GM.xmlHttpRequest({
+      const response = await $GM.xmlHttpRequest({
         method: 'POST',
         url: this._groupUrl + groupName,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        data: $J.param({action: 'join', sessionID: this._sessionId})
+        data: $J.param({action: 'join', sessionID: groupInfo.sessionId})
       });
 
       if (response.status !== 200) {
@@ -1087,10 +1218,18 @@
         return false;
       }
 
-      checkRes = checkGroup(response.responseText);
+      groupInfo = await this.getGroupInfo(groupName, response.responseText);
 
-      if (checkRes !== 0) {
-        return checkRes === 1;
+      if (!groupInfo) {
+        notifications.error(i18n.get('steam-join-group-failed', {'groupLink': this._groupUrl + groupName}));
+
+        return false;
+      }
+
+      if (groupInfo.status === 'joined') {
+        this._userGroups.push(groupName);
+
+        return true;
       }
 
       notifications.error(i18n.get('steam-join-group-failed', {'groupLink': this._groupUrl + groupName}));
@@ -1106,16 +1245,20 @@
 
       log.debug(`steam.leaveGroup(${groupName})`);
 
-      const id = await this.getGroupId(groupName);
+      const groupInfo = await this.getGroupInfo(groupName);
 
-      if (id === -1 || id === false) {
+      if (!groupInfo) {
         notifications.error(i18n.get('steam-leave-group-failed', {'groupLink': this._groupUrl + groupName}));
 
         return false;
-      } else if (id === -2) {
+      }
+
+      if (groupInfo.status === 'not_logged' || groupInfo.status === 'wrong_page') {
         notifications.error(i18n.get('steam-leave-group-not-logged', {'groupLink': this._groupUrl + groupName}));
 
         return false;
+      } else if (groupInfo.status === 'not_joined') {
+        return true;
       }
 
       log.debug(`steam.leaveGroup() : making request : ${this._processUrl}`);
@@ -1124,7 +1267,7 @@
         method: 'POST',
         url: this._processUrl,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        data: $J.param({action: 'leaveGroup', sessionID: this._sessionId, groupId: id})
+        data: $J.param({action: 'leaveGroup', sessionID: groupInfo.sessionId, groupId: groupInfo.id})
       });
 
       if (response.status !== 200) {
@@ -1136,14 +1279,14 @@
       }
 
       if (!response.finalUrl.includes('/groups')) {
-        log.debug('steam.leaveGroup() : user are not logged in');
+        log.debug('steam.leaveGroup() : user is not logged in');
 
         notifications.error(i18n.get('steam-leave-group-not-logged', {'groupLink': this._groupUrl + groupName}));
 
         return false;
       }
 
-      if (response.responseText.includes(id)) {
+      if (response.responseText.includes(groupInfo.id)) {
         log.debug('steam.leaveGroup() : not left');
 
         notifications.error(i18n.get('steam-leave-group-failed', {'groupLink': this._groupUrl + groupName}));
@@ -1161,27 +1304,15 @@
 
       return true;
     },
-    async getGroupId(groupName, groupPage) {
-      if (!config.steamGroups) {
-        return false;
-      }
+    async getGroupInfo(groupName, groupPage) {
+      let groupPageJ;
 
       groupName = groupName.toLowerCase();
 
-      log.debug(`steam.getGroupId(${groupName})`);
-
-      if (typeof this._idCache[groupName] !== 'undefined') {
-        log.debug(`steam.getGroupId() : group id found in the cache : ${this._idCache[groupName]}`);
-
-        return this._idCache[groupName];
-      };
-
       if (groupPage) {
-        if (!(groupPage instanceof $J)) {
-          groupPage = $J(groupPage);
-        }
+        groupPageJ = $J(groupPage);
       } else {
-        log.debug(`steam.getGroupId() : making request : ${this._groupUrl}${groupName}`);
+        log.debug(`steam.getGroupInfo() : making request : ${this._groupUrl}${groupName}`);
 
         const response = await $GM.xmlHttpRequest({
           method: 'GET',
@@ -1189,39 +1320,100 @@
         });
 
         if (response.status !== 200) {
-          log.debug(`steam.getGroupId() : request failed : ${response.status}`);
+          log.debug(`steam.getGroupInfo() : request failed : ${response.status}`);
 
           return false;
         }
 
-        groupPage = $J(response.responseText);
+        groupPage = response.responseText;
+        groupPageJ = $J(response.responseText);
       }
 
-      if (groupPage.find('.supernav_container').length) {
-        if (!groupPage.find('#account_pulldown').length) {
-          log.debug('steam.getGroupId() : user are not logged in');
+      const result = {
+        id: null,
+        sessionId: null
+      };
 
-          return -2;
-        }
+      if (groupPageJ.find('.supernav_container').length) {
+        if (groupPageJ.find('#account_pulldown').length) {
+          if (groupPageJ.find('.grouppage_header_name').length) {
+            if (groupPageJ.find('a[href*="ConfirmLeaveGroup"]').length) {
+              log.debug('steam.getGroupInfo() : joined');
 
-        const id = groupPage.find('input[name="groupId"]').val();
+              result.status = 'joined';
+            } else {
+              if (groupPageJ.find('a[href*="ConfirmCancelJoinRequest"]').length) {
+                log.debug('steam.getGroupInfo() : waiting for approval');
 
-        if (id) {
-          this._idCache[groupName] = id;
+                result.status = 'approval';
+              } else {
+                log.debug('steam.getGroupInfo() : not joined');
 
-          log.debug(`steam.getGroupId() : group id found : ${id}`);
+                result.status = 'not_joined';
+              }
+            }
+          } else {
+            log.debug('steam.getGroupInfo() : group not found');
 
-          return id;
+            result.status = 'not_found';
+          }
         } else {
-          log.debug('steam.getGroupId() : group id not found');
+          log.debug('steam.getGroupInfo() : user is not logged in');
+
+          result.status = 'not_logged';
         }
       } else {
-        log.debug('steam.getGroupId() : wrong page');
+        log.debug('steam.getGroupInfo() : wrong page');
 
-        return -1;
+        result.status = 'wrong_page';
       }
 
-      return false;
+      const groupId = groupPageJ.find('input[name="groupId"]').val();
+
+      if (groupId) {
+        log.debug(`steam.getGroupInfo() : group id found : ${groupId}`);
+
+        this._idCache[groupName] = groupId;
+        result.id = groupId;
+      } else {
+        log.debug('steam.getGroupInfo() : group id not found');
+      }
+
+      const sessionId = groupPage.match(/g_sessionID\s*=\s*"(.+?)"/);
+
+      if (sessionId) {
+        log.debug(`steam.getGroupInfo() : g_sessionID found : ${sessionId[1]}`);
+      } else {
+        log.debug('steam.getGroupInfo() : g_sessionID not found');
+      }
+
+      result.sessionId = sessionId[1];
+
+      return result;
+    },
+    async getSessionId(url) {
+      log.debug(`steam.getSessionId() : making request : ${url}`);
+
+      let response = await $GM.xmlHttpRequest({
+        method: 'GET',
+        url: url
+      });
+
+      if (response.status !== 200) {
+        log.debug(`steam.getSessionId() : request failed : ${response.status}`);
+
+        return false;
+      }
+
+      const sessionId = response.responseText.match(/g_sessionID\s*=\s*"(.+?)"/);
+
+      if (!sessionId) {
+        log.debug('steam.getSessionId() : g_sessionID not found');
+
+        return false;
+      }
+
+      return sessionId[1];
     },
     isJoinedGroup(groupName) {
       if (!config.steamGroups) {
@@ -1230,20 +1422,220 @@
 
       groupName = groupName.toLowerCase();
       return this._userGroups.indexOf(groupName) !== -1;
+    },
+    isAppWishlisted(appId) {
+      if (!config.steamAppWishlist) {
+        return false;
+      }
+
+      appId = parseInt(appId);
+
+      return this._userWishlistedApps.indexOf(appId) !== -1 || this._userOwnedApps.indexOf(appId) !== -1;
+    },
+    isAppFollowed(appId) {
+      if (!config.steamAppFollow) {
+        return false;
+      }
+
+      appId = parseInt(appId);
+
+      return this._userFollowedApps.indexOf(appId) !== -1;
+    },
+    isAppOwned(appId) {
+      appId = parseInt(appId);
+
+      return this._userOwnedApps.indexOf(appId) !== -1;
+    },
+    async addToWishlist(appId) {
+      if (!this._sessionId) {
+        return false;
+      }
+
+      log.debug(`steam.addToWishlist(${appId})`);
+
+      const sessionId = await this.getSessionId(`https://store.steampowered.com/app/${appId}/`);
+
+      if (!sessionId) {
+        notifications.error(i18n.get('steam-store-not-logged'));
+
+        return false;
+      }
+
+      log.debug(`steam.addToWishlist() : making request : ${this._addToWishlistUrl}`);
+
+      const response = await $GM.xmlHttpRequest({
+        method: 'POST',
+        url: this._addToWishlistUrl,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Referer': `https://store.steampowered.com/app/${appId}/`,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        data: $J.param({sessionid: sessionId, appid: appId})
+      });
+
+      if (response.status !== 200) {
+        log.debug(`steam.addToWishlist() : request failed : ${response.status}`);
+
+        notifications.error(i18n.get('steam-app-wishlist-add-failed'));
+
+        return false;
+      }
+
+      if (!JSON.parse(response.responseText).success) {
+        log.debug('steam.addToWishlist() : not success');
+
+        notifications.error(i18n.get('steam-app-wishlist-add-failed'));
+
+        return false;
+      }
+
+      this._userWishlistedApps.push(parseInt(appId));
+
+      return true;
+    },
+    async removeFromWishlist(appId) {
+      if (!this._sessionId) {
+        return false;
+      }
+
+      log.debug(`steam.removeFromWishlist(${appId})`);
+
+      const sessionId = await this.getSessionId(`https://store.steampowered.com/app/${appId}/`);
+
+      if (!sessionId) {
+        notifications.error(i18n.get('steam-store-not-logged'));
+
+        return false;
+      }
+
+      log.debug(`steam.removeFromWishlist() : making request : ${this._removeFromWishlistUrl}`);
+
+      const response = await $GM.xmlHttpRequest({
+        method: 'POST',
+        url: this._removeFromWishlistUrl,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        data: $J.param({sessionid: sessionId, appid: appId})
+      });
+
+      if (response.status !== 200) {
+        log.debug(`steam.removeFromWishlist() : request failed : ${response.status}`);
+
+        notifications.error(i18n.get('steam-app-wishlist-remove-failed'));
+
+        return false;
+      }
+
+      if (!JSON.parse(response.responseText).success) {
+        log.debug('steam.removeFromWishlist() : not success');
+
+        notifications.error(i18n.get('steam-app-wishlist-remove-failed'));
+
+        return false;
+      }
+
+      const index = this._userWishlistedApps.indexOf(parseInt(appId));
+
+      if (index !== -1) {
+        this._userWishlistedApps.splice(index, 1);
+      }
+
+      return true;
+    },
+    async followApp(appId) {
+      log.debug(`steam.followApp(${appId})`);
+
+      const sessionId = await this.getSessionId(`https://store.steampowered.com/app/${appId}/`);
+
+      if (!sessionId) {
+        notifications.error(i18n.get('steam-store-not-logged'));
+
+        return false;
+      }
+
+      log.debug(`steam.followApp() : making request : ${this._followAppUrl}`);
+
+      const response = await $GM.xmlHttpRequest({
+        method: 'POST',
+        url: this._followAppUrl,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        data: $J.param({sessionid: sessionId, appid: appId})
+      });
+
+      if (response.status !== 200) {
+        log.debug(`steam.followApp() : request failed : ${response.status}`);
+
+        notifications.error(i18n.get('steam-app-follow-failed'));
+
+        return false;
+      }
+
+      if (response.responseText != 'true') {
+        log.debug('steam.followApp() : not success');
+
+        notifications.error(i18n.get('steam-app-follow-failed'));
+
+        return false;
+      }
+
+      this._userFollowedApps.push(parseInt(appId));
+
+      return true;
+    },
+    async unfollowApp(appId) {
+      log.debug(`steam.unfollowApp(${appId})`);
+
+      const sessionId = await this.getSessionId(`https://store.steampowered.com/app/${appId}/`);
+
+      if (!sessionId) {
+        notifications.error(i18n.get('steam-store-not-logged'));
+
+        return false;
+      }
+
+      log.debug(`steam.unfollowApp() : making request : ${this._followAppUrl}`);
+
+      const response = await $GM.xmlHttpRequest({
+        method: 'POST',
+        url: this._followAppUrl,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        data: $J.param({sessionid: sessionId, appid: appId, unfollow: '1'})
+      });
+
+      if (response.status !== 200) {
+        log.debug(`steam.unfollowApp() : request failed : ${response.status}`);
+
+        notifications.error(i18n.get('steam-unfollow-app-failed'));
+
+        return false;
+      }
+
+      if (response.responseText != 'true') {
+        log.debug('steam.unfollowApp() : not success');
+
+        notifications.error(i18n.get('steam-unfollow-app-failed'));
+
+        return false;
+      }
+
+      const index = this._userFollowedApps.indexOf(parseInt(appId));
+
+      if (index !== -1) {
+        this._userFollowedApps.splice(index, 1);
+      }
+
+      return true;
     }
   };
 
   const buttons = {
-    colors: {
-      default: '#6c757d',
-      green: 'rgba(118,158,107,.7)',
-      red: 'rgba(158,107,107,.7)'
-    },
     count: 0,
     _elements: {},
     _css: {},
     _steamKeys: [],
     _steamGroups: [],
+    _steamAppWishlist: [],
+    _steamAppFollow: [],
     _init() {
       if (this._elements.main) {
         return;
@@ -1264,186 +1656,191 @@
       this._css.scrollDownId = utils.randomString(11);
 
       $J('head').append(
-          `<style>
-            #${this._css.mainId},
-            #${this._css.mainId} *,
-            #${this._css.mainId} *::before,
-            #${this._css.mainId} *::after {
-              box-sizing: border-box;
-              font-family: arial, sans-serif;
-              margin: 0;
-              padding: 0;
+        `<style>
+          #${this._css.mainId},
+          #${this._css.mainId} *,
+          #${this._css.mainId} *::before,
+          #${this._css.mainId} *::after {
+            box-sizing: border-box;
+            font-family: arial, sans-serif;
+            margin: 0;
+            padding: 0;
+          }
+          #${this._css.mainId} {
+            position: fixed;
+            z-index: 9999999;
+            right: 0;
+            width: ${config.buttonsSize + 8}px;
+            margin: 10px 0 10px 0;
+            padding: 4px;
+            border-radius: 6px 0 0 6px;
+            background-color: #263238;
+            box-shadow: 0 0 4px 2px rgba(255,255,255,.5);
+          }
+          #${this._css.wrapperId} {
+            position: relative;
+          }
+          #${this._css.wrapperId}.${this._css.disabledClass} {
+            pointer-events: none;
+            opacity: 0.6;
+          }
+          #${this._css.buttonsId} {
+            padding-right: 50px;
+            margin-right: -50px;
+            min-height: ${config.buttonsSize}px;
+            overflow-x: hidden;
+            overflow-y: scroll;
+          }
+          #${this._css.buttonsId} .${this._css.buttonClass}:not(:last-child) {
+            margin-bottom: 2px;
+          }
+          #${this._css.buttonsId} .${this._css.buttonClass} {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            cursor: pointer;
+            text-decoration: none;
+            width: ${config.buttonsSize}px;
+            height: ${config.buttonsSize}px;
+            border-radius: 6px;
+            background-color: #6c757d;
+          }
+          #${this._css.buttonsId} .${this._css.buttonClass}[data-done="1"] {
+            background-color: rgba(118,158,107,.7);
+          }
+          #${this._css.buttonsId} .${this._css.buttonClass}[data-done="0"] {
+            background-color: rgba(158,107,107,.7);
+          }
+          #${this._css.buttonsId} .${this._css.buttonContentClass} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+            color: #f5f5f5;
+            z-index: 1;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+          }
+          #${this._css.buttonsId} .${this._css.spinnerClass} .${this._css.buttonContentClass} {
+            display: none;
+          }
+          #${this._css.buttonsId} .${this._css.buttonClass}::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+            box-shadow: 0 0 2px 2px rgba(0,0,0,.15) inset, 0 0 6px rgba(0,0,0,.2) inset;
+            background-color: transparent;
+            transition: background-color .3s linear;
+          }
+          #${this._css.buttonsId} .${this._css.buttonClass}:not(.${this._css.disabledClass}):not(.${this._css.spinnerClass}):hover::after,
+          #${this._css.buttonsId} .${this._css.buttonClass}:not(.${this._css.disabledClass}):not(.${this._css.spinnerClass}):focus::after {
+            background-color: rgba(255,255,255,.12);
+          }
+          #${this._css.buttonsId} .${this._css.disabledClass},
+          #${this._css.buttonsId} .${this._css.spinnerClass} {
+            cursor: default;
+            pointer-events: none;
+          }
+          #${this._css.buttonsId} .${this._css.disabledClass}:not(.${this._css.spinnerClass}) {
+            opacity: 0.7;
+          }
+          #${this._css.buttonsId} .${this._css.spinnerClass}::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: #fff;
+            z-index: 1;
+            animation: ${this._css.spinnerKeyframe} .6s linear infinite;
+          }
+          @keyframes ${this._css.spinnerKeyframe} {
+            to {
+              transform: rotate(360deg);
             }
-            #${this._css.mainId} {
-              position: fixed;
-              z-index: 9999999;
-              right: 0;
-              width: ${config.buttonsSize + 8}px;
-              margin: 10px 0 10px 0;
-              padding: 4px;
-              border-radius: 6px 0 0 6px;
-              background-color: #263238;
-              box-shadow: 0 0 4px 2px rgba(255,255,255,.5);
-            }
-            #${this._css.wrapperId} {
-              position: relative;
-            }
-            #${this._css.wrapperId}.${this._css.disabledClass} {
-              pointer-events: none;
-              opacity: 0.6;
-            }
-            #${this._css.buttonsId} {
-              padding-right: 50px;
-              margin-right: -50px;
-              min-height: ${config.buttonsSize}px;
-              overflow-x: hidden;
-              overflow-y: scroll;
-            }
-            #${this._css.buttonsId} .${this._css.buttonClass}:not(:last-child) {
-              margin-bottom: 2px;
-            }
-            #${this._css.buttonsId} .${this._css.buttonClass} {
-              position: relative;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              overflow: hidden;
-              cursor: pointer;
-              text-decoration: none;
-              width: ${config.buttonsSize}px;
-              height: ${config.buttonsSize}px;
-              border-radius: 6px;
-              background-color: #6c757d;
-            }
-            #${this._css.buttonsId} .${this._css.buttonContentClass} {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              overflow: hidden;
-              width: 30px;
-              height: 30px;
-              font-size: 14px;
-              color: #f5f5f5;
-              z-index: 1;
-              -webkit-touch-callout: none;
-              -webkit-user-select: none;
-              -khtml-user-select: none;
-              -moz-user-select: none;
-              -ms-user-select: none;
-              user-select: none;
-            }
-            #${this._css.buttonsId} .${this._css.spinnerClass} .${this._css.buttonContentClass} {
-              display: none;
-            }
-            #${this._css.buttonsId} .${this._css.buttonClass}::after {
-              content: '';
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              border-radius: 6px;
-              box-shadow: 0 0 2px 2px rgba(0,0,0,.15) inset, 0 0 6px rgba(0,0,0,.2) inset;
-              background-color: transparent;
-              transition: background-color .3s linear;
-            }
-            #${this._css.buttonsId} .${this._css.buttonClass}:not(.${this._css.disabledClass}):not(.${this._css.spinnerClass}):hover::after,
-            #${this._css.buttonsId} .${this._css.buttonClass}:not(.${this._css.disabledClass}):not(.${this._css.spinnerClass}):focus::after {
-              background-color: rgba(255,255,255,.12);
-            }
-            #${this._css.buttonsId} .${this._css.disabledClass},
-            #${this._css.buttonsId} .${this._css.spinnerClass} {
-              cursor: default;
-              pointer-events: none;
-            }
-            #${this._css.buttonsId} .${this._css.disabledClass}:not(.${this._css.spinnerClass}) {
-              opacity: 0.7;
-            }
-            #${this._css.buttonsId} .${this._css.spinnerClass}::before {
-              content: '';
-              width: 20px;
-              height: 20px;
-              border-radius: 50%;
-              border: 2px solid transparent;
-              border-top-color: #fff;
-              z-index: 1;
-              animation: ${this._css.spinnerKeyframe} .6s linear infinite;
-            }
-            @keyframes ${this._css.spinnerKeyframe} {
-              to {
-                transform: rotate(360deg);
-              }
-            }
-            #${this._css.buttonsId} .${this._css.buttonContentClass} svg {
-              width: 30px;
-              height: 30px;
-            }
-            #${this._css.buttonsId} .${this._css.buttonContentClass} path {
-              fill: #f5f5f5;
-            }
-            #${this._css.buttonsId} .${this._css.spinnerClass} svg {
-              display: none;
-            }
-            #${this._css.buttonsId} .${this._css.progressClass} {
-              height: 100%;
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 0;
-              background-color: rgba(234,131,30,.6);
-              transition: width .3s linear;
-            }
-            #${this._css.moverId},
-            #${this._css.resizerId} {
-              display: block;
-              border: 2px solid #777;
-              border-radius: 2px;
-            }
-            #${this._css.moverId} {
-              cursor: move;
-              margin-bottom: 4px;
-            }
-            #${this._css.resizerId} {
-              cursor: n-resize;
-              margin-top: 4px;
-            }
-            #${this._css.scrollUpId},
-            #${this._css.scrollDownId} {
-              position: absolute;
-              width: 100%;
-              left: 0;
-              line-height: 1;
-              font-size: 12px;
-              text-align: center;
-              color: #dcdcdc;
-              cursor: default;
-              z-index: 1;
-            }
-            #${this._css.scrollUpId} {
-              top: 0;
-              background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 70%);
-            }
-            #${this._css.scrollDownId} {
-              bottom: 0;
-              background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 70%);
-            }
-          </style>`
+          }
+          #${this._css.buttonsId} .${this._css.buttonContentClass} svg {
+            width: 30px;
+            height: 30px;
+          }
+          #${this._css.buttonsId} .${this._css.buttonContentClass} path {
+            fill: #f5f5f5;
+          }
+          #${this._css.buttonsId} .${this._css.spinnerClass} svg {
+            display: none;
+          }
+          #${this._css.buttonsId} .${this._css.progressClass} {
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            background-color: rgba(234,131,30,.6);
+            transition: width .3s linear;
+          }
+          #${this._css.moverId},
+          #${this._css.resizerId} {
+            display: block;
+            border: 2px solid #777;
+            border-radius: 2px;
+          }
+          #${this._css.moverId} {
+            cursor: move;
+            margin-bottom: 4px;
+          }
+          #${this._css.resizerId} {
+            cursor: n-resize;
+            margin-top: 4px;
+          }
+          #${this._css.scrollUpId},
+          #${this._css.scrollDownId} {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            line-height: 1;
+            font-size: 12px;
+            text-align: center;
+            color: #dcdcdc;
+            cursor: default;
+            z-index: 1;
+          }
+          #${this._css.scrollUpId} {
+            top: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 70%);
+          }
+          #${this._css.scrollDownId} {
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 70%);
+          }
+        </style>`
       );
 
       this._elements.main = $J(
-          `<div id="${this._css.mainId}">
-            <span id="${this._css.moverId}"></span>
-            <div id="${this._css.wrapperId}">
-              <div id="${this._css.buttonsId}"></div>
-              <span id="${this._css.scrollUpId}">&#x2BC5;</span>
-              <span id="${this._css.scrollDownId}">&#x2BC6;</span>
-            </div>
-            <span id="${this._css.resizerId}"></span>
-          </div>`
+        `<div id="${this._css.mainId}">
+          <span id="${this._css.moverId}"></span>
+          <div id="${this._css.wrapperId}">
+            <div id="${this._css.buttonsId}"></div>
+            <span id="${this._css.scrollUpId}">&#x2BC5;</span>
+            <span id="${this._css.scrollDownId}">&#x2BC6;</span>
+          </div>
+          <span id="${this._css.resizerId}"></span>
+        </div>`
       );
 
       this._elements.main.hide();
-
       this._elements.main.appendTo('body');
 
       this._elements.wrapper = $J(`#${this._css.wrapperId}`);
@@ -1688,6 +2085,9 @@
           } else {
             this.element.removeClass(self._css.spinnerClass);
           }
+        },
+        done(value) {
+          this.element.attr('data-done', value ? '1' : '0');
         }
       };
 
@@ -1717,6 +2117,7 @@
         options.title = i18n.get('steam-activate-key', {key: options.steamKey});
         options.content = icons.key;
         options.prepend = true;
+        options.insertByType = true;
         options.data = {steamKey: options.steamKey};
         options.click = (p) => {
           steam.openKeyActivationPage(p.button.element.data('steamKey'));
@@ -1772,24 +2173,14 @@
         options.data = {steamGroup: group};
 
         if (!steam.isJoinedGroup(group)) {
-          if (this._elements.buttons) {
-            const btn = this._elements.buttons.find('[data-joined="1"]').first().data('button');
-
-            if (btn) {
-              options.insertBefore = btn;
-            }
-          }
-
-          options.attr = {'data-joined': '0'};
+          options.done = false;
           options.title = i18n.get('steam-group-join', {group: group});
-          options.color = self.colors.red;
         } else {
-          options.attr = {'data-joined': '1'};
+          options.done = true;
           options.title = i18n.get('steam-group-leave', {group: group});
-          options.color = self.colors.green;
         }
 
-        options.content = icons.steam;
+        options.content = icons.group;
         options.click = (p) => {
           const group = p.button.element.data('steamGroup');
 
@@ -1801,15 +2192,180 @@
           return new Promise(async (resolve) => {
             if (!steam.isJoinedGroup(group)) {
               if (await steam.joinGroup(group)) {
-                button.color(self.colors.green);
-                button.element.attr('data-joined', '1');
+                button.done(true);
                 button.title(i18n.get('steam-group-leave', {group: group}));
               }
             } else {
               if (await steam.leaveGroup(group)) {
-                button.color(self.colors.red);
-                button.element.attr('data-joined', '0');
+                button.done(false);
                 button.title(i18n.get('steam-group-join', {group: group}));
+              }
+            }
+
+            resolve();
+          });
+        };
+      } else if (options.type === 'steam-app-wishlist') {
+        if (!config.steamAppWishlist ||
+          !options.steamApp ||
+          this.isSteamAppWishlistAdded(options.steamApp) ||
+          steam.isAppOwned(options.steamApp)
+        ) {
+          return false;
+        }
+        if (!await steam.init()) {
+          return false;
+        }
+
+        log.debug(`buttons.add() : steam-app-wishlist button : ${options.steamApp}`);
+
+        let steamApp = options.steamApp;
+
+        if (steamApp.includes('/')) {
+          let ext = steam.extractAppId(steamApp);
+
+          if (!ext) {
+            const res = await utils.resolveUrl(steamApp);
+
+            if (res === false) {
+              return false;
+            }
+
+            steamApp = res;
+            ext = steam.extractAppId(steamApp);
+          }
+
+          if (!ext) {
+            log.debug(`buttons.add() : cannot extract app id : ${steamApp}`);
+
+            return false;
+          }
+
+          steamApp = ext;
+
+          if (this.isSteamAppWishlistAdded(steamApp)) {
+            return false;
+          }
+
+          this._steamAppWishlist.push(options.steamApp);
+        }
+
+        if (steam.isAppOwned(steamApp)) {
+          return false;
+        }
+
+        this._steamAppWishlist.push(steamApp);
+
+        options.data = {steamApp: steamApp};
+
+        if (!steam.isAppWishlisted(steamApp)) {
+          options.done = false;
+          options.title = i18n.get('steam-app-wishlist-add', {appId: steamApp});
+        } else {
+          options.done = true;
+          options.title = i18n.get('steam-app-wishlist-remove', {appId: steamApp});
+        }
+
+        options.content = icons.wishlist;
+        options.click = (p) => {
+          const appId = p.button.element.data('steamApp');
+
+          if (p.event.ctrlKey) {
+            steam.openAppPage(appId);
+            return;
+          }
+
+          return new Promise(async (resolve) => {
+            if (!steam.isAppWishlisted(appId)) {
+              if (await steam.addToWishlist(appId)) {
+                button.done(true);
+                button.title(i18n.get('steam-app-wishlist-remove', {appId: appId}));
+              }
+            } else {
+              if (await steam.removeFromWishlist(appId)) {
+                button.done(false);
+                button.title(i18n.get('steam-app-wishlist-add', {appId: appId}));
+              }
+            }
+
+            resolve();
+          });
+        };
+      } else if (options.type === 'steam-app-follow') {
+        if (!config.steamAppWishlist || !options.steamApp) {
+          return false;
+        }
+        if (this.isSteamAppFollowAdded(options.steamApp)) {
+          return false;
+        }
+        if (!await steam.init()) {
+          return false;
+        }
+
+        log.debug(`buttons.add() : steam-app-follow button : ${options.steamApp}`);
+
+        let steamApp = options.steamApp;
+
+        if (steamApp.includes('/')) {
+          let ext = steam.extractAppId(steamApp);
+
+          if (!ext) {
+            const res = await utils.resolveUrl(steamApp);
+
+            if (res === false) {
+              return false;
+            }
+
+            steamApp = res;
+            ext = steam.extractAppId(steamApp);
+          }
+
+          if (!ext) {
+            log.debug(`buttons.add() : cannot extract app id : ${steamApp}`);
+
+            return false;
+          }
+
+          steamApp = ext;
+
+          if (this.isSteamAppFollowAdded(steamApp)) {
+            return false;
+          }
+
+          this._steamAppFollow.push(options.steamApp);
+        }
+
+        this._steamAppFollow.push(steamApp);
+
+        options.data = {steamApp: steamApp};
+
+        if (!steam.isAppFollowed(steamApp)) {
+          options.done = false;
+          options.title = i18n.get('steam-app-follow', {appId: steamApp});
+        } else {
+          options.done = true;
+          options.title = i18n.get('steam-app-unfollow', {appId: steamApp});
+        }
+
+        options.content = icons.follow;
+        options.click = (p) => {
+          const appId = p.button.element.data('steamApp');
+
+          if (p.event.ctrlKey) {
+            steam.openAppPage(appId);
+            return;
+          }
+
+          return new Promise(async (resolve) => {
+            if (!steam.isAppFollowed(appId)) {
+              if (await steam.followApp(appId)) {
+                button.done(true);
+                button.title(i18n.get('steam-app-follow', {appId: appId}));
+              }
+            } else {
+              if (await steam.unfollowApp(appId)) {
+                button.done(false);
+                button.title(i18n.get('steam-app-unfollow', {appId: appId}));
               }
             }
 
@@ -1819,9 +2375,9 @@
       } else if (options.type === 'tasks') {
         log.debug('buttons.add() : tasks button');
 
-        options.title = i18n.get('complete-tasks');
+        options.title = i18n.get('confirm-tasks');
         options.content = icons.checkmark;
-        options.prepend = true;
+        options.sticky = true;
         options.overlay = true;
         options.disable = true;
       }
@@ -1833,9 +2389,9 @@
       this._init();
 
       const element = $J(
-          `<a href="#" tabindex="0" class="${this._css.buttonClass}">
-            <span class="${this._css.buttonContentClass}"></span>
-          </a>`
+        `<a href="#" tabindex="0" class="${this._css.buttonClass}">
+          <span class="${this._css.buttonContentClass}"></span>
+        </a>`
       );
 
       if (typeof options.title !== 'undefined') {
@@ -1858,26 +2414,64 @@
           element.attr(key, options.attr[key]);
         });
       }
+      if (typeof options.done === 'boolean') {
+        element.attr('data-done', options.done ? '1' : '0');
+      }
 
+      element.attr('data-type', options.type);
       element.data('button', button);
 
-      if (options.insertBefore) {
-        element.insertBefore(options.insertBefore.element);
+      if (options.sticky) {
+        element.attr('data-sticky', '1');
+        element.prependTo(this._elements.buttons);
       } else {
-        if (options.sticky) {
-          element.attr('data-sticky', '1');
-          element.prependTo(this._elements.buttons);
-        } else {
-          if (options.prepend) {
-            const sticky = this._elements.buttons.find('[data-sticky="1"]');
+        if (typeof options.done === 'boolean') {
+          if (options.done) {
+            element.appendTo(this._elements.buttons);
+          } else {
+            const btns = this._elements.buttons.children(`[data-done="1"]`);
 
-            if (sticky.length) {
-              element.insertAfter(sticky.last());
+            if (btns.length) {
+              element.insertBefore(btns.first());
             } else {
-              element.prependTo(this._elements.buttons);
+              element.appendTo(this._elements.buttons);
+            }
+          }
+        } else {
+          if (options.insertByType) {
+            let btns = this._elements.buttons.children(`[data-type="${options.type}"]`);
+
+            if (btns.length) {
+              if (options.prependByType) {
+                element.insertBefore(btns.first());
+              } else {
+                element.insertAfter(btns.last());
+              }
+            } else {
+              if (options.prepend) {
+                btns = this._elements.buttons.children('[data-sticky="1"]');
+
+                if (btns.length) {
+                  element.insertAfter(btns.last());
+                } else {
+                  element.prependTo(this._elements.buttons);
+                }
+              } else {
+                element.appendTo(this._elements.buttons);
+              }
             }
           } else {
-            element.appendTo(this._elements.buttons);
+            if (options.prepend) {
+              const btns = this._elements.buttons.children(':not([data-sticky="1"])');
+
+              if (btns.length) {
+                element.insertBefore(btns.first());
+              } else {
+                element.prependTo(this._elements.buttons);
+              }
+            } else {
+              element.appendTo(this._elements.buttons);
+            }
           }
         }
       }
@@ -2150,6 +2744,12 @@
         group = group.toLowerCase();
       }
       return this._steamGroups.indexOf(group) !== -1;
+    },
+    isSteamAppWishlistAdded(id) {
+      return this._steamAppWishlist.indexOf(id) !== -1;
+    },
+    isSteamAppFollowAdded(id) {
+      return this._steamAppFollow.indexOf(id) !== -1;
     }
   };
 
@@ -2180,129 +2780,130 @@
       this._css.notificationCloseClass = utils.randomString(11);
 
       $J('head').append(
-          `<style>
-            #${this._css.containerId},
-            #${this._css.containerId} *,
-            #${this._css.containerId} *::before,
-            #${this._css.containerId} *::after {
-              box-sizing: border-box;
-              font-family: arial, sans-serif;
-              margin: 0;
-              padding: 0;
-            }
-            #${this._css.containerId} {
-              z-index: 9999999;
-              position: fixed;
-              right: 0;
-              bottom: 0;
-              margin: 0 10px 10px 0;
-            }
-            #${this._css.containerId} .${this._css.notificationClass} {
-              display: flex;
-              padding: 6px;
-              border-radius: 6px;
-              background-color: #263238;
-              width: ${config.notifications.width}px;
-              color: #f5f5f5;
-              opacity: .9;
-              border: 2px solid rgba(255,255,255,.3);
-            }
-            #${this._css.containerId} .${this._css.notificationClass}:not(:first-child) {
-              margin-top: 10px;
-            }
-            #${this._css.containerId} .${this._css.notificationClass}:hover {
-              opacity: 1;
-            }
-            #${this._css.containerId} .${this._css.notificationClickableClass}:hover {
-              cursor: pointer;
-            }
-            #${this._css.containerId} .${this._css.notificationSuccessClass} {
-              border: 2px solid rgba(98,224,71,.3);
-            }
-            #${this._css.containerId} .${this._css.notificationInfoClass} {
-              border: 2px solid rgba(71,224,221,.3);
-            }
-            #${this._css.containerId} .${this._css.notificationWarningClass} {
-              border: 2px solid rgba(224,216,71,.3);
-            }
-            #${this._css.containerId} .${this._css.notificationErrorClass} {
-              border: 2px solid rgba(224,71,71,.3);
-            }
-            #${this._css.containerId} .${this._css.notificationSuccessClass} .${this._css.notificationIconClass} path {
-              fill: #62e047;
-            }
-            #${this._css.containerId} .${this._css.notificationInfoClass} .${this._css.notificationIconClass} path {
-              fill: #47e0dd;
-            }
-            #${this._css.containerId} .${this._css.notificationWarningClass} .${this._css.notificationIconClass} path {
-              fill: #e0d847;
-            }
-            #${this._css.containerId} .${this._css.notificationErrorClass} .${this._css.notificationIconClass} path {
-              fill: #e04747;
-            }
-            #${this._css.containerId} .${this._css.notificationIconClass} {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              margin-right: 6px;
-              padding-right: 6px;
-              border-right: 1px solid rgba(255,255,255,.4);
-            }
-            #${this._css.containerId} .${this._css.notificationIconClass} svg {
-              width: 30px;
-              height: 30px;
-            }
-            #${this._css.containerId} .${this._css.notificationContentClass} {
-              flex-grow: 1;
-              overflow: hidden;
-            }
-            #${this._css.containerId} .${this._css.notificationTitleClass} {
-              font-size: 14px;
-              font-weight: bold;
-              margin-bottom: 4px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
-            #${this._css.containerId} .${this._css.notificationMessageClass} {
-              font-size: 14px;
-              font-weight: normal !important;
-              line-height: 20px;
-              overflow-wrap: break-word;
-            }
-            #${this._css.containerId} .${this._css.notificationMessageClass} li {
-              font-weight: normal !important;
-            }
-            #${this._css.containerId} .${this._css.notificationClass} a {
-              color: #ffa241;
-              text-decoration: none;
-            }
-            #${this._css.containerId} .${this._css.notificationClass} a:hover {
-              text-decoration: underline;
-            }
-            #${this._css.containerId} .${this._css.notificationClass} ul {
-              padding-left: 16px;
-            }
-            #${this._css.containerId} .${this._css.notificationCloseClass} {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              float: right;
-              cursor: pointer;
-              width: 20px;
-              height: 20px;
-            }
-            #${this._css.containerId} .${this._css.notificationCloseClass} svg {
-              width: 100%;
-              height: 100%;
-            }
-            #${this._css.containerId} .${this._css.notificationCloseClass} path {
-              fill: rgba(255,255,255,.8);
-              transition: fill .3s linear;
-            }
-            #${this._css.containerId} .${this._css.notificationCloseClass}:hover path {
-              fill: #fff;
-            }
-          </style>`
+        `<style>
+          #${this._css.containerId},
+          #${this._css.containerId} *,
+          #${this._css.containerId} *::before,
+          #${this._css.containerId} *::after {
+            box-sizing: border-box;
+            font-family: arial, sans-serif;
+            margin: 0;
+            padding: 0;
+          }
+          #${this._css.containerId} {
+            z-index: 9999999;
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            margin: 0 10px 10px 0;
+          }
+          #${this._css.containerId} .${this._css.notificationClass} {
+            display: flex;
+            padding: 6px;
+            border-radius: 6px;
+            background-color: #263238;
+            width: ${config.notifications.width}px;
+            color: #f5f5f5;
+            opacity: .9;
+            border: 2px solid rgba(255,255,255,.3);
+          }
+          #${this._css.containerId} .${this._css.notificationClass}:not(:first-child) {
+            margin-top: 10px;
+          }
+          #${this._css.containerId} .${this._css.notificationClass}:hover {
+            opacity: 1;
+          }
+          #${this._css.containerId} .${this._css.notificationClickableClass}:hover {
+            cursor: pointer;
+          }
+          #${this._css.containerId} .${this._css.notificationSuccessClass} {
+            border: 2px solid rgba(98,224,71,.3);
+          }
+          #${this._css.containerId} .${this._css.notificationInfoClass} {
+            border: 2px solid rgba(71,224,221,.3);
+          }
+          #${this._css.containerId} .${this._css.notificationWarningClass} {
+            border: 2px solid rgba(224,216,71,.3);
+          }
+          #${this._css.containerId} .${this._css.notificationErrorClass} {
+            border: 2px solid rgba(224,71,71,.3);
+          }
+          #${this._css.containerId} .${this._css.notificationSuccessClass} .${this._css.notificationIconClass} path {
+            fill: #62e047;
+          }
+          #${this._css.containerId} .${this._css.notificationInfoClass} .${this._css.notificationIconClass} path {
+            fill: #47e0dd;
+          }
+          #${this._css.containerId} .${this._css.notificationWarningClass} .${this._css.notificationIconClass} path {
+            fill: #e0d847;
+          }
+          #${this._css.containerId} .${this._css.notificationErrorClass} .${this._css.notificationIconClass} path {
+            fill: #e04747;
+          }
+          #${this._css.containerId} .${this._css.notificationIconClass} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 6px;
+            padding-right: 6px;
+            border-right: 1px solid rgba(255,255,255,.4);
+          }
+          #${this._css.containerId} .${this._css.notificationIconClass} svg {
+            width: 30px;
+            height: 30px;
+          }
+          #${this._css.containerId} .${this._css.notificationContentClass} {
+            flex-grow: 1;
+            overflow: hidden;
+          }
+          #${this._css.containerId} .${this._css.notificationTitleClass} {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          #${this._css.containerId} .${this._css.notificationMessageClass} {
+            font-size: 14px;
+            font-weight: normal !important;
+            line-height: 20px;
+            overflow-wrap: break-word;
+          }
+          #${this._css.containerId} .${this._css.notificationMessageClass} li {
+            font-weight: normal !important;
+          }
+          #${this._css.containerId} .${this._css.notificationClass} a {
+            color: #ffa241;
+            text-decoration: none;
+          }
+          #${this._css.containerId} .${this._css.notificationClass} a:hover {
+            text-decoration: underline;
+          }
+          #${this._css.containerId} .${this._css.notificationClass} ul {
+            padding-left: 16px;
+            list-style: square outside;
+          }
+          #${this._css.containerId} .${this._css.notificationCloseClass} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            float: right;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+          }
+          #${this._css.containerId} .${this._css.notificationCloseClass} svg {
+            width: 100%;
+            height: 100%;
+          }
+          #${this._css.containerId} .${this._css.notificationCloseClass} path {
+            fill: rgba(255,255,255,.8);
+            transition: fill .3s linear;
+          }
+          #${this._css.containerId} .${this._css.notificationCloseClass}:hover path {
+            fill: #fff;
+          }
+        </style>`
       );
 
       this._container = $J(`<div id="${this._css.containerId}"></div>`).appendTo('body');
@@ -2386,16 +2987,16 @@
       this._init();
 
       noti.element = $J(
-          `<div class="${this._css.notificationClass}">
-            <span class="${this._css.notificationIconClass}"></span>
-            <div class="${this._css.notificationContentClass}">
-              <div class="${this._css.notificationTitleClass}">
-                <span>Giveaway Companion</span>
-                <span class="${this._css.notificationCloseClass}">${icons.close}</span>
-              </div>
-              <div class="${this._css.notificationMessageClass}">${options.message}</div>
+        `<div class="${this._css.notificationClass}">
+          <span class="${this._css.notificationIconClass}"></span>
+          <div class="${this._css.notificationContentClass}">
+            <div class="${this._css.notificationTitleClass}">
+              <span>Giveaway Companion</span>
+              <span class="${this._css.notificationCloseClass}">${icons.close}</span>
             </div>
-          </div>`
+            <div class="${this._css.notificationMessageClass}">${options.message}</div>
+          </div>
+        </div>`
       );
 
       noti.element.hide();
@@ -2827,31 +3428,62 @@
           }
         };
 
-        if (config.steamGroups && !steam.initFailed && typeof object.steamGroups !== 'undefined' && !object._steamGroupsWorking) {
+        if (!steam.initFailed && !object._steamTasksWorking && (
+          (config.steamGroups && object.steamGroups) ||
+          (config.steamAppWishlist && object.steamAppWishlist) ||
+          (config.steamAppFollow && object.steamAppFollow)
+        )) {
           const groups = [];
+          const wishlist = [];
+          const follow = [];
 
-          getElementResult(object.steamGroups, '@href', (res) => {
-            const addGroup = (group) => {
-              if (group && !buttons.isSteamGroupAdded(group) && !utils.getResolvedUrl(group)) {
-                groups.push(group);
+          if (object.steamGroups) {
+            getElementResult(object.steamGroups, '@href', (res) => {
+              if (!Array.isArray(res)) {
+                res = [res];
               }
-            };
 
-            if (typeof res === 'string') {
-              addGroup(res);
-            } else if (Array.isArray(res)) {
               for (const r of res) {
-                addGroup(r);
+                if (r && !buttons.isSteamGroupAdded(r) && !utils.getResolvedUrl(r)) {
+                  groups.push(r);
+                }
               }
-            }
-          });
+            });
+          }
 
-          if (groups.length) {
-            object._steamGroupsWorking = true;
+          if (object.steamAppWishlist) {
+            getElementResult(object.steamAppWishlist, '@href', (res) => {
+              if (!Array.isArray(res)) {
+                res = [res];
+              }
+
+              for (const r of res) {
+                if (r && !buttons.isSteamAppWishlistAdded(r) && !utils.getResolvedUrl(r)) {
+                  wishlist.push(r);
+                }
+              }
+            });
+          }
+
+          if (object.steamAppFollow) {
+            getElementResult(object.steamAppFollow, '@href', (res) => {
+              if (!Array.isArray(res)) {
+                res = [res];
+              }
+
+              for (const r of res) {
+                if (r && !buttons.isSteamAppFollowAdded(r) && !utils.getResolvedUrl(r)) {
+                  follow.push(r);
+                }
+              }
+            });
+          }
+
+          if (groups.length || wishlist.length || follow.length) {
+            object._steamTasksWorking = true;
 
             setTimeout(async () => {
-              const noti = notifications.info(i18n.get('steam-loading-groups'), {timeout: 0});
-
+              const noti = notifications.info(i18n.get('steam-loading-tasks'), {timeout: 0});
               const promises = [];
 
               for (const g of groups) {
@@ -2861,11 +3493,25 @@
                 }));
               }
 
+              for (const w of wishlist) {
+                promises.push(buttons.add({
+                  type: 'steam-app-wishlist',
+                  steamApp: w
+                }));
+              }
+
+              for (const f of follow) {
+                promises.push(buttons.add({
+                  type: 'steam-app-follow',
+                  steamApp: f
+                }));
+              }
+
               await Promise.all(promises);
 
               noti.remove();
 
-              object._steamGroupsWorking = false;
+              object._steamTasksWorking = false;
             });
           }
         }

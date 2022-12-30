@@ -1,8 +1,0 @@
-! Title: Giveaway Companion filters
-! Description: Removes various annoying things on games giveaway sites
-! Version: 202006161258
-! Expires: 3 days
-! Homepage: https://github.com/longnull/GiveawayCompanion
-@@||marvelousga.com^$generichide
-marvelousga.com##script:inject(abort-current-inline-script.js, $, openNewWindow)
-indiegala.com###giveaway-social-cont

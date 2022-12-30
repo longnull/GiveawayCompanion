@@ -1,4 +1,14 @@
 ## Changelog
+### v1.6 (2022-12-30)
+* New type of tasks: add a game to wishlist on Steam.
+* New type of tasks: follow a game on Steam.
+* Added support for givee.club.
+* Added support for opquests.com.
+* Key-hub.eu: added support for "add a game to wishlist on Steam" tasks.
+* Removed support for marvelousga.com.
+* Removed support for indiegala.com.
+* Removed support for givekey.ru.
+* Removed support for takekey.ru.
 ### v1.5.1 (2021-01-29)
 * Gamehag: fixed completion of "Play one of our free games" tasks.
 ### v1.5 (2020-06-16)
@@ -50,6 +60,16 @@
 ***
 
 ## Список изменений
+### v1.6 (2022-12-30)
+* Новый тип заданий: добавить игру в список желаемого Steam.
+* Новый тип заданий: подписаться на игру в Steam.
+* Добавлена поддержка givee.club.
+* Добавлена поддержка opquests.com.
+* Key-hub.eu: добавлена поддержка заданий "добавить игру в список желаемого Steam".
+* Удалена поддержка marvelousga.com.
+* Удалена поддержка indiegala.com.
+* Удалена поддержка givekey.ru.
+* Удалена поддержка takekey.ru.
 ### v1.5.1 (2021-01-29)
 * Gamehag: исправлено выполнение заданий "Play one of our free games".
 ### v1.5 (2020-06-16)

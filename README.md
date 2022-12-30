@@ -1,8 +1,8 @@
 # Giveaway Companion
 ## English description
-This script adds useful features on sites with games giveaways. Allows you to quickly complete/skip tasks, join and leave Steam groups in one click, open Steam key activation page.
+This script adds useful features to game giveaway sites. Allows you to quickly complete/skip tasks, complete Steam tasks without leaving the giveaway page (join groups, add to wishlist, follow games), open Steam key activation page.
 
-The script does not do subscriptions/reposts/likes on social networks, but such tasks can be completed automatically if they do not have validation, or if you have previously done the same task and did not cancel the subscription/repost/like.
+The script does not complete subscriptions/reposts/likes on social networks, but such tasks can be completed automatically if they have no verification or if you have completed the same task before and have not cancelled the action.
 
 The script bar looks something like this (the set of buttons depends on the site and page):  
 <img src="images/script_bar.png" title="The script bar" alt="The script bar">
@@ -14,54 +14,34 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
 **Disclaimer: the usage of this script may violate the Terms of Service of the sites it runs on. Use at your own risk.**
 
 ### Supported sites
-<table>
-    <thead>
-        <tr><td rowspan="2" width="200"><strong>Site</strong></td><td colspan="4" align="center"><strong>Features</strong></td></tr>
-        <tr><td align="center"><strong>Tasks</strong></td><td align="center"><strong>Groups</strong></td><td align="center"><strong>Keys</strong></td><td><strong>Other</strong></td></tr>
-    </thead>
-    <tbody>
-        <tr><td>grabfreegame.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>bananagiveaway.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gamingimpact.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>givekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Sets tasks timer to zero</td></tr>
-        <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Opens Steam key activation page when you click <a href="images/indiegala_key_activation.png">Steam logo</a> next to a key on <a href="https://www.indiegala.com/profile">your profile page</a></td></tr>
-        <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>giveaway.su</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>keyjoker.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Opens Steam key activation page when you click a <a href="images/keyjoker_key_activation.png">game image</a> on <a href="https://www.keyjoker.com/account/keys">"Keys"</a> page</td></tr>
-        <tr><td>key-hub.eu</td><td align="center">✔</td><td align="center">✔</td><td></td><td>The script goes through the tasks with <code>key-hub.eu/away</code> address, these tasks do not require any additional actions and are considered completed</td></tr>
-        <tr><td>takekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-    </tbody>
-</table>
+* grabfreegame.com
+* bananagiveaway.com
+* gamingimpact.com
+* whosgamingnow.net
+* gamehag.com
+* gleam.io
+* chubkeys.com
+* giveaway.su
+* keyjoker.com
+* key-hub.eu
+* givee.club
+* opquests.com
 
 ### Installation
 1. Install one of the browser extensions to run user scripts.  
-   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/en/extensions/details/tampermonkey-beta/)  
-   Violentmonkey: [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/), [Maxthon](https://extension.maxthon.com/detail/index.php?view_id=1680)  
+   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/en/extensions/details/tampermonkey-beta/), [Edge](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)  
+   Violentmonkey: [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/), [Maxthon](https://extension.maxthon.com/detail/index.php?view_id=1680), [Edge](https://microsoftedge.microsoft.com/addons/detail/violentmonkey/eeagobfjdenkkddmbclomhiblgggliao)  
 2. Go [here](/../../raw/master/GiveawayCompanion.user.js).
 3. Confirm installation of the script.
 
 Automatic updating of the script may require your confirmation.
 
-### Filter list for uBlock Origin
-[Filter list](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt) for uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/), [Opera](https://addons.opera.com/en/extensions/details/ublock/)) that remove various annoying things (ad blocker warnings, pop-ups, etc.) on games giveaway sites.
-
-**Importing the filter list into uBlock Origin**
-1. Open uBlock Origin settings.
-2. Go to "Filter lists" tab.
-3. In "Custom" section, mark "Import..." checkbox.
-4. In the appeared text field paste this address: https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt
-5. Click "Apply сhanges" button that appears at the top right.
-
 ***
 
 ## Русское описание
-Данный скрипт добавляет полезные функции на сайтах с раздачами игр. Позволяет быстро выполнять/пропускать задания, вступать в Steam группы и выходить из них в один клик, переходить на страницу активации Steam ключа.
+Данный скрипт добавляет полезные функции на сайтах с раздачами игр. Позволяет быстро выполнять/пропускать задания, выполнять Steam задания не уходя со страницы раздачи (вступать в группы, добавлять в желаемое и подписываться на игры), переходить на страницу активации Steam ключа.
 
-Скрипт не выполняет подписки/репосты/лайки в социальных сетях, но подобные задания могут быть выполнены автоматически, если они не имеют проверки или если вы раньше уже выполняли такое же задание и не отменили подписку/репост/лайк.
+Скрипт не выполняет подписки/репосты/лайки в социальных сетях, но подобные задания могут быть выполнены автоматически, если они не имеют проверки или если вы раньше уже выполняли такое же задание и не отменили действие.
 
 Панель скрипта выглядит примерно так (набор кнопок зависит от сайта и страницы):  
 <img src="images/script_bar.png" title="Панель скрипта" alt="Панель скрипта">
@@ -73,44 +53,24 @@ Automatic updating of the script may require your confirmation.
 **Отказ от ответственности: использование данного скрипта может нарушать правила сайтов, на которых он используется. Используйте на свой страх и риск.**
 
 ### Поддерживаемые сайты
-<table>
-    <thead>
-        <tr><td rowspan="2" width="200"><strong>Сайт</strong></td><td colspan="4" align="center"><strong>Функции</strong></td></tr>
-        <tr><td align="center"><strong>Задания</strong></td><td align="center"><strong>Группы</strong></td><td align="center"><strong>Ключи</strong></td><td><strong>Прочее</strong></td></tr>
-    </thead>
-    <tbody>
-        <tr><td>grabfreegame.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>bananagiveaway.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gamingimpact.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>marvelousga.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>whosgamingnow.net</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gamehag.com</td><td align="center">✔</td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>givekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>gleam.io</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Установка таймера заданий в ноль</td></tr>
-        <tr><td>indiegala.com</td><td></td><td></td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/indiegala_key_activation.png">логотипу Steam</a> рядом с ключом на <a href="https://www.indiegala.com/profile">странице вашего профиля</a></td></tr>
-        <tr><td>chubkeys.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>giveaway.su</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-        <tr><td>keyjoker.com</td><td></td><td align="center">✔</td><td align="center">✔</td><td>Переход на страницу активации Steam ключа при клике по <a href="images/keyjoker_key_activation.png">изображению игры</a> на странице <a href="https://www.keyjoker.com/account/keys">"Keys"</a></td></tr>
-        <tr><td>key-hub.eu</td><td align="center">✔</td><td align="center">✔</td><td></td><td>Скрипт проходит по заданиям с адресом <code>key-hub.eu/away</code>, эти задания не требуют больше никаких действий и считаются выполненными</td></tr>
-        <tr><td>takekey.ru</td><td></td><td align="center">✔</td><td align="center">✔</td><td></td></tr>
-    </tbody>
-</table>
+* grabfreegame.com
+* bananagiveaway.com
+* gamingimpact.com
+* whosgamingnow.net
+* gamehag.com
+* gleam.io
+* chubkeys.com
+* giveaway.su
+* keyjoker.com
+* key-hub.eu
+* givee.club
+* opquests.com
 
 ### Установка
 1. Установить одно из браузерных расширений для выполнения пользовательских скриптов.  
-   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/)  
-   Violentmonkey: [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/violentmonkey/), [Maxthon](https://extension.maxthon.com/detail/index.php?view_id=1680)  
+   Tampermonkey: [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/), [Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/), [Edge](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd?hl=ru-RU)  
+   Violentmonkey: [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/violentmonkey/), [Maxthon](https://extension.maxthon.com/detail/index.php?view_id=1680), [Edge](https://microsoftedge.microsoft.com/addons/detail/violentmonkey/eeagobfjdenkkddmbclomhiblgggliao?hl=ru-RU)   
 2. Перейти [сюда](/../../raw/master/GiveawayCompanion.user.js).
 3. Подтвердить установку скрипта.
 
 При автоматическом обновлении скрипта может потребоваться ваше подтверждение.
-
-### Список фильтров для uBlock Origin
-[Список фильтров](https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt) для uBlock Origin ([Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=ru), [Firefox](https://addons.mozilla.org/ru/firefox/addon/ublock-origin/), [Opera](https://addons.opera.com/ru/extensions/details/ublock/)), которые удаляют разные назойливые штуки (предупреждения о блокировщике рекламы, всплывающую рекламу и прочее) на сайтах с раздачами игр.
-
-**Импортирование списка фильтров в uBlock Origin**
-1. Открыть настройки uBlock Origin.
-2. Перейти на вкладку "Списки фильтров".
-3. В разделе "Пользовательские" отметить галку "Импортировать...".
-4. В появившееся текстовое поле вставить этот адрес: https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/uBlockOrigin_filters.txt
-5. Нажать появившуюся вверху справа кнопку "Применить изменения".
