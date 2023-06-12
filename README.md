@@ -14,18 +14,21 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
 **Disclaimer: the usage of this script may violate the Terms of Service of the sites it runs on. Use at your own risk.**
 
 ### Supported sites
-* grabfreegame.com
-* bananagiveaway.com
-* gamingimpact.com
-* whosgamingnow.net
-* gamehag.com
-* gleam.io
-* chubkeys.com
-* giveaway.su
-* keyjoker.com
-* key-hub.eu
-* givee.club
-* opquests.com
+| Site               | Features
+| :----------------- | :-----------------
+| grabfreegame.com   | Complete simple tasks and confirm, join a Steam group, activate a key on Steam
+| bananagiveaway.com | Complete simple tasks and confirm, join a Steam group, activate a key on Steam
+| gamingimpact.com   | Complete simple tasks and confirm, join a Steam group, activate a key on Steam
+| whosgamingnow.net  | Confirm tasks, join a Steam group, activate a key on Steam
+| gamehag.com        | Complete simple tasks and confirm, join a Steam group, activate a key on Steam
+| gleam.io           | Complete simple tasks and confirm, set a task timer to zero, join a Steam group, activate a key on Steam
+| chubkeys.com       | Confirm tasks, join a Steam group, activate a key on Steam
+| giveaway.su        | Join a Steam group, activate a key on Steam
+| keyjoker.com       | Join a Steam group, activate a key on Steam, opens a key activation page when you click a game image on [your keys page](https://www.keyjoker.com/account/keys)
+| key-hub.eu         | Complete simple tasks, join a Steam group, add to Steam wishlist
+| givee.club         | Confirm tasks, join a Steam group, add to Steam wishlist
+| opquests.com       | Confirm tasks, join a Steam group, add to Steam wishlist, follow a game on Steam, activate a key on Steam
+| key.gift           | Join a Steam group, activate a key on Steam, opens a key activation page when you click a game image on [the profile page](https://key.gift/profile)
 
 ### Installation
 1. Install one of the browser extensions to run user scripts.  
@@ -53,18 +56,21 @@ Automatic updating of the script may require your confirmation.
 **Отказ от ответственности: использование данного скрипта может нарушать правила сайтов, на которых он используется. Используйте на свой страх и риск.**
 
 ### Поддерживаемые сайты
-* grabfreegame.com
-* bananagiveaway.com
-* gamingimpact.com
-* whosgamingnow.net
-* gamehag.com
-* gleam.io
-* chubkeys.com
-* giveaway.su
-* keyjoker.com
-* key-hub.eu
-* givee.club
-* opquests.com
+| Сайт               | Функции
+| :----------------- | :-----------------
+| grabfreegame.com   | Выполнение простых заданий и подтверждение, вступление в группу в Steam, активация ключа в Steam
+| bananagiveaway.com | Выполнение простых заданий и подтверждение, вступление в группу в Steam, активация ключа в Steam
+| gamingimpact.com   | Выполнение простых заданий и подтверждение, вступление в группу в Steam, активация ключа в Steam
+| whosgamingnow.net  | Подтверждение заданий, вступление в группу в Steam, активация ключа в Steam
+| gamehag.com        | Выполнение простых заданий и подтверждение, вступление в группу в Steam, активация ключа в Steam
+| gleam.io           | Выполнение простых заданий и подтверждение, установка таймера заданий в ноль, вступление в группу в Steam, активация ключа в Steam
+| chubkeys.com       | Подтверждение заданий, вступление в группу в Steam, активация ключа в Steam
+| giveaway.su        | Вступление в группу в Steam, активация ключа в Steam
+| keyjoker.com       | Вступление в группу в Steam, активация ключа в Steam, переход на страницу активации ключа при клике по изображению игры на [странице ваших ключей](https://www.keyjoker.com/account/keys)
+| key-hub.eu         | Выполнение простых заданий, вступление в группу в Steam, добавление в список желаемого в Steam
+| givee.club         | Подтверждение заданий, вступление в группу в Steam, добавление в список желаемого в Steam
+| opquests.com       | Подтверждение заданий, вступление в группу в Steam, добавление в список желаемого в Steam, подписка на игру в Steam, активация ключа в Steam
+| key.gift           | Вступление в группу в Steam, активация ключа в Steam, переход на страницу активации ключа при клике по изображению игры на [странице профиля](https://key.gift/profile)
 
 ### Установка
 1. Установить одно из браузерных расширений для выполнения пользовательских скриптов.  

@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.6
+// @version 1.7
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -21,6 +21,7 @@
 // @match *://*.key-hub.eu/giveaway/*
 // @match *://*.givee.club/*/event/*
 // @match *://*.opquests.com/*
+// @match *://*.key.gift/*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
 // @connect bananagiveaway.com
@@ -32,38 +33,24 @@
 // @grant GM.getValue
 // @grant GM_xmlhttpRequest
 // @grant GM.xmlHttpRequest
-// @require https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js
+// @require https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js
 // ==/UserScript==
 
 (async () => {
   'use strict';
 
   const version = {
-    string: '1.6',
+    string: '1.7',
     changes: {
       default:
         `<ul>
-          <li>New type of tasks: add a game to wishlist on Steam.</li>
-          <li>New type of tasks: follow a game on Steam.</li>
-          <li>Added support for givee.club.</li>
-          <li>Added support for opquests.com.</li>
-          <li>Key-hub.eu: added support for "add a game to wishlist on Steam" tasks.</li>
-          <li>Removed support for marvelousga.com.</li>
-          <li>Removed support for indiegala.com.</li>
-          <li>Removed support for givekey.ru.</li>
-          <li>Removed support for takekey.ru.</li>
+          <li>Added support for key.gift</li>
+          <li>Gleam: added simple task completion and task confirmation</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Новый тип заданий: добавить игру в список желаемого Steam.</li>
-          <li>Новый тип заданий: подписаться на игру в Steam.</li>
-          <li>Добавлена поддержка givee.club.</li>
-          <li>Добавлена поддержка opquests.com.</li>
-          <li>Key-hub.eu: добавлена поддержка заданий "добавить игру в список желаемого Steam".</li>
-          <li>Удалена поддержка marvelousga.com.</li>
-          <li>Удалена поддержка indiegala.com.</li>
-          <li>Удалена поддержка givekey.ru.</li>
-          <li>Удалена поддержка takekey.ru.</li>
+          <li>Добавлена поддержка key.gift</li>
+          <li>Gleam: добавлено выполнение простых заданий и подтверждение заданий</li>
         </ul>`
     }
   };
@@ -378,7 +365,7 @@
           }
 
           params.self._gleam = unsafeWindow.angular.element(container.get(0)).scope();
-          return typeof params.self._gleam !== 'undefined';
+          return !!params.self._gleam;
         },
         ready(params) {
           for (const entry of params.self._gleam.entry_methods) {
@@ -400,7 +387,90 @@
           }
 
           return groups;
-        }
+        },
+        conditions: [
+          {
+            getEntries(params) {
+              return $J('.entry-method:visible:not(.completed-entry-method)').filter((i, e) => {
+                const scope = unsafeWindow.angular.element(e).scope();
+
+                return scope &&
+                  params.site._gleam.canEnter(scope.entry_method) &&
+                  !params.site._gleam.isEntered(scope.entry_method) &&
+                  params.site._gleam.enoughUserDetails(scope.entry_method) &&
+                  (/(custom_action|_view|_visit)/.test(scope.entry_method.entry_type) || (
+                    params.site._gleam.enoughEntryDetails(scope.entry_method) &&
+                    (!scope.entry_method.requires_authentication || params.site._gleam.isAuthenticated(scope.entry_method, scope.entry_method.provider))
+                  ));
+              });
+            },
+            check(params) {
+              return params.site._gleam.contestantState.contestant.id &&
+                !params.site._gleam.bestCouponCode() &&
+                params.self.getEntries(params).length;
+            },
+            buttons: [
+              {
+                type: 'tasks',
+                cancellable: true,
+                click(params) {
+                  const tasks = params.self.getEntries(params);
+
+                  log.debug(`tasks found : ${tasks.length}`);
+
+                  if (tasks.length) {
+                    return new Promise(async (resolve) => {
+                      for (let i = 0; i < tasks.length; i++) {
+                        if (params.cancelled) {
+                          log.debug('cancelled');
+
+                          return resolve();
+                        }
+                        if (params.site._gleam.bestCouponCode()) {
+                          log.debug('key is available');
+
+                          return resolve();
+                        }
+
+                        const scope = unsafeWindow.angular.element(tasks[i]).scope();
+
+                        try {
+                          if (/(custom_action|_view|_visit)/.test(scope.entry_method.entry_type)) {
+                            log.debug(`${i + 1} : visit :`, scope.entry_method.action_description);
+
+                            params.site._gleam.triggerVisit(scope.entry_method);
+
+                            await utils.sleep(300);
+                          }
+
+                          if (params.site._gleam.enoughEntryDetails(scope.entry_method) &&
+                            (!scope.entry_method.requires_authentication || params.site._gleam.isAuthenticated(scope.entry_method, scope.entry_method.provider))
+                          ) {
+                            log.debug(`${i + 1} : confirm :`, scope.entry_method.action_description);
+
+                            params.site._gleam.resumeEntry(scope.entry_method);
+
+                            while (scope.entry_method.entering) {
+                              await utils.sleep(500);
+                            }
+                          }
+                        } catch (e) {
+                          log.debug(`${i + 1} : task error :`, e);
+                        }
+
+                        params.button.progress(tasks.length, i + 1);
+                      }
+
+                      log.debug('all tasks done');
+
+                      resolve();
+                    });
+                  }
+                }
+              }
+            ]
+          }
+        ]
       },
       {
         host: 'chubkeys.com',
@@ -731,6 +801,38 @@
             }
           },
         ]
+      },
+      {
+        host: 'key.gift',
+        element: 'div[class*="_navbarSection_"] span[class*="_username_"]',
+        conditions: [
+          {
+            path: /^\/giveaway/,
+            steamKeys: 'div[class*="_gameContainer_"] div[class*="_key_"]',
+            steamGroups: 'div[class*="_tasksContainer_"] a[href*="steamcommunity.com/groups/"]'
+          },
+          {
+            path: /^\/profile/,
+            steamKeys: 'div[class*="_keyCardsCointainer_"] span[class*="_key_"]',
+            ready() {
+              $J('div[class*="_keyCardsCointainer_"] div[class*="_cardInfo_"] img').on('click', (e) => {
+                const key = steam.extractKeys($J(e.currentTarget).parents('div[class*="_keycard_"]').find('span[class*="_key_"]').text());
+
+                if (key) {
+                  steam.openKeyActivationPage(key[0]);
+                }
+              });
+
+              $J('head').append(
+                `<style>
+                  div[class*="_keyCardsCointainer_"] div[class*="_cardInfo_"] img {
+                    cursor: pointer;
+                  }
+                </style>`
+              );
+            }
+          }
+        ]
       }
     ]
   };
@@ -963,6 +1065,11 @@
         };
 
         check();
+      });
+    },
+    async sleep(ms) {
+      return new Promise((resolve) => {
+        setTimeout(resolve, ms);
       });
     }
   };
@@ -1975,23 +2082,58 @@
         remove() {
           log.debug('button.remove()');
 
-          const group = this.element.data('steamGroup');
+          switch (this.element.data('type')) {
+            case 'steam-key': {
+              const key = this.element.data('steamKey');
 
-          if (group) {
-            const idx = self._steamGroups.indexOf(group);
+              if (key) {
+                const idx = self._steamKeys.indexOf(key);
 
-            if (idx !== -1) {
-              self._steamGroups.splice(idx, 1);
-            }
-          } else {
-            const key = this.element.data('steamKey');
-
-            if (key) {
-              const idx = self._steamKeys.indexOf(key);
-
-              if (idx !== -1) {
-                self._steamKeys.splice(idx, 1);
+                if (idx !== -1) {
+                  self._steamKeys.splice(idx, 1);
+                }
               }
+
+              break;
+            }
+            case 'steam-group': {
+              const group = this.element.data('steamGroup');
+
+              if (group) {
+                const idx = self._steamGroups.indexOf(group);
+
+                if (idx !== -1) {
+                  self._steamGroups.splice(idx, 1);
+                }
+              }
+
+              break;
+            }
+            case 'steam-app-wishlist': {
+              const app = this.element.data('steamApp');
+
+              if (app) {
+                const idx = self._steamAppWishlist.indexOf(app);
+
+                if (idx !== -1) {
+                  self._steamAppWishlist.splice(idx, 1);
+                }
+              }
+
+              break;
+            }
+            case 'steam-app-follow': {
+              const app = this.element.data('steamApp');
+
+              if (app) {
+                const idx = self._steamAppFollow.indexOf(app);
+
+                if (idx !== -1) {
+                  self._steamAppFollow.splice(idx, 1);
+                }
+              }
+
+              break;
             }
           }
 
@@ -2641,22 +2783,24 @@
 
       log.debug(`buttons.visible(${value})`);
 
+      const updateAll = () => {
+        this._updateResizer();
+        this._updateScroll();
+        this._updateHeightAndPosition();
+        notifications.updatePosition();
+      };
+
+      const resizeHandler = () => {
+        if ($J(window).height() === 0) {
+          return;
+        }
+
+        updateAll();
+      };
+
       if (value) {
-        const updateAll = () => {
-          this._updateResizer();
-          this._updateScroll();
-          this._updateHeightAndPosition();
-          notifications.updatePosition();
-        };
-
         if (this._elements.main.is(':visible') !== value) {
-          $J(window).on('resize', () => {
-            if ($J(window).height() === 0) {
-              return;
-            }
-
-            updateAll();
-          });
+          $J(window).on('resize', resizeHandler);
 
           this._elements.buttons.on('scroll', () => {
             this._updateScroll();
@@ -2667,7 +2811,7 @@
 
         updateAll();
       } else {
-        $J(window).off('resize');
+        $J(window).off('resize', resizeHandler);
         this._elements.buttons.off('scroll');
         this._elements.main.hide();
       }

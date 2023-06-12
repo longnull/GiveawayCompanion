@@ -1,4 +1,7 @@
 ## Changelog
+### v1.7 (2023-06-12)
+* Added support for key.gift.
+* Gleam: added simple task completion and task confirmation.
 ### v1.6 (2022-12-30)
 * New type of tasks: add a game to wishlist on Steam.
 * New type of tasks: follow a game on Steam.
@@ -60,6 +63,9 @@
 ***
 
 ## Список изменений
+### v1.7 (2023-06-12)
+* Добавлена поддержка key.gift.
+* Gleam: добавлено выполнение простых заданий и подтверждение заданий.
 ### v1.6 (2022-12-30)
 * Новый тип заданий: добавить игру в список желаемого Steam.
 * Новый тип заданий: подписаться на игру в Steam.
