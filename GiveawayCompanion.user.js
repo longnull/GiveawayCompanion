@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.7
+// @version 1.7.1
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -40,45 +40,77 @@
   'use strict';
 
   const version = {
-    string: '1.7',
+    string: '1.7.1',
     changes: {
       default:
         `<ul>
-          <li>Added support for key.gift</li>
-          <li>Gleam: added simple task completion and task confirmation</li>
+          <li>New type of tasks: add a game to Steam library</li>
+          <li>Opquests: added support for "add a game to Steam library" tasks</li>
+          <li>Gleam: added another type of simple tasks to complete</li>
+          <li>Gleam: added completion of tasks that require an answer from the user (disabled by default, can be enabled at the top of the script in sitesConfig block)</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Добавлена поддержка key.gift</li>
-          <li>Gleam: добавлено выполнение простых заданий и подтверждение заданий</li>
+          <li>Новый тип заданий: добавить игру в библиотеку Steam</li>
+          <li>Opquests: добавлена поддержка заданий "добавить игру в библиотеку Steam"</li>
+          <li>Gleam: добавлен ещё один тип простых заданий для выполнения</li>
+          <li>Gleam: добавлено выполнение заданий, требующих ответа от пользователя (выключено по умолчанию, включается вверху скрипта в блоке sitesConfig)</li>
         </ul>`
     }
   };
 
   const config = {
-    // Output debug info into console
+    // Output debug info into console (false - disabled, true - enabled)
+    // Выводить отладочную информацию в консоль (false - выключено, true - включено)
     debug: false,
-    // Enable Steam groups functionality
+    // Features related to Steam groups (false - disabled, true - enabled)
+    // Функционал связанный с группами Steam (false - выключено, true - включено)
     steamGroups: true,
-    // Enable Steam application wishlist functionality
+    // Features related to Steam wishlist (false - disabled, true - enabled)
+    // Функционал связанный со списком желаемого Steam (false - выключено, true - включено)
     steamAppWishlist: true,
-    // Enable Steam application follow functionality
+    // Features related to application following in Steam (false - disabled, true - enabled)
+    // Функционал связанный с подпиской на приложения в Steam (false - выключено, true - включено)
     steamAppFollow: true,
+    // Features related to adding an application to Steam library (false - disabled, true - enabled)
+    // Функционал связанный с добавлением приложения в библиотеку Steam (false - выключено, true - включено)
+    steamAppAddToLibrary: true,
     // Size of the buttons (pixels)
+    // Размер кнопок (пиксели)
     buttonsSize: 40,
     notifications: {
       // Maximum number of notifications
+      // Максимальное количество уведомлений
       maxCount: 5,
-      // Newest notifications on top
+      // Newest notifications on top (false - disabled, true - enabled)
+      // Новые уведомления вверху (false - выключено, true - включено)
       newestOnTop: false,
       // Notifications width (pixels)
+      // Ширина уведомлений (пиксели)
       width: 400,
       // How long the notification will display without user interaction (milliseconds, 0 - infinite, can be overridden)
+      // Как долго будет отображаться уведомление без пользовательского взаимодействия (миллисекунды, 0 - бесконечно, может быть переопределено)
       timeout: 10000,
       // How long the notification will display after the user moves the mouse out of timed out notification (milliseconds)
+      // Как долго будет отображаться "просроченное" уведомление после того, как пользователь убрал курсор (миллисекунды)
       extendedTimeout: 3000,
       // Close notification on click (can be overridden)
+      // Закрывать уведомление по клику (может быть переопределено)
       closeOnClick: false
+    },
+    // Sites settings
+    // Настройки сайтов
+    sitesConfig: {
+      // Settings for Gleam
+      // Настройки для Gleam
+      gleam: {
+        // Completion of tasks that require an answer from the user (false - disabled, true - enabled)
+        // Выполнение заданий, требующих ответа от пользователя (false - выключено, true - включено)
+        answerQuestions: false,
+        // Answer
+        // Ответ
+        answer: 'Yes'
+      }
     },
     sites: [
       {
@@ -398,7 +430,7 @@
                   params.site._gleam.canEnter(scope.entry_method) &&
                   !params.site._gleam.isEntered(scope.entry_method) &&
                   params.site._gleam.enoughUserDetails(scope.entry_method) &&
-                  (/(custom_action|_view|_visit)/.test(scope.entry_method.entry_type) || (
+                  (/(custom_action|_view|_visit|blog_comment)/.test(scope.entry_method.entry_type) || (
                     params.site._gleam.enoughEntryDetails(scope.entry_method) &&
                     (!scope.entry_method.requires_authentication || params.site._gleam.isAuthenticated(scope.entry_method, scope.entry_method.provider))
                   ));
@@ -435,12 +467,22 @@
                         const scope = unsafeWindow.angular.element(tasks[i]).scope();
 
                         try {
-                          if (/(custom_action|_view|_visit)/.test(scope.entry_method.entry_type)) {
+                          if (/(custom_action|_view|_visit|blog_comment)/.test(scope.entry_method.entry_type)) {
                             log.debug(`${i + 1} : visit :`, scope.entry_method.action_description);
 
                             params.site._gleam.triggerVisit(scope.entry_method);
 
                             await utils.sleep(300);
+                          }
+
+                          if (config.sitesConfig.gleam.answerQuestions && config.sitesConfig.gleam.answer &&
+                              ((scope.entry_method.entry_type === 'custom_action' && /(Ask a question|Allow question or tracking)/.test(scope.entry_method.method_type)) ||
+                               scope.entry_method.entry_type === 'blog_comment' || scope.entry_method.config3 === 'Question' || scope.entry_method.config5 === 'Question')
+                          ) {
+                            log.debug(`${i + 1} : details :`, scope.entry_method.action_description);
+
+                            params.site._gleam.entryDetailsState[scope.entry_method.id] = config.sitesConfig.gleam.answer;
+                            params.site._gleam.entryState.formData[scope.entry_method.id] = config.sitesConfig.gleam.answer;
                           }
 
                           if (params.site._gleam.enoughEntryDetails(scope.entry_method) &&
@@ -711,9 +753,10 @@
         conditions: [
           {
             path: /^\/quests\//,
-            steamGroups: '.items-center a[href*="steamcommunity.com/groups/"]',
+            steamGroups: '.items-center:has(.fa-users):has(.submit-loader) a[href*="steamcommunity.com/groups/"]',
             steamAppWishlist: '.items-center:has(.fa-list):has(.submit-loader) a[href*="store.steampowered.com/app/"]',
             steamAppFollow: '.items-center:has(.fa-gamepad):has(.submit-loader) a[href*="store.steampowered.com/app/"]',
+            steamAppAddToLibrary: '.items-center:has(.fa-plus-square):has(.submit-loader) a[href*="store.steampowered.com/app/"]',
             conditions: [
               {
                 element: '.items-center .submit-loader',
@@ -844,6 +887,7 @@
     group: '<svg viewBox="0 0 24 24"><path d="M19 17V19H7V17S7 13 13 13 19 17 19 17M16 8A3 3 0 1 0 13 11A3 3 0 0 0 16 8M19.2 13.06A5.6 5.6 0 0 1 21 17V19H24V17S24 13.55 19.2 13.06M18 5A2.91 2.91 0 0 0 17.11 5.14A5 5 0 0 1 17.11 10.86A2.91 2.91 0 0 0 18 11A3 3 0 0 0 18 5M8 10H5V7H3V10H0V12H3V15H5V12H8Z" /></svg>',
     wishlist: '<svg viewBox="0 0 24 24"><path d="M17,14H19V17H22V19H19V22H17V19H14V17H17V14M5,3H19C20.11,3 21,3.89 21,5V12.8C20.39,12.45 19.72,12.2 19,12.08V5H5V19H12.08C12.2,19.72 12.45,20.39 12.8,21H5C3.89,21 3,20.11 3,19V5C3,3.89 3.89,3 5,3M7,7H17V9H7V7M7,11H17V12.08C16.15,12.22 15.37,12.54 14.68,13H7V11M7,15H12V17H7V15Z" /></svg>',
     follow: '<svg viewBox="0 0 24 24"><path d="M23.5 17L18.5 22L15 18.5L16.5 17L18.5 19L22 15.5L23.5 17M22 13.5L22 13.8C21.37 13.44 20.67 13.19 19.94 13.07C19.75 12.45 19.18 12 18.5 12H17V7H12V5.5C12 4.67 11.33 4 10.5 4C9.67 4 9 4.67 9 5.5V7H4L4 9.12C5.76 9.8 7 11.5 7 13.5C7 15.5 5.75 17.2 4 17.88V20H6.12C6.8 18.25 8.5 17 10.5 17C11.47 17 12.37 17.3 13.12 17.8L13 19C13 20.09 13.29 21.12 13.8 22H13.2V21.7C13.2 20.21 12 19 10.5 19C9 19 7.8 20.21 7.8 21.7V22H4C2.9 22 2 21.1 2 20V16.2H2.3C3.79 16.2 5 15 5 13.5C5 12 3.79 10.8 2.3 10.8H2V7C2 5.9 2.9 5 4 5H7.04C7.28 3.3 8.74 2 10.5 2C12.26 2 13.72 3.3 13.96 5H17C18.1 5 19 5.9 19 7V10.04C20.7 10.28 22 11.74 22 13.5Z" /></svg>',
+    library: '<svg viewBox="0 0 24 24"><path d="M13 3V11H21V3H13M3 21H11V13H3V21M3 3V11H11V3H3M13 16H16V13H18V16H21V18H18V21H16V18H13V16Z" /></svg>',
     cancel: '<svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.63,15.55 5.68,16.91L16.91,5.68C15.55,4.63 13.85,4 12,4M12,20A8,8 0 0,0 20,12C20,10.15 19.37,8.45 18.32,7.09L7.09,18.32C8.45,19.37 10.15,20 12,20Z" /></svg>',
     success: '<svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z" /></svg>',
     info: '<svg viewBox="0 0 24 24"><path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>',
@@ -911,6 +955,8 @@
         'steam-app-unfollow': 'Unfollow game #{appId} on Steam (Ctrl+Click - open the game in a new tab)',
         'steam-app-follow-failed': 'Failed to follow a game on Steam. [steam-store-issues]',
         'steam-app-unfollow-failed': 'Failed to unfollow a game on Steam. [steam-store-issues]',
+        'steam-app-add-to-library': 'Add game #{appId} to Steam library (Ctrl+Click - open the game in a new tab)',
+        'steam-app-add-to-library-failed': 'Failed to add a game to Steam library. [steam-store-issues]',
         'steam-community-not-logged': 'It looks like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.',
         'steam-store-not-logged': 'It looks like you are not logged in to <a href="https://store.steampowered.com" target="_blank">Steam Store</a>.',
         'steam-store-issues': 'Perhaps you are not logged in to <a href="https://store.steampowered.com" target="_blank">Steam Store</a> or Steam is experiencing some issues.',
@@ -941,6 +987,8 @@
         'steam-app-unfollow': 'Отписаться в Steam от игры #{appId} (Ctrl+Клик - открыть игру в новой вкладке)',
         'steam-app-follow-failed': 'Не удалось подписаться на Steam игру. [steam-store-issues]',
         'steam-app-unfollow-failed': 'Не удалось отписаться от Steam игры. [steam-store-issues]',
+        'steam-app-add-to-library': 'Добавить игру #{appId} в библиотеку Steam (Ctrl+Клик - открыть игру в новой вкладке)',
+        'steam-app-add-to-library-failed': 'Не удалось добавить игру в библиотеку Steam. [steam-store-issues]',
         'steam-community-not-logged': 'Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.',
         'steam-store-not-logged': 'Похоже, вы не авторизованы в <a href="https://store.steampowered.com" target="_blank">Магазине Steam</a>.',
         'steam-store-issues': 'Возможно, вы не авторизованы в <a href="https://store.steampowered.com" target="_blank">Магазине Steam</a> или Steam испытывает какие-то проблемы.',
@@ -1111,6 +1159,7 @@
     _addToWishlistUrl: 'https://store.steampowered.com/api/addtowishlist',
     _removeFromWishlistUrl: 'https://store.steampowered.com/api/removefromwishlist',
     _followAppUrl: 'https://store.steampowered.com/explore/followgame/',
+    _addToLibraryUrl: 'https://store.steampowered.com/freelicense/addfreelicense/',
     _groupRegex: /steamcommunity\.com\/groups\/([a-zA-Z0-9\-_]{2,32})/,
     _appRegex: /store\.steampowered\.com\/app\/(\d+)/,
     _keyRegex: /[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}(-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5})?/g,
@@ -1712,7 +1761,7 @@
       if (response.status !== 200) {
         log.debug(`steam.unfollowApp() : request failed : ${response.status}`);
 
-        notifications.error(i18n.get('steam-unfollow-app-failed'));
+        notifications.error(i18n.get('steam-app-unfollow-failed'));
 
         return false;
       }
@@ -1720,7 +1769,7 @@
       if (response.responseText != 'true') {
         log.debug('steam.unfollowApp() : not success');
 
-        notifications.error(i18n.get('steam-unfollow-app-failed'));
+        notifications.error(i18n.get('steam-app-unfollow-failed'));
 
         return false;
       }
@@ -1730,6 +1779,70 @@
       if (index !== -1) {
         this._userFollowedApps.splice(index, 1);
       }
+
+      return true;
+    },
+    async addToLibrary(appId) {
+      log.debug(`steam.addToLibrary(${appId})`);
+      log.debug(`steam.addToLibrary() : making request : https://store.steampowered.com/app/${appId}/`);
+
+      let response = await $GM.xmlHttpRequest({
+        method: 'GET',
+        url: `https://store.steampowered.com/app/${appId}/`
+      });
+
+      if (response.status !== 200) {
+        log.debug(`steam.addToLibrary() : request failed : ${response.status}`);
+
+        notifications.error(i18n.get('steam-app-add-to-library-failed'));
+
+        return false;
+      }
+
+      if (response.responseText.includes('game_area_already_owned')) {
+        log.debug('steam.addToLibrary() : already owned');
+
+        return true;
+      }
+
+      const sessionId = response.responseText.match(/g_sessionID\s*=\s*"(.+?)"/);
+
+      if (!sessionId) {
+        log.debug('steam.addToLibrary() : g_sessionID not found');
+
+        notifications.error(i18n.get('steam-app-add-to-library-failed'));
+
+        return false;
+      }
+
+      const subId = response.responseText.match(/AddFreeLicense\(\s*(\d+)/);
+
+      if (!subId) {
+        log.debug('steam.addToLibrary() : subId not found');
+
+        notifications.error(i18n.get('steam-app-add-to-library-failed'));
+
+        return false;
+      }
+
+      log.debug(`steam.addToLibrary() : making request : https://store.steampowered.com/app/${subId[1]}/`);
+
+      response = await $GM.xmlHttpRequest({
+        method: 'POST',
+        url: this._addToLibraryUrl + subId[1],
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        data: $J.param({sessionid: sessionId[1], ajax: 'true'})
+      });
+
+      if (response.status !== 200) {
+        log.debug(`steam.addToLibrary() : request failed : ${response.status}`);
+
+        notifications.error(i18n.get('steam-app-add-to-library-failed'));
+
+        return false;
+      }
+
+      this._userOwnedApps.push(parseInt(appId));
 
       return true;
     }
@@ -1743,6 +1856,7 @@
     _steamGroups: [],
     _steamAppWishlist: [],
     _steamAppFollow: [],
+    _steamAppAddToLibrary: [],
     _init() {
       if (this._elements.main) {
         return;
@@ -2077,8 +2191,8 @@
     },
     async add(options) {
       const self = this;
-
       const button = {
+        clickable: true,
         remove() {
           log.debug('button.remove()');
 
@@ -2135,6 +2249,19 @@
 
               break;
             }
+            case 'steam-app-add': {
+              const app = this.element.data('steamApp');
+
+              if (app) {
+                const idx = self._steamAppAddToLibrary.indexOf(app);
+
+                if (idx !== -1) {
+                  self._steamAppAddToLibrary.splice(idx, 1);
+                }
+              }
+
+              break;
+            }
           }
 
           this.element.remove();
@@ -2154,7 +2281,7 @@
           }
 
           if (value) {
-            if (this.attr('data-working') || this.attr('data-not-enable')) {
+            if (this.attr('data-working') || this.attr('data-not-enable') || !this.clickable) {
               return;
             }
 
@@ -2291,12 +2418,12 @@
 
             group = res;
             ext = steam.extractGroupName(group);
-          }
 
-          if (!ext) {
-            log.debug(`buttons.add() : cannot extract group name : ${group}`);
+            if (!ext) {
+              log.debug(`buttons.add() : cannot extract group name : ${group}`);
 
-            return false;
+              return false;
+            }
           }
 
           group = ext;
@@ -2375,12 +2502,12 @@
 
             steamApp = res;
             ext = steam.extractAppId(steamApp);
-          }
 
-          if (!ext) {
-            log.debug(`buttons.add() : cannot extract app id : ${steamApp}`);
+            if (!ext) {
+              log.debug(`buttons.add() : cannot extract app id : ${steamApp}`);
 
-            return false;
+              return false;
+            }
           }
 
           steamApp = ext;
@@ -2460,12 +2587,12 @@
 
             steamApp = res;
             ext = steam.extractAppId(steamApp);
-          }
 
-          if (!ext) {
-            log.debug(`buttons.add() : cannot extract app id : ${steamApp}`);
+            if (!ext) {
+              log.debug(`buttons.add() : cannot extract app id : ${steamApp}`);
 
-            return false;
+              return false;
+            }
           }
 
           steamApp = ext;
@@ -2513,6 +2640,80 @@
 
             resolve();
           });
+        };
+      } else if (options.type === 'steam-app-add') {
+        if (!config.steamAppAddToLibrary || !options.steamApp) {
+          return false;
+        }
+        if (this.isSteamAppAddToLibraryAdded(options.steamApp)) {
+          return false;
+        }
+        if (!await steam.init()) {
+          return false;
+        }
+
+        log.debug(`buttons.add() : steam-app-add button : ${options.steamApp}`);
+
+        let steamApp = options.steamApp;
+
+        if (steamApp.includes('/')) {
+          let ext = steam.extractAppId(steamApp);
+
+          if (!ext) {
+            const res = await utils.resolveUrl(steamApp);
+
+            if (res === false) {
+              return false;
+            }
+
+            steamApp = res;
+            ext = steam.extractAppId(steamApp);
+
+            if (!ext) {
+              log.debug(`buttons.add() : cannot extract app id : ${steamApp}`);
+
+              return false;
+            }
+          }
+
+          steamApp = ext;
+
+          if (this.isSteamAppAddToLibraryAdded(steamApp)) {
+            return false;
+          }
+
+          this._steamAppAddToLibrary.push(options.steamApp);
+        }
+
+        this._steamAppAddToLibrary.push(steamApp);
+
+        options.data = {steamApp: steamApp};
+
+        if (steam.isAppOwned(steamApp)) {
+          return false;
+        }
+
+        options.done = false;
+        options.title = i18n.get('steam-app-add-to-library', {appId: steamApp});
+        options.content = icons.library;
+        options.click = (p) => {
+          const appId = p.button.element.data('steamApp');
+
+          if (p.event.ctrlKey) {
+            steam.openAppPage(appId);
+            return;
+          }
+
+          if (!steam.isAppOwned(steamApp)) {
+            return new Promise(async (resolve) => {
+              if (await steam.addToLibrary(appId)) {
+                button.clickable = false;
+                button.done(true);
+              }
+
+              resolve();
+            });
+          }
         };
       } else if (options.type === 'tasks') {
         log.debug('buttons.add() : tasks button');
@@ -2631,7 +2832,7 @@
       element.on('click', async (e) => {
         e.preventDefault();
 
-        if (!button.enabled()) {
+        if (!button.enabled() || !button.clickable) {
           return;
         }
 
@@ -2872,11 +3073,13 @@
 
       this._elements.buttons.children(`.${this._css.buttonClass}`).each((i, el) => {
         const jel = $J(el);
+
         if (value) {
           jel.removeAttr('data-not-enable');
         } else {
           jel.attr('data-not-enable', '1');
         }
+
         jel.data('button').enabled(value);
       });
     },
@@ -2894,6 +3097,9 @@
     },
     isSteamAppFollowAdded(id) {
       return this._steamAppFollow.indexOf(id) !== -1;
+    },
+    isSteamAppAddToLibraryAdded(id) {
+      return this._steamAppAddToLibrary.indexOf(id) !== -1;
     }
   };
 
@@ -3575,11 +3781,13 @@
         if (!steam.initFailed && !object._steamTasksWorking && (
           (config.steamGroups && object.steamGroups) ||
           (config.steamAppWishlist && object.steamAppWishlist) ||
-          (config.steamAppFollow && object.steamAppFollow)
+          (config.steamAppFollow && object.steamAppFollow) ||
+          (config.steamAppAddToLibrary && object.steamAppAddToLibrary)
         )) {
           const groups = [];
           const wishlist = [];
           const follow = [];
+          const library = [];
 
           if (object.steamGroups) {
             getElementResult(object.steamGroups, '@href', (res) => {
@@ -3623,7 +3831,21 @@
             });
           }
 
-          if (groups.length || wishlist.length || follow.length) {
+          if (object.steamAppAddToLibrary) {
+            getElementResult(object.steamAppAddToLibrary, '@href', (res) => {
+              if (!Array.isArray(res)) {
+                res = [res];
+              }
+
+              for (const r of res) {
+                if (r && !buttons.isSteamAppAddToLibraryAdded(r) && !utils.getResolvedUrl(r)) {
+                  library.push(r);
+                }
+              }
+            });
+          }
+
+          if (groups.length || wishlist.length || follow.length || library.length) {
             object._steamTasksWorking = true;
 
             setTimeout(async () => {
@@ -3648,6 +3870,13 @@
                 promises.push(buttons.add({
                   type: 'steam-app-follow',
                   steamApp: f
+                }));
+              }
+
+              for (const l of library) {
+                promises.push(buttons.add({
+                  type: 'steam-app-add',
+                  steamApp: l
                 }));
               }
 
@@ -3698,6 +3927,10 @@
 
       setTimeout(checkSite, 1000);
     };
+
+    if (window.location.href.includes('::entry_method')) {
+      return;
+    }
 
     for (const s of config.sites) {
       if (checkStringCondition(s.host, state.host)) {

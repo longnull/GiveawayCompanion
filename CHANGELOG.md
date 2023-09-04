@@ -1,4 +1,9 @@
 ## Changelog
+### v1.7.1 (2023-09-04)
+* New type of tasks: add a game to Steam library.
+* Opquests: added support for "add a game to Steam library" tasks.
+* Gleam: added another type of simple tasks to complete.
+* Gleam: added completion of tasks that require an answer from the user (disabled by default, can be enabled at the top of the script in the sitesConfig block).
 ### v1.7 (2023-06-12)
 * Added support for key.gift.
 * Gleam: added simple task completion and task confirmation.
@@ -63,6 +68,11 @@
 ***
 
 ## Список изменений
+### v1.7.1 (2023-09-04)
+* Новый тип заданий: добавить игру в библиотеку Steam.
+* Opquests: добавлена поддержка заданий "добавить игру в библиотеку Steam".
+* Gleam: добавлен ещё один тип простых заданий для выполнения.
+* Gleam: добавлено выполнение заданий, требующих ответа от пользователя (выключено по умолчанию, включается вверху скрипта в блоке sitesConfig).
 ### v1.7 (2023-06-12)
 * Добавлена поддержка key.gift.
 * Gleam: добавлено выполнение простых заданий и подтверждение заданий.
