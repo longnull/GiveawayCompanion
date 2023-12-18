@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.7.1
+// @version 1.7.2
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -40,21 +40,23 @@
   'use strict';
 
   const version = {
-    string: '1.7.1',
+    string: '1.7.2',
     changes: {
       default:
         `<ul>
-          <li>New type of tasks: add a game to Steam library</li>
-          <li>Opquests: added support for "add a game to Steam library" tasks</li>
-          <li>Gleam: added another type of simple tasks to complete</li>
-          <li>Gleam: added completion of tasks that require an answer from the user (disabled by default, can be enabled at the top of the script in sitesConfig block)</li>
+          <li>Gleam: added completion of Twitter and TikTok tasks</li>
+          <li>Gleam: added completion of tasks that require a correct answer from the user (disabled by default, can be enabled at the top of the script in answerQuestionsWithCheck block)</li>
+          <li>Gleam: added filling in username in Twitter tasks (disabled by default, can be enabled at the top of the script in twitterSetUsername block)</li>
+          <li>Gleam: added filling in username in TikTok tasks (disabled by default, can be enabled at the top of the script in tiktokSetUsername block)</li>
+          <li>Giveaway.su: fixed Steam groups</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Новый тип заданий: добавить игру в библиотеку Steam</li>
-          <li>Opquests: добавлена поддержка заданий "добавить игру в библиотеку Steam"</li>
-          <li>Gleam: добавлен ещё один тип простых заданий для выполнения</li>
-          <li>Gleam: добавлено выполнение заданий, требующих ответа от пользователя (выключено по умолчанию, включается вверху скрипта в блоке sitesConfig)</li>
+          <li>Gleam: добавлено выполнение Twitter и TikTok заданий</li>
+          <li>Gleam: добавлено выполнение заданий, требующих правильного ответа от пользователя (выключено по умолчанию, включается вверху скрипта в блоке answerQuestionsWithCheck)</li>
+          <li>Gleam: добавлено заполнение имени пользователя в Twitter заданиях (выключено по умолчанию, включается вверху скрипта в блоке twitterSetUsername)</li>
+          <li>Gleam: добавлено заполнение имени пользователя в TikTok заданиях (выключено по умолчанию, включается вверху скрипта в блоке tiktokSetUsername)</li>
+          <li>Giveaway.su: исправлены группы Steam</li>
         </ul>`
     }
   };
@@ -104,12 +106,43 @@
       // Settings for Gleam
       // Настройки для Gleam
       gleam: {
-        // Completion of tasks that require an answer from the user (false - disabled, true - enabled)
-        // Выполнение заданий, требующих ответа от пользователя (false - выключено, true - включено)
-        answerQuestions: false,
-        // Answer
-        // Ответ
-        answer: 'Yes'
+        // Completion of tasks that require input from the user
+        // Выполнение заданий, требующих ввода от пользователя
+        answerQuestions: {
+          // false - disabled, true - enabled
+          // false - выключено, true - включено
+          enabled: false,
+          // Text
+          // Текст
+          answer: 'Yes'
+        },
+        // Completion of tasks that require a correct answer from the user (client-side verification)
+        // Выполнение заданий, требующих правильного ответа от пользователя (проверка на стороне клиента)
+        answerQuestionsWithCheck: {
+          // false - disabled, true - enabled
+          // false - выключено, true - включено
+          enabled: false
+        },
+        // Fill in username in Twitter tasks
+        // Заполнить имя пользователя в Twitter заданиях
+        twitterSetUsername: {
+          // false - disabled, true - enabled
+          // false - выключено, true - включено
+          enabled: false,
+          // Username (if empty, the script will take the username from the email)
+          // Имя (если пусто, то скрипт возьмёт имя из email)
+          username: ''
+        },
+        // Fill in username in TikTok tasks
+        // Заполнить имя пользователя в TikTok заданиях
+        tiktokSetUsername: {
+          // false - disabled, true - enabled
+          // false - выключено, true - включено
+          enabled: false,
+          // Username (if empty, the script will take the username from the email)
+          // Имя (если пусто, то скрипт возьмёт имя из email)
+          username: ''
+        },
       }
     },
     sites: [
@@ -430,7 +463,7 @@
                   params.site._gleam.canEnter(scope.entry_method) &&
                   !params.site._gleam.isEntered(scope.entry_method) &&
                   params.site._gleam.enoughUserDetails(scope.entry_method) &&
-                  (/(custom_action|_view|_visit|blog_comment)/.test(scope.entry_method.entry_type) || (
+                  (/(custom_action|_view|_visit|blog_comment|twitter_tweet|twitter_retweet|twitter_follow|tiktok_visit|tiktok_follow)/.test(scope.entry_method.entry_type) || (
                     params.site._gleam.enoughEntryDetails(scope.entry_method) &&
                     (!scope.entry_method.requires_authentication || params.site._gleam.isAuthenticated(scope.entry_method, scope.entry_method.provider))
                   ));
@@ -452,6 +485,8 @@
 
                   if (tasks.length) {
                     return new Promise(async (resolve) => {
+                      const emailName = params.site._gleam.contestantState.contestant.email.match(/[^@]+/)[0].replace(/[\.\+]/g, '_').slice(-15);
+
                       for (let i = 0; i < tasks.length; i++) {
                         if (params.cancelled) {
                           log.debug('cancelled');
@@ -467,7 +502,7 @@
                         const scope = unsafeWindow.angular.element(tasks[i]).scope();
 
                         try {
-                          if (/(custom_action|_view|_visit|blog_comment)/.test(scope.entry_method.entry_type)) {
+                          if (/(custom_action|_view|_visit|blog_comment|tiktok_visit|tiktok_follow)/.test(scope.entry_method.entry_type)) {
                             log.debug(`${i + 1} : visit :`, scope.entry_method.action_description);
 
                             params.site._gleam.triggerVisit(scope.entry_method);
@@ -475,14 +510,54 @@
                             await utils.sleep(300);
                           }
 
-                          if (config.sitesConfig.gleam.answerQuestions && config.sitesConfig.gleam.answer &&
-                              ((scope.entry_method.entry_type === 'custom_action' && /(Ask a question|Allow question or tracking)/.test(scope.entry_method.method_type)) ||
-                               scope.entry_method.entry_type === 'blog_comment' || scope.entry_method.config3 === 'Question' || scope.entry_method.config5 === 'Question')
+                          if ((scope.entry_method.entry_type === 'custom_action' && /(Ask a question|Allow question or tracking)/.test(scope.entry_method.method_type)) ||
+                              scope.entry_method.entry_type === 'blog_comment' || scope.entry_method.config3 === 'Question' || scope.entry_method.config5 === 'Question'
                           ) {
-                            log.debug(`${i + 1} : details :`, scope.entry_method.action_description);
+                            let answer;
 
-                            params.site._gleam.entryDetailsState[scope.entry_method.id] = config.sitesConfig.gleam.answer;
-                            params.site._gleam.entryState.formData[scope.entry_method.id] = config.sitesConfig.gleam.answer;
+                            if (scope.entry_method.config5 === '1') {
+                              if (config.sitesConfig.gleam.answerQuestionsWithCheck.enabled) {
+                                answer = decodeURIComponent(atob(scope.entry_method.config8).replace(/\+/g, ' ')).split(/\r|\n/).find((v) => !!v);
+                              }
+                            } else if (config.sitesConfig.gleam.answerQuestions.enabled && config.sitesConfig.gleam.answerQuestions.answer) {
+                              answer = config.sitesConfig.gleam.answerQuestions.answer;
+                            }
+
+                            if (answer) {
+                              log.debug(`${i + 1} : details :`, answer, ':', scope.entry_method.action_description);
+
+                              params.site._gleam.entryDetailsState[scope.entry_method.id] = answer;
+                              params.site._gleam.entryState.formData[scope.entry_method.id] = answer;
+                            }
+                          }
+
+                          if (scope.entry_method.entry_type === 'tiktok_follow' && config.sitesConfig.gleam.tiktokSetUsername.enabled &&
+                            !params.site._gleam.entryState.formData[scope.entry_method.id]
+                          ) {
+                            const tiktokName = config.sitesConfig.gleam.tiktokSetUsername.username ? config.sitesConfig.gleam.tiktokSetUsername.username : emailName;
+
+                            log.debug(`${i + 1} : tiktok username :`, tiktokName, ':', scope.entry_method.action_description);
+
+                            params.site._gleam.entryDetailsState[scope.entry_method.id] = tiktokName;
+                            params.site._gleam.entryState.formData[scope.entry_method.id] = tiktokName;
+                          }
+
+                          if (/(twitter_tweet|twitter_retweet|twitter_follow)/.test(scope.entry_method.entry_type)) {
+                            log.debug(`${i + 1} : twitter attempt :`, scope.entry_method.action_description);
+
+                            params.site._gleam.attemptEntry(scope.entry_method);
+
+                            await utils.sleep(200);
+
+                            if (config.sitesConfig.gleam.twitterSetUsername.enabled && !params.site._gleam.entryState.formData[scope.entry_method.id]) {
+                              const twitterName = config.sitesConfig.gleam.twitterSetUsername.username ? config.sitesConfig.gleam.twitterSetUsername.username : emailName;
+
+                              log.debug(`${i + 1} : twitter username :`, twitterName, ':', scope.entry_method.action_description);
+
+                              scope.entry_method.show_extra = true;
+                              params.site._gleam.entryDetailsState[scope.entry_method.id] = {twitter_username: twitterName};
+                              params.site._gleam.entryState.formData[scope.entry_method.id] = {twitter_username: twitterName};
+                            }
                           }
 
                           if (params.site._gleam.enoughEntryDetails(scope.entry_method) &&
@@ -598,7 +673,7 @@
         steamGroups() {
           const groups = [];
 
-          $J('#actions tr:has(.fa-steam)').each((i, el) => {
+          $J('#actions tr:has(.fa-steam-symbol)').each((i, el) => {
             const btn = $J(el).find('button[data-type="action.universal"]');
 
             if (btn.length) {

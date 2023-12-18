@@ -1,9 +1,15 @@
 ## Changelog
+### v1.7.2 (2023-12-18)
+* Gleam: added completion of Twitter and TikTok tasks.
+* Gleam: added completion of tasks that require a correct answer from the user (disabled by default, can be enabled at the top of the script in answerQuestionsWithCheck block).
+* Gleam: added filling in username in Twitter tasks (disabled by default, can be enabled at the top of the script in twitterSetUsername block).
+* Gleam: added filling in username in TikTok tasks (disabled by default, can be enabled at the top of the script in tiktokSetUsername block).
+* Giveaway.su: fixed Steam groups.
 ### v1.7.1 (2023-09-04)
 * New type of tasks: add a game to Steam library.
 * Opquests: added support for "add a game to Steam library" tasks.
 * Gleam: added another type of simple tasks to complete.
-* Gleam: added completion of tasks that require an answer from the user (disabled by default, can be enabled at the top of the script in the sitesConfig block).
+* Gleam: added completion of tasks that require an answer from the user (disabled by default, can be enabled at the top of the script in answerQuestions block).
 ### v1.7 (2023-06-12)
 * Added support for key.gift.
 * Gleam: added simple task completion and task confirmation.
@@ -68,11 +74,17 @@
 ***
 
 ## Список изменений
+### v1.7.2 (2023-12-18)
+* Gleam: добавлено выполнение Twitter и TikTok заданий.
+* Gleam: добавлено выполнение заданий, требующих правильного ответа от пользователя (выключено по умолчанию, включается вверху скрипта в блоке answerQuestionsWithCheck).
+* Gleam: добавлено заполнение имени пользователя в Twitter заданиях (выключено по умолчанию, включается вверху скрипта в блоке twitterSetUsername).
+* Gleam: добавлено заполнение имени пользователя в TikTok заданиях (выключено по умолчанию, включается вверху скрипта в блоке tiktokSetUsername).
+* Giveaway.su: исправлены группы Steam.
 ### v1.7.1 (2023-09-04)
 * Новый тип заданий: добавить игру в библиотеку Steam.
 * Opquests: добавлена поддержка заданий "добавить игру в библиотеку Steam".
 * Gleam: добавлен ещё один тип простых заданий для выполнения.
-* Gleam: добавлено выполнение заданий, требующих ответа от пользователя (выключено по умолчанию, включается вверху скрипта в блоке sitesConfig).
+* Gleam: добавлено выполнение заданий, требующих ввода от пользователя (выключено по умолчанию, включается вверху скрипта в блоке answerQuestions).
 ### v1.7 (2023-06-12)
 * Добавлена поддержка key.gift.
 * Gleam: добавлено выполнение простых заданий и подтверждение заданий.
