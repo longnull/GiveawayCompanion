@@ -4,13 +4,13 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.7.2
+// @version 1.7.3
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
 // @downloadURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
 // @match *://*.grabfreegame.com/giveaway/*
-// @match *://*.bananagiveaway.com/giveaway/*
+// @match *://*.bananatic.com/*/giveaway/*
 // @match *://*.gamingimpact.com/giveaway/*
 // @match *://*.whosgamingnow.net/giveaway/*
 // @match *://*.gamehag.com/*
@@ -24,7 +24,7 @@
 // @match *://*.key.gift/*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
-// @connect bananagiveaway.com
+// @connect bananatic.com
 // @connect gamingimpact.com
 // @connect *
 // @grant GM_setValue
@@ -40,23 +40,15 @@
   'use strict';
 
   const version = {
-    string: '1.7.2',
+    string: '1.7.3',
     changes: {
       default:
         `<ul>
-          <li>Gleam: added completion of Twitter and TikTok tasks</li>
-          <li>Gleam: added completion of tasks that require a correct answer from the user (disabled by default, can be enabled at the top of the script in answerQuestionsWithCheck block)</li>
-          <li>Gleam: added filling in username in Twitter tasks (disabled by default, can be enabled at the top of the script in twitterSetUsername block)</li>
-          <li>Gleam: added filling in username in TikTok tasks (disabled by default, can be enabled at the top of the script in tiktokSetUsername block)</li>
-          <li>Giveaway.su: fixed Steam groups</li>
+          <li>bananagiveaway.com has been replaced by bananatic.com</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Gleam: добавлено выполнение Twitter и TikTok заданий</li>
-          <li>Gleam: добавлено выполнение заданий, требующих правильного ответа от пользователя (выключено по умолчанию, включается вверху скрипта в блоке answerQuestionsWithCheck)</li>
-          <li>Gleam: добавлено заполнение имени пользователя в Twitter заданиях (выключено по умолчанию, включается вверху скрипта в блоке twitterSetUsername)</li>
-          <li>Gleam: добавлено заполнение имени пользователя в TikTok заданиях (выключено по умолчанию, включается вверху скрипта в блоке tiktokSetUsername)</li>
-          <li>Giveaway.su: исправлены группы Steam</li>
+          <li>bananagiveaway.com заменён на bananatic.com</li>
         </ul>`
     }
   };
@@ -147,7 +139,7 @@
     },
     sites: [
       {
-        host: ['grabfreegame.com', 'bananagiveaway.com', 'gamingimpact.com'],
+        host: ['grabfreegame.com', 'bananatic.com', 'gamingimpact.com'],
         element: 'a[href*="logout"]',
         steamKeys: '.code:visible',
         conditions: [

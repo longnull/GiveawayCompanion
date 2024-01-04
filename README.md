@@ -17,7 +17,7 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
 | Site               | Features
 | :----------------- | :-----------------
 | grabfreegame.com   | Complete simple tasks and confirm, join a Steam group, activate a key on Steam
-| bananagiveaway.com | Complete simple tasks and confirm, join a Steam group, activate a key on Steam
+| bananatic.com      | Complete simple tasks and confirm, join a Steam group, activate a key on Steam
 | gamingimpact.com   | Complete simple tasks and confirm, join a Steam group, activate a key on Steam
 | whosgamingnow.net  | Confirm tasks, join a Steam group, activate a key on Steam
 | gamehag.com        | Complete simple tasks and confirm, join a Steam group, activate a key on Steam
@@ -59,7 +59,7 @@ Automatic updating of the script may require your confirmation.
 | Сайт               | Функции
 | :----------------- | :-----------------
 | grabfreegame.com   | Выполнение простых заданий и подтверждение, вступление в группу в Steam, активация ключа в Steam
-| bananagiveaway.com | Выполнение простых заданий и подтверждение, вступление в группу в Steam, активация ключа в Steam
+| bananatic.com      | Выполнение простых заданий и подтверждение, вступление в группу в Steam, активация ключа в Steam
 | gamingimpact.com   | Выполнение простых заданий и подтверждение, вступление в группу в Steam, активация ключа в Steam
 | whosgamingnow.net  | Подтверждение заданий, вступление в группу в Steam, активация ключа в Steam
 | gamehag.com        | Выполнение простых заданий и подтверждение, вступление в группу в Steam, активация ключа в Steam

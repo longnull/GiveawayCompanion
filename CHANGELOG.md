@@ -1,4 +1,6 @@
 ## Changelog
+### v1.7.3 (2024-01-04)
+* bananagiveaway.com has been replaced by bananatic.com.
 ### v1.7.2 (2023-12-18)
 * Gleam: added completion of Twitter and TikTok tasks.
 * Gleam: added completion of tasks that require a correct answer from the user (disabled by default, can be enabled at the top of the script in answerQuestionsWithCheck block).
@@ -74,6 +76,8 @@
 ***
 
 ## Список изменений
+### v1.7.3 (2024-01-04)
+* bananagiveaway.com заменён на bananatic.com.
 ### v1.7.2 (2023-12-18)
 * Gleam: добавлено выполнение Twitter и TikTok заданий.
 * Gleam: добавлено выполнение заданий, требующих правильного ответа от пользователя (выключено по умолчанию, включается вверху скрипта в блоке answerQuestionsWithCheck).
