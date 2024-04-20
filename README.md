@@ -26,7 +26,7 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
 | giveaway.su        | Join a Steam group, activate a key on Steam
 | keyjoker.com       | Join a Steam group, activate a key on Steam, opens a key activation page when you click a game image on [your keys page](https://www.keyjoker.com/account/keys)
 | key-hub.eu         | Complete simple tasks, join a Steam group, add to Steam wishlist
-| givee.club         | Confirm tasks, join a Steam group, add to Steam wishlist
+| givee.club         | Confirm tasks, join a Steam group, add to Steam wishlist, follow a game on Steam
 | opquests.com       | Confirm tasks, join a Steam group, add to Steam wishlist, follow a game on Steam, add a game to Steam library, activate a key on Steam
 | key.gift           | Join a Steam group, activate a key on Steam, opens a key activation page when you click a game image on [the profile page](https://key.gift/profile)
 
@@ -68,7 +68,7 @@ Automatic updating of the script may require your confirmation.
 | giveaway.su        | Вступление в группу в Steam, активация ключа в Steam
 | keyjoker.com       | Вступление в группу в Steam, активация ключа в Steam, переход на страницу активации ключа при клике по изображению игры на [странице ваших ключей](https://www.keyjoker.com/account/keys)
 | key-hub.eu         | Выполнение простых заданий, вступление в группу в Steam, добавление в список желаемого в Steam
-| givee.club         | Подтверждение заданий, вступление в группу в Steam, добавление в список желаемого в Steam
+| givee.club         | Подтверждение заданий, вступление в группу в Steam, добавление в список желаемого в Steam, подписка на игру в Steam
 | opquests.com       | Подтверждение заданий, вступление в группу в Steam, добавление в список желаемого в Steam, подписка на игру в Steam, добавление игры в библиотеку Steam, активация ключа в Steam
 | key.gift           | Вступление в группу в Steam, активация ключа в Steam, переход на страницу активации ключа при клике по изображению игры на [странице профиля](https://key.gift/profile)
 

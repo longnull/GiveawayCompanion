@@ -1,4 +1,6 @@
 ## Changelog
+### v1.7.4 (2024-04-20)
+* Givee.club: added support for "follow a game" tasks.
 ### v1.7.3 (2024-01-04)
 * bananagiveaway.com has been replaced by bananatic.com.
 ### v1.7.2 (2023-12-18)
@@ -76,6 +78,8 @@
 ***
 
 ## Список изменений
+### v1.7.4 (2024-04-20)
+* Givee.club: добавлена поддержка заданий "подписаться на игру".
 ### v1.7.3 (2024-01-04)
 * bananagiveaway.com заменён на bananatic.com.
 ### v1.7.2 (2023-12-18)

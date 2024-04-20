@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.7.3
+// @version 1.7.4
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -40,15 +40,15 @@
   'use strict';
 
   const version = {
-    string: '1.7.3',
+    string: '1.7.4',
     changes: {
       default:
         `<ul>
-          <li>bananagiveaway.com has been replaced by bananatic.com</li>
+          <li>Givee.club: added support for "follow a game" tasks</li>
         </ul>`,
       ru:
         `<ul>
-          <li>bananagiveaway.com заменён на bananatic.com</li>
+          <li>Givee.club: добавлена поддержка заданий "подписаться на игру"</li>
         </ul>`
     }
   };
@@ -768,6 +768,7 @@
         element: 'a[href*="logout"]',
         steamGroups: '.event-actions tr:has(.fa-steam-symbol) .event-action-label a:not([href*="#"])',
         steamAppWishlist: ['.event-actions tr:has(.fa-plus-circle) .event-action-label a:not([href*="#"])', '.event-actions tr:has(.fa-plus-circle) .event-action-label a[href="#"]@data-steam-wishlist-appid'],
+        steamAppFollow: '.event-actions tr:has(.fa-heart) .event-action-label a:not([href*="#"])',
         conditions: [
           {
             element: '.event-action-buttons .glyphicon-refresh',
