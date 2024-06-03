@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.7.4
+// @version 1.7.5
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -40,15 +40,17 @@
   'use strict';
 
   const version = {
-    string: '1.7.4',
+    string: '1.7.5',
     changes: {
       default:
         `<ul>
-          <li>Givee.club: added support for "follow a game" tasks</li>
+          <li>KeyJoker: added task confirmation</li>
+          <li>KeyJoker: fixed infinite loading of Steam tasks (it happened because of captcha, now the script doesn't retry to load failed tasks)</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Givee.club: добавлена поддержка заданий "подписаться на игру"</li>
+          <li>KeyJoker: добавлено подтверждение заданий</li>
+          <li>KeyJoker: исправлена бесконечная загрузка заданий Steam (это происходило из-за капчи, теперь скрипт не пытается повторно загрузить неудачные задания)</li>
         </ul>`
     }
   };
@@ -686,7 +688,54 @@
         conditions: [
           {
             path: /^\/entries/,
-            steamGroups: '.list-complete-item:has(.fa-steam) a.btn-primary'
+            steamGroups: '.list-complete-item:has(.fa-steam) a.btn-primary',
+            conditions: [
+              {
+                element: '.list-complete-item button',
+                buttons: [
+                  {
+                    type: 'tasks',
+                    cancellable: true,
+                    click(params) {
+                      const tasks = $J(params.self.element);
+
+                      log.debug(`tasks found : ${tasks.length}`);
+
+                      if (tasks.length) {
+                        return new Promise(async (resolve) => {
+                          document.cookie = 'fraud_warning_notice=1; expires=Sun, 1 Jan 2030 00:00:00 UTC; path=/';
+
+                          for (let i = 0; i < tasks.length; i++) {
+                            if (params.cancelled) {
+                              break;
+                            }
+
+                            log.debug(`${i + 1} : click`);
+
+                            tasks.get(i).click();
+
+                            await utils.sleep(200);
+                            await utils.waitForElement('.list-complete-item button .spinner-border', false);
+
+                            log.debug(`${i + 1} : task done`);
+
+                            params.button.progress(tasks.length, i + 1);
+                          }
+
+                          if (params.cancelled) {
+                            log.debug('cancelled');
+                          } else {
+                            log.debug('all tasks done');
+                          }
+
+                          resolve();
+                        });
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
           },
           {
             path: /^\/account\/keys/,
@@ -1112,7 +1161,7 @@
       });
 
       if (response.status !== 200) {
-        log.debug(`utils.resolveUrl() : request failed : ${response.status}`);
+        log.debug(`utils.resolveUrl() : request failed : ${url} : ${response.status}`);
 
         return false;
       }
@@ -3864,7 +3913,7 @@
               }
 
               for (const r of res) {
-                if (r && !buttons.isSteamGroupAdded(r) && !utils.getResolvedUrl(r)) {
+                if (r && !buttons.isSteamGroupAdded(r) && !utils.getResolvedUrl(r) && (!state.site._buttonsFailed || !state.site._buttonsFailed.includes(r))) {
                   groups.push(r);
                 }
               }
@@ -3878,7 +3927,7 @@
               }
 
               for (const r of res) {
-                if (r && !buttons.isSteamAppWishlistAdded(r) && !utils.getResolvedUrl(r)) {
+                if (r && !buttons.isSteamAppWishlistAdded(r) && !utils.getResolvedUrl(r) && (!state.site._buttonsFailed || !state.site._buttonsFailed.includes(r))) {
                   wishlist.push(r);
                 }
               }
@@ -3892,7 +3941,7 @@
               }
 
               for (const r of res) {
-                if (r && !buttons.isSteamAppFollowAdded(r) && !utils.getResolvedUrl(r)) {
+                if (r && !buttons.isSteamAppFollowAdded(r) && !utils.getResolvedUrl(r) && (!state.site._buttonsFailed || !state.site._buttonsFailed.includes(r))) {
                   follow.push(r);
                 }
               }
@@ -3906,7 +3955,7 @@
               }
 
               for (const r of res) {
-                if (r && !buttons.isSteamAppAddToLibraryAdded(r) && !utils.getResolvedUrl(r)) {
+                if (r && !buttons.isSteamAppAddToLibraryAdded(r) && !utils.getResolvedUrl(r) && (!state.site._buttonsFailed || !state.site._buttonsFailed.includes(r))) {
                   library.push(r);
                 }
               }
@@ -3919,33 +3968,42 @@
             setTimeout(async () => {
               const noti = notifications.info(i18n.get('steam-loading-tasks'), {timeout: 0});
               const promises = [];
+              const result = (res, id) => {
+                if (!res) {
+                  if (!state.site._buttonsFailed) {
+                    state.site._buttonsFailed = [];
+                  }
+
+                  state.site._buttonsFailed.push(id);
+                }
+              };
 
               for (const g of groups) {
                 promises.push(buttons.add({
                   type: 'steam-group',
                   steamGroup: g
-                }));
+                }).then((res) => result(res, g)));
               }
 
               for (const w of wishlist) {
                 promises.push(buttons.add({
                   type: 'steam-app-wishlist',
                   steamApp: w
-                }));
+                }).then((res) => result(res, w)));
               }
 
               for (const f of follow) {
                 promises.push(buttons.add({
                   type: 'steam-app-follow',
                   steamApp: f
-                }));
+                }).then((res) => result(res, f)));
               }
 
               for (const l of library) {
                 promises.push(buttons.add({
                   type: 'steam-app-add',
                   steamApp: l
-                }));
+                }).then((res) => result(res, l)));
               }
 
               await Promise.all(promises);

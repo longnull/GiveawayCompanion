@@ -1,4 +1,7 @@
 ## Changelog
+### v1.7.5 (2024-06-03)
+* KeyJoker: added task confirmation.
+* KeyJoker: fixed infinite loading of Steam tasks (it happened because of captcha, now the script doesn't retry to load failed tasks).
 ### v1.7.4 (2024-04-20)
 * Givee.club: added support for "follow a game" tasks.
 ### v1.7.3 (2024-01-04)
@@ -78,6 +81,9 @@
 ***
 
 ## Список изменений
+### v1.7.5 (2024-06-03)
+* KeyJoker: добавлено подтверждение заданий.
+* KeyJoker: исправлена бесконечная загрузка заданий Steam (это происходило из-за капчи, теперь скрипт не пытается повторно загрузить неудачные задания).
 ### v1.7.4 (2024-04-20)
 * Givee.club: добавлена поддержка заданий "подписаться на игру".
 ### v1.7.3 (2024-01-04)
