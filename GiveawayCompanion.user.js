@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.7.5
+// @version 1.7.6
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -15,13 +15,11 @@
 // @match *://*.whosgamingnow.net/giveaway/*
 // @match *://*.gamehag.com/*
 // @match *://*.gleam.io/*/*
-// @match *://*.chubkeys.com/giveaway/*
 // @match *://*.giveaway.su/giveaway/view/*
 // @match *://*.keyjoker.com/*
 // @match *://*.key-hub.eu/giveaway/*
 // @match *://*.givee.club/*/event/*
 // @match *://*.opquests.com/*
-// @match *://*.key.gift/*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
 // @connect bananatic.com
@@ -40,17 +38,19 @@
   'use strict';
 
   const version = {
-    string: '1.7.5',
+    string: '1.7.6',
     changes: {
       default:
         `<ul>
-          <li>KeyJoker: added task confirmation</li>
-          <li>KeyJoker: fixed infinite loading of Steam tasks (it happened because of captcha, now the script doesn't retry to load failed tasks)</li>
+          <li>Steam: fixed loading of tasks related to games</li>
+          <li>Removed support for key.gift</li>
+          <li>Removed support for chubkeys.com</li>
         </ul>`,
       ru:
         `<ul>
-          <li>KeyJoker: добавлено подтверждение заданий</li>
-          <li>KeyJoker: исправлена бесконечная загрузка заданий Steam (это происходило из-за капчи, теперь скрипт не пытается повторно загрузить неудачные задания)</li>
+          <li>Steam: исправлена загрузка заданий связанных с играми</li>
+          <li>Удалена поддержка key.gift</li>
+          <li>Удалена поддержка chubkeys.com</li>
         </ul>`
     }
   };
@@ -584,83 +584,6 @@
         ]
       },
       {
-        host: 'chubkeys.com',
-        steamKeys: '#gameKey:visible:not(:empty)',
-        steamGroups: 'form[action*="steamcommunity.com/groups/"]@action',
-        conditions: [
-          {
-            elementAnd: ['.task-item .btn-check:not(.btn-success)', '!#gameKey:visible:not(:empty):not(:contains("XXXX-XXXX-XXXX"))'],
-            buttons: [
-              {
-                type: 'tasks',
-                cancellable: true,
-                click(params) {
-                  // They make synchronous requests and the page hangs when you click "verify" buttons,
-                  // so we make the requests ourselves and change the style of the buttons
-
-                  const tasks = $J('.task-item:not(:has(.btn-check.btn-success))');
-
-                  log.debug(`tasks found : ${tasks.length}`);
-
-                  if (tasks.length) {
-                    return new Promise(async (resolve) => {
-                      for (let i = 0; i < tasks.length; i++) {
-                        if (params.cancelled) {
-                          break;
-                        }
-
-                        const task = $J(tasks.get(i));
-                        const icon = task.find('.btn-verify-task i');
-                        const verify = task.find('.btn-check');
-
-                        if (icon.length && verify.length) {
-                          const match = verify.attr('id').match(/verifyTaskBtn(\d+)/);
-
-                          if (match) {
-                            const type = icon.hasClass('la-steam') ? 'steam' : 'chain';
-                            const url = `${window.location.origin}/${type}/check/giveaway/${match[1]}`;
-
-                            log.debug(`${i + 1} : making request : ${url}`);
-
-                            try {
-                              const response = await $J.get(url);
-
-                              if (response === 'success') {
-                                log.debug(`${i + 1} : task done`);
-
-                                verify.removeClass('btn-danger');
-                                verify.addClass('btn-success');
-                                verify.html('<i class="la la-check"></i>&nbsp;DONE');
-                              } else {
-                                log.debug(`${i + 1} : task error : ${response.content}`);
-
-                                verify.removeClass('btn-primary');
-                                verify.addClass('btn-danger');
-                                verify.html('<i class="la la-close"></i>&nbsp;ERROR');
-                              }
-                            } catch (e) {}
-                          }
-                        }
-
-                        params.button.progress(tasks.length, i + 1);
-                      }
-
-                      if (params.cancelled) {
-                        log.debug('cancelled');
-                      } else {
-                        log.debug('all tasks done');
-                      }
-
-                      resolve();
-                    });
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
         host: 'giveaway.su',
         element: 'a[href*="logout"]',
         steamKeys: '.giveaway-key input%val',
@@ -961,38 +884,6 @@
             }
           },
         ]
-      },
-      {
-        host: 'key.gift',
-        element: 'div[class*="_navbarSection_"] span[class*="_username_"]',
-        conditions: [
-          {
-            path: /^\/giveaway/,
-            steamKeys: 'div[class*="_gameContainer_"] div[class*="_key_"]',
-            steamGroups: 'div[class*="_tasksContainer_"] a[href*="steamcommunity.com/groups/"]'
-          },
-          {
-            path: /^\/profile/,
-            steamKeys: 'div[class*="_keyCardsCointainer_"] span[class*="_key_"]',
-            ready() {
-              $J('div[class*="_keyCardsCointainer_"] div[class*="_cardInfo_"] img').on('click', (e) => {
-                const key = steam.extractKeys($J(e.currentTarget).parents('div[class*="_keycard_"]').find('span[class*="_key_"]').text());
-
-                if (key) {
-                  steam.openKeyActivationPage(key[0]);
-                }
-              });
-
-              $J('head').append(
-                `<style>
-                  div[class*="_keyCardsCointainer_"] div[class*="_cardInfo_"] img {
-                    cursor: pointer;
-                  }
-                </style>`
-              );
-            }
-          }
-        ]
       }
     ]
   };
@@ -1278,7 +1169,7 @@
     _followAppUrl: 'https://store.steampowered.com/explore/followgame/',
     _addToLibraryUrl: 'https://store.steampowered.com/freelicense/addfreelicense/',
     _groupRegex: /steamcommunity\.com\/groups\/([a-zA-Z0-9\-_]{2,32})/,
-    _appRegex: /store\.steampowered\.com\/app\/(\d+)/,
+    _appRegex: /store\.steampowered\.com(?:\/agecheck)?\/app\/(\d+)/,
     _keyRegex: /[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}(-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5})?/g,
     _initPromise: null,
     openGroupPage(group) {

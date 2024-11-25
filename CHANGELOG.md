@@ -1,4 +1,8 @@
 ## Changelog
+### v1.7.6 (2024-11-25)
+* Steam: fixed loading of tasks related to games.
+* Removed support for key.gift.
+* Removed support for chubkeys.com.
 ### v1.7.5 (2024-06-03)
 * KeyJoker: added task confirmation.
 * KeyJoker: fixed infinite loading of Steam tasks (it happened because of captcha, now the script doesn't retry to load failed tasks).
@@ -81,6 +85,10 @@
 ***
 
 ## Список изменений
+### v1.7.6 (2024-11-25)
+* Steam: исправлена загрузка заданий связанных с играми.
+* Удалена поддержка key.gift.
+* Удалена поддержка chubkeys.com.
 ### v1.7.5 (2024-06-03)
 * KeyJoker: добавлено подтверждение заданий.
 * KeyJoker: исправлена бесконечная загрузка заданий Steam (это происходило из-за капчи, теперь скрипт не пытается повторно загрузить неудачные задания).
