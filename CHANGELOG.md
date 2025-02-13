@@ -1,4 +1,6 @@
 ## Changelog
+### v1.7.7 (2025-02-13)
+* Steam: fixed loading of tasks related to adult games.
 ### v1.7.6 (2024-11-25)
 * Steam: fixed loading of tasks related to games.
 * Removed support for key.gift.
@@ -85,6 +87,8 @@
 ***
 
 ## Список изменений
+### v1.7.7 (2025-02-13)
+* Steam: исправлена загрузка заданий связанных с играми для взрослых.
 ### v1.7.6 (2024-11-25)
 * Steam: исправлена загрузка заданий связанных с играми.
 * Удалена поддержка key.gift.

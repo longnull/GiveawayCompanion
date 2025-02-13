@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.7.6
+// @version 1.7.7
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -38,19 +38,15 @@
   'use strict';
 
   const version = {
-    string: '1.7.6',
+    string: '1.7.7',
     changes: {
       default:
         `<ul>
-          <li>Steam: fixed loading of tasks related to games</li>
-          <li>Removed support for key.gift</li>
-          <li>Removed support for chubkeys.com</li>
+          <li>Steam: fixed loading of tasks related to adult games</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Steam: исправлена загрузка заданий связанных с играми</li>
-          <li>Удалена поддержка key.gift</li>
-          <li>Удалена поддержка chubkeys.com</li>
+          <li>Steam: исправлена загрузка заданий связанных с играми для взрослых</li>
         </ul>`
     }
   };
@@ -1169,7 +1165,7 @@
     _followAppUrl: 'https://store.steampowered.com/explore/followgame/',
     _addToLibraryUrl: 'https://store.steampowered.com/freelicense/addfreelicense/',
     _groupRegex: /steamcommunity\.com\/groups\/([a-zA-Z0-9\-_]{2,32})/,
-    _appRegex: /store\.steampowered\.com(?:\/agecheck)?\/app\/(\d+)/,
+    _appRegex: /store\.steampowered\.com\/.*?app(?:\/|%2F)(\d+)/,
     _keyRegex: /[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}(-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5})?/g,
     _initPromise: null,
     openGroupPage(group) {
