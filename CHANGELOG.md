@@ -1,4 +1,7 @@
 ## Changelog
+### v1.7.8 (2025-05-18)
+* Steam: fixed leaving the group.
+* Steam: added link to steamstat.us in error messages.
 ### v1.7.7 (2025-02-13)
 * Steam: fixed loading of tasks related to adult games.
 ### v1.7.6 (2024-11-25)
@@ -87,6 +90,9 @@
 ***
 
 ## Список изменений
+### v1.7.8 (2025-05-18)
+* Steam: исправлен выход из группы.
+* Steam: в сообщения об ошибках добавлена ссылка на steamstat.us.
 ### v1.7.7 (2025-02-13)
 * Steam: исправлена загрузка заданий связанных с играми для взрослых.
 ### v1.7.6 (2024-11-25)

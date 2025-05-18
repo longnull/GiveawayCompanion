@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.7.7
+// @version 1.7.8
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -38,15 +38,17 @@
   'use strict';
 
   const version = {
-    string: '1.7.7',
+    string: '1.7.8',
     changes: {
       default:
         `<ul>
-          <li>Steam: fixed loading of tasks related to adult games</li>
+          <li>Steam: fixed leaving the group</li>
+          <li>Steam: added link to steamstat.us in error messages</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Steam: исправлена загрузка заданий связанных с играми для взрослых</li>
+          <li>Steam: исправлен выход из группы</li>
+          <li>Steam: в сообщения об ошибках добавлена ссылка на steamstat.us</li>
         </ul>`
     }
   };
@@ -943,13 +945,13 @@
         'steam-loading-tasks': 'Loading Steam tasks...',
         'steam-group-join': 'Join Steam group "{group}" (Ctrl+Click - open the group in a new tab)',
         'steam-group-leave': 'Leave Steam group "{group}" (Ctrl+Click - open the group in a new tab)',
-        'steam-init-groups-request-failed': 'Failed to load <a href="https://steamcommunity.com/my/groups" target="_blank">your groups</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down.',
-        'steam-init-store-request-failed': 'Failed to get information from your Steam account. <a href="https://store.steampowered.com" target="_blank">Steam Store</a> is probably down.',
-        'steam-join-group-failed': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably experiencing some issues.',
+        'steam-init-groups-request-failed': 'Failed to load <a href="https://steamcommunity.com/my/groups" target="_blank">your groups</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably down (check <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
+        'steam-init-store-request-failed': 'Failed to get information from your Steam account. <a href="https://store.steampowered.com" target="_blank">Steam Store</a> is probably down (check <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
+        'steam-join-group-failed': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably experiencing some issues (check <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
         'steam-join-group-join-request-sent': 'Join request sent. To join the <a href="{groupLink}" target="_blank">group</a>, your join request must be approved by the group administrator.',
         'steam-join-group-not-logged': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. [steam-community-not-logged]',
         'steam-join-group-not-found': 'Failed to join the <a href="{groupLink}" target="_blank">group</a>. Looks like the group does not exist.',
-        'steam-leave-group-failed': 'Failed to leave the <a href="{groupLink}" target="_blank">group</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably experiencing some issues.',
+        'steam-leave-group-failed': 'Failed to leave the <a href="{groupLink}" target="_blank">group</a>. <a href="https://steamcommunity.com" target="_blank">Steam Community</a> is probably experiencing some issues (check <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
         'steam-leave-group-not-logged': 'Failed to leave the <a href="{groupLink}" target="_blank">group</a>. [steam-community-not-logged]',
         'steam-app-wishlist-add': 'Add game #{appId} to Steam wishlist (Ctrl+Click - open the game in a new tab)',
         'steam-app-wishlist-remove': 'Remove game #{appId} from Steam wishlist (Ctrl+Click - open the game in a new tab)',
@@ -963,7 +965,7 @@
         'steam-app-add-to-library-failed': 'Failed to add a game to Steam library. [steam-store-issues]',
         'steam-community-not-logged': 'It looks like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.',
         'steam-store-not-logged': 'It looks like you are not logged in to <a href="https://store.steampowered.com" target="_blank">Steam Store</a>.',
-        'steam-store-issues': 'Perhaps you are not logged in to <a href="https://store.steampowered.com" target="_blank">Steam Store</a> or Steam is experiencing some issues.',
+        'steam-store-issues': 'Perhaps you are not logged in to <a href="https://store.steampowered.com" target="_blank">Steam Store</a> or Steam is experiencing some issues (check <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
         'gc-updated': `Giveaway Companion has been updated to version ${version.string}.<br><br><b>Changes:</b>`
       },
       ru: {
@@ -975,13 +977,13 @@
         'steam-loading-tasks': 'Загрузка заданий Steam...',
         'steam-group-join': 'Вступить в Steam группу "{group}" (Ctrl+Клик - открыть группу в новой вкладке)',
         'steam-group-leave': 'Выйти из Steam группы "{group}" (Ctrl+Клик - открыть группу в новой вкладке)',
-        'steam-init-groups-request-failed': 'Не удалось загрузить <a href="https://steamcommunity.com/my/groups" target="_blank">ваши группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно.',
-        'steam-init-store-request-failed': 'Не удалось загрузить информацию из вашего аккаунта Steam. <a href="https://store.steampowered.com" target="_blank">Магазин Steam</a>, возможно, неактивен.',
-        'steam-join-group-failed': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, испытывает какие-то проблемы.',
+        'steam-init-groups-request-failed': 'Не удалось загрузить <a href="https://steamcommunity.com/my/groups" target="_blank">ваши группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, неактивно (проверьте <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
+        'steam-init-store-request-failed': 'Не удалось загрузить информацию из вашего аккаунта Steam. <a href="https://store.steampowered.com" target="_blank">Магазин Steam</a>, возможно, неактивен (проверьте <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
+        'steam-join-group-failed': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, испытывает какие-то проблемы (проверьте <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
         'steam-join-group-join-request-sent': 'Заявка на вступление отправлена. Чтобы вступить в <a href="{groupLink}" target="_blank">группу</a>, вашу заявку должен одобрить администратор группы.',
         'steam-join-group-not-logged': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. [steam-community-not-logged]',
         'steam-join-group-not-found': 'Не удалось вступить в <a href="{groupLink}" target="_blank">группу</a>. Похоже, группа не существует.',
-        'steam-leave-group-failed': 'Не удалось выйти из <a href="{groupLink}" target="_blank">группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, испытывает какие-то проблемы.',
+        'steam-leave-group-failed': 'Не удалось выйти из <a href="{groupLink}" target="_blank">группы</a>. <a href="https://steamcommunity.com" target="_blank">Сообщество Steam</a>, возможно, испытывает какие-то проблемы (проверьте <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
         'steam-leave-group-not-logged': 'Не удалось выйти из <a href="{groupLink}" target="_blank">группы</a>. [steam-community-not-logged]',
         'steam-app-wishlist-add': 'Добавить в список желаемого Steam игру #{appId} (Ctrl+Клик - открыть игру в новой вкладке)',
         'steam-app-wishlist-remove': 'Удалить из списка желаемого Steam игру #{appId} (Ctrl+Клик - открыть игру в новой вкладке)',
@@ -995,7 +997,7 @@
         'steam-app-add-to-library-failed': 'Не удалось добавить игру в библиотеку Steam. [steam-store-issues]',
         'steam-community-not-logged': 'Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.',
         'steam-store-not-logged': 'Похоже, вы не авторизованы в <a href="https://store.steampowered.com" target="_blank">Магазине Steam</a>.',
-        'steam-store-issues': 'Возможно, вы не авторизованы в <a href="https://store.steampowered.com" target="_blank">Магазине Steam</a> или Steam испытывает какие-то проблемы.',
+        'steam-store-issues': 'Возможно, вы не авторизованы в <a href="https://store.steampowered.com" target="_blank">Магазине Steam</a> или Steam испытывает какие-то проблемы (проверьте <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
         'gc-updated': `Giveaway Companion был обновлён до версии ${version.string}.<br><br><b>Изменения:</b>`
       }
     }
@@ -1366,7 +1368,10 @@
       const response = await $GM.xmlHttpRequest({
         method: 'POST',
         url: this._groupUrl + groupName,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Origin': 'https://steamcommunity.com'
+        },
         data: $J.param({action: 'join', sessionID: groupInfo.sessionId})
       });
 
@@ -1426,7 +1431,10 @@
       const response = await $GM.xmlHttpRequest({
         method: 'POST',
         url: this._processUrl,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Origin': 'https://steamcommunity.com'
+        },
         data: $J.param({action: 'leaveGroup', sessionID: groupInfo.sessionId, groupId: groupInfo.id})
       });
 
@@ -1628,6 +1636,7 @@
         url: this._addToWishlistUrl,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          'Origin': 'https://store.steampowered.com',
           'Referer': `https://store.steampowered.com/app/${appId}/`,
           'X-Requested-With': 'XMLHttpRequest'
         },
@@ -1674,7 +1683,10 @@
       const response = await $GM.xmlHttpRequest({
         method: 'POST',
         url: this._removeFromWishlistUrl,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Origin': 'https://store.steampowered.com'
+        },
         data: $J.param({sessionid: sessionId, appid: appId})
       });
 
@@ -1718,7 +1730,10 @@
       const response = await $GM.xmlHttpRequest({
         method: 'POST',
         url: this._followAppUrl,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Origin': 'https://store.steampowered.com'
+        },
         data: $J.param({sessionid: sessionId, appid: appId})
       });
 
@@ -1758,7 +1773,10 @@
       const response = await $GM.xmlHttpRequest({
         method: 'POST',
         url: this._followAppUrl,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Origin': 'https://store.steampowered.com'
+        },
         data: $J.param({sessionid: sessionId, appid: appId, unfollow: '1'})
       });
 
@@ -1834,7 +1852,10 @@
       response = await $GM.xmlHttpRequest({
         method: 'POST',
         url: this._addToLibraryUrl + subId[1],
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Origin': 'https://store.steampowered.com'
+        },
         data: $J.param({sessionid: sessionId[1], ajax: 'true'})
       });
 
