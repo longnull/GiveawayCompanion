@@ -27,6 +27,7 @@ The script is inspired by [Giveaway Helper](https://github.com/Citrinate/giveawa
 | key-hub.eu         | Complete simple tasks, join a Steam group, add to Steam wishlist
 | givee.club         | Confirm tasks, join a Steam group, add to Steam wishlist, follow a game on Steam
 | opquests.com       | Confirm tasks, join a Steam group, add to Steam wishlist, follow a game on Steam, add a game to Steam library, activate a key on Steam
+| freeanywhere.net   | Confirm tasks, join a Steam group, add to Steam wishlist, activate a key on Steam
 
 ### Installation
 1. Install one of the browser extensions to run user scripts.  
@@ -67,6 +68,7 @@ Automatic updating of the script may require your confirmation.
 | key-hub.eu         | Выполнение простых заданий, вступление в группу в Steam, добавление в список желаемого в Steam
 | givee.club         | Подтверждение заданий, вступление в группу в Steam, добавление в список желаемого в Steam, подписка на игру в Steam
 | opquests.com       | Подтверждение заданий, вступление в группу в Steam, добавление в список желаемого в Steam, подписка на игру в Steam, добавление игры в библиотеку Steam, активация ключа в Steam
+| freeanywhere.net   | Подтверждение заданий, вступление в группу в Steam, добавление в список желаемого в Steam, активация ключа в Steam
 
 ### Установка
 1. Установить одно из браузерных расширений для выполнения пользовательских скриптов.  

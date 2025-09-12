@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.7.8
+// @version 1.8
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -20,6 +20,7 @@
 // @match *://*.key-hub.eu/giveaway/*
 // @match *://*.givee.club/*/event/*
 // @match *://*.opquests.com/*
+// @match *://*.freeanywhere.net/game*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
 // @connect bananatic.com
@@ -38,17 +39,15 @@
   'use strict';
 
   const version = {
-    string: '1.7.8',
+    string: '1.8',
     changes: {
       default:
         `<ul>
-          <li>Steam: fixed leaving the group</li>
-          <li>Steam: added link to steamstat.us in error messages</li>
+          <li>Added support for freeanywhere.net</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Steam: исправлен выход из группы</li>
-          <li>Steam: в сообщения об ошибках добавлена ссылка на steamstat.us</li>
+          <li>Добавлена поддержка freeanywhere.net</li>
         </ul>`
     }
   };
@@ -881,6 +880,58 @@
               }
             }
           },
+        ]
+      },
+      {
+        host: 'freeanywhere.net',
+        element: 'a[href="?steam_logout"]',
+        steamGroups: '.game__content-tasks__task[data-type="steam_group_sub"] .task-link a',
+        steamAppWishlist: '.game__content-tasks__task[data-type="steam_game_wishlist"] .task-link a',
+        steamKeys: '.game__content-tasks__get-message__content .message',
+        conditions: [
+          {
+            element: '.game__content-tasks__task:not(.done) .task-check',
+            buttons: [
+              {
+                type: 'tasks',
+                cancellable: true,
+                click(params) {
+                  const tasks = $J(params.self.element);
+
+                  log.debug(`tasks found : ${tasks.length}`);
+
+                  if (tasks.length) {
+                    return new Promise(async (resolve) => {
+                      for (let i = 0; i < tasks.length; i++) {
+                        if (params.cancelled) {
+                          break;
+                        }
+
+                        log.debug(`${i + 1} : click`);
+
+                        const task = tasks.get(i);
+
+                        task.click();
+                        await utils.sleep(500);
+
+                        log.debug(`${i + 1} : task done`);
+
+                        params.button.progress(tasks.length, i + 1);
+                      }
+
+                      if (params.cancelled) {
+                        log.debug('cancelled');
+                      } else {
+                        log.debug('all tasks done');
+                      }
+
+                      resolve();
+                    });
+                  }
+                }
+              }
+            ]
+          }
         ]
       }
     ]

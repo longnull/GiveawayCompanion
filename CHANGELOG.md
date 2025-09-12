@@ -1,4 +1,6 @@
 ## Changelog
+### v1.8 (2025-09-12)
+* Added support for freeanywhere.net.
 ### v1.7.8 (2025-05-18)
 * Steam: fixed leaving the group.
 * Steam: added link to steamstat.us in error messages.
@@ -90,6 +92,8 @@
 ***
 
 ## Список изменений
+### v1.8 (2025-09-12)
+* Добавлена поддержка freeanywhere.net.
 ### v1.7.8 (2025-05-18)
 * Steam: исправлен выход из группы.
 * Steam: в сообщения об ошибках добавлена ссылка на steamstat.us.
