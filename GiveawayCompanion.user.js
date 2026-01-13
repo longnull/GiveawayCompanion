@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.8
+// @version 1.9
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -32,6 +32,8 @@
 // @grant GM.getValue
 // @grant GM_xmlhttpRequest
 // @grant GM.xmlHttpRequest
+// @grant GM_registerMenuCommand
+// @grant GM.registerMenuCommand
 // @require https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js
 // ==/UserScript==
 
@@ -39,15 +41,21 @@
   'use strict';
 
   const version = {
-    string: '1.8',
+    string: '1.9',
     changes: {
       default:
         `<ul>
-          <li>Added support for freeanywhere.net</li>
+          <li>Added settings window (accessible via Violentmonkey/Tampermonkey menu).</li>
+          <li>Gleam: added completion of Instagram tasks for following and commenting.</li>
+          <li>Gleam: added completion of X/Twitter tasks for posting hashtags.</li>
+          <li>Freeanywhere: the script now also confirms green tasks.</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Добавлена поддержка freeanywhere.net</li>
+          <li>Добавлено окно настроек (вызывается в меню Violentmonkey/Tampermonkey).</li>
+          <li>Gleam: добавлено выполнение Instagram заданий на подписку и комментарий.</li>
+          <li>Gleam: добавлено выполнение X/Twitter заданий на публикацию хештегов.</li>
+          <li>Freeanywhere: теперь скрипт подтверждает и зелёные задания.</li>
         </ul>`
     }
   };
@@ -114,13 +122,13 @@
           // false - выключено, true - включено
           enabled: false
         },
-        // Fill in username in Twitter tasks
-        // Заполнить имя пользователя в Twitter заданиях
+        // Fill in username in X/Twitter tasks
+        // Заполнить имя пользователя в X/Twitter заданиях
         twitterSetUsername: {
           // false - disabled, true - enabled
           // false - выключено, true - включено
           enabled: false,
-          // Username (if empty, the script will take the username from the email)
+          // Username (if empty, the script will take the username from your email address)
           // Имя (если пусто, то скрипт возьмёт имя из email)
           username: ''
         },
@@ -130,10 +138,20 @@
           // false - disabled, true - enabled
           // false - выключено, true - включено
           enabled: false,
-          // Username (if empty, the script will take the username from the email)
+          // Username (if empty, the script will take the username from your email address)
           // Имя (если пусто, то скрипт возьмёт имя из email)
           username: ''
         },
+        // Fill in username in Instagram tasks
+        // Заполнить имя пользователя в Instagram заданиях
+        instagramSetUsername: {
+          // false - disabled, true - enabled
+          // false - выключено, true - включено
+          enabled: false,
+          // Username (if empty, the script will take the username from your email address)
+          // Имя (если пусто, то скрипт возьмёт имя из email)
+          username: ''
+        }
       }
     },
     sites: [
@@ -454,7 +472,7 @@
                   params.site._gleam.canEnter(scope.entry_method) &&
                   !params.site._gleam.isEntered(scope.entry_method) &&
                   params.site._gleam.enoughUserDetails(scope.entry_method) &&
-                  (/(custom_action|_view|_visit|blog_comment|twitter_tweet|twitter_retweet|twitter_follow|tiktok_visit|tiktok_follow)/.test(scope.entry_method.entry_type) || (
+                  (/(custom_action|_view|_visit|blog_comment|twitter_tweet|twitter_retweet|twitter_follow|twitter_hashtags|tiktok_visit|tiktok_follow|instagram_follow|instagram_comment)/.test(scope.entry_method.entry_type) || (
                     params.site._gleam.enoughEntryDetails(scope.entry_method) &&
                     (!scope.entry_method.requires_authentication || params.site._gleam.isAuthenticated(scope.entry_method, scope.entry_method.provider))
                   ));
@@ -493,7 +511,7 @@
                         const scope = unsafeWindow.angular.element(tasks[i]).scope();
 
                         try {
-                          if (/(custom_action|_view|_visit|blog_comment|tiktok_visit|tiktok_follow)/.test(scope.entry_method.entry_type)) {
+                          if (/(custom_action|_view|_visit|blog_comment|twitter_tweet|twitter_hashtags|tiktok_visit|tiktok_follow|instagram_follow|instagram_comment)/.test(scope.entry_method.entry_type)) {
                             log.debug(`${i + 1} : visit :`, scope.entry_method.action_description);
 
                             params.site._gleam.triggerVisit(scope.entry_method);
@@ -533,7 +551,7 @@
                             params.site._gleam.entryState.formData[scope.entry_method.id] = tiktokName;
                           }
 
-                          if (/(twitter_tweet|twitter_retweet|twitter_follow)/.test(scope.entry_method.entry_type)) {
+                          if (/(twitter_tweet|twitter_hashtags|twitter_retweet|twitter_follow)/.test(scope.entry_method.entry_type)) {
                             log.debug(`${i + 1} : twitter attempt :`, scope.entry_method.action_description);
 
                             params.site._gleam.attemptEntry(scope.entry_method);
@@ -549,6 +567,23 @@
                               params.site._gleam.entryDetailsState[scope.entry_method.id] = {twitter_username: twitterName};
                               params.site._gleam.entryState.formData[scope.entry_method.id] = {twitter_username: twitterName};
                             }
+                          }
+
+                          if (/(instagram_follow|instagram_comment)/.test(scope.entry_method.entry_type) && config.sitesConfig.gleam.instagramSetUsername.enabled &&
+                            !params.site._gleam.entryState.formData[scope.entry_method.id]
+                          ) {
+                            log.debug(`${i + 1} : instagram attempt :`, scope.entry_method.action_description);
+
+                            params.site._gleam.attemptEntry(scope.entry_method);
+
+                            await utils.sleep(200);
+
+                            const instagramName = config.sitesConfig.gleam.instagramSetUsername.username ? config.sitesConfig.gleam.instagramSetUsername.username : emailName;
+
+                            log.debug(`${i + 1} : instagram username :`, instagramName, ':', scope.entry_method.action_description);
+
+                            params.site._gleam.entryDetailsState[scope.entry_method.id] = instagramName;
+                            params.site._gleam.entryState.formData[scope.entry_method.id] = instagramName;
                           }
 
                           if (params.site._gleam.enoughEntryDetails(scope.entry_method) &&
@@ -890,7 +925,7 @@
         steamKeys: '.game__content-tasks__get-message__content .message',
         conditions: [
           {
-            element: '.game__content-tasks__task:not(.done) .task-check',
+            element: '.game__content-tasks__task .task-check',
             buttons: [
               {
                 type: 'tasks',
@@ -1017,7 +1052,25 @@
         'steam-community-not-logged': 'It looks like you are not logged in to <a href="https://steamcommunity.com" target="_blank">Steam Community</a>.',
         'steam-store-not-logged': 'It looks like you are not logged in to <a href="https://store.steampowered.com" target="_blank">Steam Store</a>.',
         'steam-store-issues': 'Perhaps you are not logged in to <a href="https://store.steampowered.com" target="_blank">Steam Store</a> or Steam is experiencing some issues (check <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
-        'gc-updated': `Giveaway Companion has been updated to version ${version.string}.<br><br><b>Changes:</b>`
+        'gc-updated': `Giveaway Companion has been updated to version ${version.string}.<br><br><b>Changes:</b>`,
+        'settings': 'Settings',
+        'settings-general': 'General',
+        'settings-general-debug': 'Output debug info into console',
+        'settings-general-steam-groups': 'Joining Steam groups',
+        'settings-general-steam-wishlist': 'Adding to Steam wishlist',
+        'settings-general-steam-follow': 'Following games on Steam',
+        'settings-general-steam-library': 'Adding games to Steam library',
+        'settings-sites': 'Sites',
+        'settings-sites-gleam-questions': 'Completing tasks that require user input',
+        'settings-sites-gleam-questions-text': 'Text:',
+        'settings-sites-gleam-questions-with-check': 'Completing tasks that require a correct answer from the user (client-side verification)',
+        'settings-sites-gleam-twitter': 'Filling in the username in X/Twitter tasks',
+        'settings-sites-gleam-tiktok': 'Filling in the username in TikTok tasks',
+        'settings-sites-gleam-instagram': 'Filling in the username in Instagram tasks',
+        'settings-sites-gleam-name': 'Name:',
+        'settings-sites-gleam-name-title': 'If empty, the script will take the name from your email address',
+        'settings-save': 'Save',
+        'settings-reload-to-apply': '<a href="javascript:window.location.reload(false)">Refresh</a> the page to apply the settings.'
       },
       ru: {
         'confirm-tasks': 'Подтвердить задания',
@@ -1049,7 +1102,25 @@
         'steam-community-not-logged': 'Похоже, вы не авторизованы в <a href="https://steamcommunity.com" target="_blank">Сообществе Steam</a>.',
         'steam-store-not-logged': 'Похоже, вы не авторизованы в <a href="https://store.steampowered.com" target="_blank">Магазине Steam</a>.',
         'steam-store-issues': 'Возможно, вы не авторизованы в <a href="https://store.steampowered.com" target="_blank">Магазине Steam</a> или Steam испытывает какие-то проблемы (проверьте <a href="https://steamstat.us" target="_blank">Steam Status</a>).',
-        'gc-updated': `Giveaway Companion был обновлён до версии ${version.string}.<br><br><b>Изменения:</b>`
+        'gc-updated': `Giveaway Companion был обновлён до версии ${version.string}.<br><br><b>Изменения:</b>`,
+        'settings': 'Настройки',
+        'settings-general': 'Основные',
+        'settings-general-debug': 'Выводить отладочную информацию в консоль',
+        'settings-general-steam-groups': 'Вход в группы Steam',
+        'settings-general-steam-wishlist': 'Добавление в список желаемого Steam',
+        'settings-general-steam-follow': 'Подписка на игры в Steam',
+        'settings-general-steam-library': 'Добавление игр в библиотеку Steam',
+        'settings-sites': 'Сайты',
+        'settings-sites-gleam-questions': 'Выполнять задания, требующие ввода от пользователя',
+        'settings-sites-gleam-questions-text': 'Текст:',
+        'settings-sites-gleam-questions-with-check': 'Выполнять задания, требующие правильного ответа от пользователя (проверка на стороне клиента)',
+        'settings-sites-gleam-twitter': 'Заполнять имя пользователя в X/Twitter заданиях',
+        'settings-sites-gleam-tiktok': 'Заполнять имя пользователя в TikTok заданиях',
+        'settings-sites-gleam-instagram': 'Заполнять имя пользователя в Instagram заданиях',
+        'settings-sites-gleam-name': 'Имя:',
+        'settings-sites-gleam-name-title': 'Если пусто, то скрипт возьмёт имя из вашего email адреса',
+        'settings-save': 'Сохранить',
+        'settings-reload-to-apply': '<a href="javascript:window.location.reload(false)">Обновите</a> страницу, чтобы применить настройки.'
       }
     }
   };
@@ -1176,6 +1247,34 @@
       return new Promise((resolve) => {
         setTimeout(resolve, ms);
       });
+    },
+    get(obj, path) {
+      const keys = path.split(/[.[\]]/g).filter((key) => key !== '');
+
+      return keys.reduce((currentObj, key) => {
+        if (currentObj && currentObj.hasOwnProperty(key)) {
+          return currentObj[key];
+        }
+
+        return undefined;
+      }, obj);
+    },
+    set(obj, path, value) {
+      const keys = path.split(/[.[\]]/g).filter((key) => key !== '');
+      const lastKey = keys.pop();
+      let current = obj;
+
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+
+        if (!current[key]) {
+          current[key] = {};
+        }
+
+        current = current[key];
+      }
+
+      current[lastKey] = value;
     }
   };
 
@@ -1288,7 +1387,7 @@
       return false;
     },
     async init() {
-      if (!config.steamGroups || this.initFailed) {
+      if ((!config.steamGroups && !config.steamAppWishlist && !config.steamAppFollow && !config.steamAppAddToLibrary) || this.initFailed) {
         return false;
       }
       if (this._sessionId) {
@@ -3560,6 +3659,338 @@
     }
   };
 
+  const settings = {
+    _settings: {},
+    _css: {},
+    async open() {
+      if (this._container) {
+        return;
+      }
+
+      this._css.containerId = utils.randomString(11);
+      this._css.settingsClass = utils.randomString(11);
+      this._css.settingsHeaderClass = utils.randomString(11);
+      this._css.settingsTitleClass = utils.randomString(11);
+      this._css.settingsCloseClass = utils.randomString(11);
+      this._css.settingsContentClass = utils.randomString(11);
+      this._css.settingsContentHeaderClass = utils.randomString(11);
+      this._css.settingsContentSubheaderClass = utils.randomString(11);
+      this._css.settingsContentOptionClass = utils.randomString(11);
+      this._css.settingsContentSuboptionClass = utils.randomString(11);
+      this._css.settingsContentOptionTitleClass = utils.randomString(11);
+      this._css.settingsContentOptionValueClass = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId2 = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId3 = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId4 = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId5 = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId6 = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId7 = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId8 = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId9 = utils.randomString(11);
+      this._css.settingsContentOptionCheckboxId10 = utils.randomString(11);
+      this._css.settingsFooterClass = utils.randomString(11);
+
+      this._style = $J(
+        `<style>
+          #${this._css.containerId} {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999999;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,.5);
+            line-height: 1;
+          }
+          #${this._css.containerId} * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: arial, sans-serif;
+            font-weight: normal;
+          }
+          #${this._css.containerId} .${this._css.settingsClass} {
+            display: flex;
+            flex-direction: column;
+            width: 430px;
+            border-radius: 6px;
+            letter-spacing: normal;
+            color: #f5f5f5;
+            background-color: #263238;
+            box-shadow: 0 0 4px 2px rgba(255,255,255,.5);
+          }
+          #${this._css.containerId} .${this._css.settingsHeaderClass} {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            padding: 4px;
+            border-radius: 6px 6px 0 0;
+            background-color: #182024;
+          }
+          #${this._css.containerId} .${this._css.settingsTitleClass} {
+            flex-grow: 1;
+            margin-left: 4px;
+            font-size: 16px;
+            font-weight: bold;
+          }
+          #${this._css.containerId} .${this._css.settingsCloseClass} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+          }
+          #${this._css.containerId} .${this._css.settingsCloseClass} svg {
+            width: 100%;
+            height: 100%;
+          }
+          #${this._css.containerId} .${this._css.settingsCloseClass} path {
+            fill: rgba(255,255,255,.8);
+            transition: fill .3s linear;
+          }
+          #${this._css.containerId} .${this._css.settingsCloseClass}:hover path {
+            fill: #fff;
+          }
+          #${this._css.containerId} .${this._css.settingsContentClass} {
+            flex-grow: 1;
+            padding: 8px;
+          }
+          #${this._css.containerId} .${this._css.settingsContentHeaderClass} {
+            margin-bottom: 10px;
+            font-size: 16px;
+            line-height: 0;
+            border-bottom: 1px solid #b0b0b0;
+          }
+          #${this._css.containerId} .${this._css.settingsContentHeaderClass}:not(:first-child) {
+            margin-top: 16px;
+          }
+          #${this._css.containerId} .${this._css.settingsContentHeaderClass} span {
+            padding: 0 10px 0 10px;
+            font-weight: bold;
+            color: #333;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+          }
+          #${this._css.containerId} .${this._css.settingsContentSubheaderClass} {
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: bold;
+          }
+          #${this._css.containerId} .${this._css.settingsContentOptionClass} {
+            display: flex;
+            margin-top: 6px;
+          }
+          #${this._css.containerId} .${this._css.settingsContentSuboptionClass} {
+            display: flex;
+            margin: 2px 0 0 10px;
+          }
+          #${this._css.containerId} .${this._css.settingsContentOptionClass} .${this._css.settingsContentOptionTitleClass},
+          #${this._css.containerId} .${this._css.settingsContentSuboptionClass} .${this._css.settingsContentOptionTitleClass} {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+          }
+          #${this._css.containerId} .${this._css.settingsContentOptionClass} .${this._css.settingsContentOptionTitleClass} {
+            flex-grow: 1;
+          }
+          #${this._css.containerId} .${this._css.settingsContentSuboptionClass} .${this._css.settingsContentOptionTitleClass} {
+            width: 40px;
+          }
+          #${this._css.containerId} .${this._css.settingsContentOptionTitleClass} label {
+            width: 100%;
+            line-height: 14px;
+            cursor: default;
+          }
+          #${this._css.containerId} .${this._css.settingsContentOptionValueClass} {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+          }
+          #${this._css.containerId} .${this._css.settingsContentSuboptionClass} .${this._css.settingsContentOptionValueClass} {
+            flex-grow: 1;
+          }
+          #${this._css.containerId} .${this._css.settingsContentOptionValueClass} input {
+            margin: 0 !important;
+            font-size: 14px !important;
+            text-indent: 0 !important;
+            letter-spacing: normal !important;
+            color: #333 !important;
+            box-shadow: none !important;
+            outline-offset: 0 !important;
+          }
+          #${this._css.containerId} .${this._css.settingsContentOptionValueClass} input[type="text"] {
+            padding: 4px !important;
+            width: 100% !important;
+            height: 24px !important;
+            border: none !important;
+            border-radius: 4px !important;
+          }
+          #${this._css.containerId} .${this._css.settingsContentOptionValueClass} input[type="checkbox"] {
+            cursor: default;
+          }
+          #${this._css.containerId} .${this._css.settingsContentOptionValueClass} input:focus-visible {
+            outline: 1px solid #f28053;
+          }
+          #${this._css.containerId} .${this._css.settingsFooterClass} {
+            background-color: #182024;
+            padding: 4px;
+            border-radius: 0 0 6px 6px;
+          }
+          #${this._css.containerId} .${this._css.settingsFooterClass} button {
+            width: 100% !important;
+            height: 30px !important;
+            font-weight: bold;
+            font-size: 16px;
+            letter-spacing: normal;
+            cursor: pointer;
+            border-radius: 6px;
+            border: 0 !important;
+            background-color: #6c757d !important;
+            color: #f5f5f5 !important;
+            text-shadow: 1px 1px 2px #3a3a3a;
+            transition: background-color .3s linear;
+          }
+          #${this._css.containerId} .${this._css.settingsFooterClass} button:hover {
+            background-color: #76818A !important;
+          }
+          #${this._css.containerId} .${this._css.settingsFooterClass} button:focus-visible {
+            outline: 1px solid #f28053;
+          }
+        </style>`
+      );
+
+      this._container = $J(
+        `<div id="${this._css.containerId}">
+          <div class="${this._css.settingsClass}">
+            <div class="${this._css.settingsHeaderClass}">
+              <span class="${this._css.settingsTitleClass}">Giveaway Companion</span>
+              <span class="${this._css.settingsCloseClass}">${icons.close}</span>
+            </div>
+            <div class="${this._css.settingsContentClass}">
+              <div class="${this._css.settingsContentHeaderClass}"><span>${i18n.get('settings-general')}</span></div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId}">${i18n.get('settings-general-debug')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId}" type="checkbox" name="debug"></span>
+              </div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId2}">${i18n.get('settings-general-steam-groups')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId2}" type="checkbox" name="steamGroups"></span>
+              </div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId3}">${i18n.get('settings-general-steam-wishlist')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId3}" type="checkbox" name="steamAppWishlist"></span>
+              </div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId4}">${i18n.get('settings-general-steam-follow')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId4}" type="checkbox" name="steamAppFollow"></span>
+              </div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId5}">${i18n.get('settings-general-steam-library')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId5}" type="checkbox" name="steamAppAddToLibrary"></span>
+              </div>
+              <div class="${this._css.settingsContentHeaderClass}"><span>${i18n.get('settings-sites')}</span></div>
+              <div class="${this._css.settingsContentSubheaderClass}">Gleam</div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId6}">${i18n.get('settings-sites-gleam-questions-with-check')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId6}" type="checkbox" name="sitesConfig.gleam.answerQuestionsWithCheck.enabled"></span>
+              </div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId7}">${i18n.get('settings-sites-gleam-questions')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId7}" type="checkbox" name="sitesConfig.gleam.answerQuestions.enabled"></span>
+              </div>
+              <div class="${this._css.settingsContentSuboptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}">${i18n.get('settings-sites-gleam-questions-text')}</span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input type="text" name="sitesConfig.gleam.answerQuestions.answer"></span>
+              </div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId8}">${i18n.get('settings-sites-gleam-twitter')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId8}" type="checkbox" name="sitesConfig.gleam.twitterSetUsername.enabled"></span>
+              </div>
+              <div class="${this._css.settingsContentSuboptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}">${i18n.get('settings-sites-gleam-name')}</span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input type="text" name="sitesConfig.gleam.twitterSetUsername.username" title="${i18n.get('settings-sites-gleam-name-title')}"></span>
+              </div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId9}">${i18n.get('settings-sites-gleam-tiktok')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId9}" type="checkbox" name="sitesConfig.gleam.tiktokSetUsername.enabled"></span>
+              </div>
+              <div class="${this._css.settingsContentSuboptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}">${i18n.get('settings-sites-gleam-name')}</span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input type="text" name="sitesConfig.gleam.tiktokSetUsername.username" title="${i18n.get('settings-sites-gleam-name-title')}"></span>
+              </div>
+              <div class="${this._css.settingsContentOptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}"><label for="${this._css.settingsContentOptionCheckboxId10}">${i18n.get('settings-sites-gleam-instagram')}</label></span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input id="${this._css.settingsContentOptionCheckboxId10}" type="checkbox" name="sitesConfig.gleam.instagramSetUsername.enabled"></span>
+              </div>
+              <div class="${this._css.settingsContentSuboptionClass}">
+                <span class="${this._css.settingsContentOptionTitleClass}">${i18n.get('settings-sites-gleam-name')}</span>
+                <span class="${this._css.settingsContentOptionValueClass}"><input type="text" name="sitesConfig.gleam.instagramSetUsername.username" title="${i18n.get('settings-sites-gleam-name-title')}"></span>
+              </div>
+            </div>
+            <div class="${this._css.settingsFooterClass}">
+              <button>${i18n.get('settings-save')}</button>
+            </div>
+          </div>
+        </div>`
+      );
+
+      this._container.find(`.${this._css.settingsCloseClass}`).on('click', () => {
+        this.close();
+      });
+
+      this._container.find(`.${this._css.settingsFooterClass} button`).on('click', () => {
+        this._settings = {};
+        this._container.find('input').each((index, element) => {
+          this._settings[element.name] = $J(element).is(':checkbox') ? element.checked : $J(element).val();
+        });
+
+        log.debug('settings : saving :', this._settings);
+
+        $GM.setValue('settings', this._settings);
+        notifications.success(i18n.get('settings-reload-to-apply'), {timeout: 0});
+
+        this.close();
+      });
+
+      this._container.find('input').each((index, element) => {
+        const value = this._settings[element.name] !== undefined ? this._settings[element.name] : utils.get(config, element.name);
+
+        if ($J(element).is(':checkbox')) {
+          element.checked = value;
+        } else {
+          $J(element).val(value);
+        }
+      });
+
+      this._style.appendTo('head');
+      this._container.appendTo('body');
+    },
+    close() {
+      if (!this._container) {
+        return;
+      }
+
+      this._container.remove();
+      this._style.remove();
+      this._container = null;
+      this._style = null;
+    },
+    async load() {
+      this._settings = await $GM.getValue('settings', {});
+
+      log.debug('settings : loaded :', this._settings);
+
+      Object.keys(this._settings).forEach((item) => {
+        utils.set(config, item, this._settings[item]);
+      });
+    }
+  }
+
   const log = {
     debug(...args) {
       if (config.debug) {
@@ -3609,7 +4040,8 @@
           reject(e);
         }
       });
-    }
+    },
+    registerMenuCommand: typeof GM !== 'undefined' ? GM.registerMenuCommand : GM_registerMenuCommand
   };
 
   (async () => {
@@ -4044,6 +4476,12 @@
       i18n.lang = i18n.langs.default;
       i18n.code = 'default';
     }
+
+    await settings.load();
+
+    $GM.registerMenuCommand(i18n.get('settings'), () => {
+      settings.open();
+    });
 
     const oldVersion = await $GM.getValue('version', false);
 

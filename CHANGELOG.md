@@ -1,4 +1,9 @@
 ## Changelog
+### v1.9 (2026-01-13)
+* Added settings window (accessible via Violentmonkey/Tampermonkey menu).
+* Gleam: added completion of Instagram tasks for following and commenting.
+* Gleam: added completion of X/Twitter tasks for posting hashtags.
+* Freeanywhere: the script now also confirms green tasks.
 ### v1.8 (2025-09-12)
 * Added support for freeanywhere.net.
 ### v1.7.8 (2025-05-18)
@@ -92,6 +97,11 @@
 ***
 
 ## Список изменений
+### v1.9 (2026-01-13)
+* Добавлено окно настроек (вызывается в меню Violentmonkey/Tampermonkey).
+* Gleam: добавлено выполнение Instagram заданий на подписку и комментарий.
+* Gleam: добавлено выполнение X/Twitter заданий на публикацию хештегов.
+* Freeanywhere: теперь скрипт подтверждает и зелёные задания.
 ### v1.8 (2025-09-12)
 * Добавлена поддержка freeanywhere.net.
 ### v1.7.8 (2025-05-18)
