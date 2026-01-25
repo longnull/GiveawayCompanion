@@ -1,4 +1,6 @@
 ## Changelog
+### v1.9.1 (2026-01-25)
+* Freeanywhere: now the task confirmation button is not displayed if the key has already been received.
 ### v1.9 (2026-01-13)
 * Added settings window (accessible via Violentmonkey/Tampermonkey menu).
 * Gleam: added completion of Instagram tasks for following and commenting.
@@ -97,6 +99,8 @@
 ***
 
 ## Список изменений
+### v1.9.1 (2026-01-25)
+* Freeanywhere: теперь кнопка подтверждения заданий не отображается, если ключ уже получен.
 ### v1.9 (2026-01-13)
 * Добавлено окно настроек (вызывается в меню Violentmonkey/Tampermonkey).
 * Gleam: добавлено выполнение Instagram заданий на подписку и комментарий.

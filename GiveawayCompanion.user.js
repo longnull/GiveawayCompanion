@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.9
+// @version 1.9.1
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -41,21 +41,15 @@
   'use strict';
 
   const version = {
-    string: '1.9',
+    string: '1.9.1',
     changes: {
       default:
         `<ul>
-          <li>Added settings window (accessible via Violentmonkey/Tampermonkey menu).</li>
-          <li>Gleam: added completion of Instagram tasks for following and commenting.</li>
-          <li>Gleam: added completion of X/Twitter tasks for posting hashtags.</li>
-          <li>Freeanywhere: the script now also confirms green tasks.</li>
+          <li>Freeanywhere: now the task confirmation button is not displayed if the key has already been received.</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Добавлено окно настроек (вызывается в меню Violentmonkey/Tampermonkey).</li>
-          <li>Gleam: добавлено выполнение Instagram заданий на подписку и комментарий.</li>
-          <li>Gleam: добавлено выполнение X/Twitter заданий на публикацию хештегов.</li>
-          <li>Freeanywhere: теперь скрипт подтверждает и зелёные задания.</li>
+          <li>Freeanywhere: теперь кнопка подтверждения заданий не отображается, если ключ уже получен.</li>
         </ul>`
     }
   };
@@ -922,16 +916,16 @@
         element: 'a[href="?steam_logout"]',
         steamGroups: '.game__content-tasks__task[data-type="steam_group_sub"] .task-link a',
         steamAppWishlist: '.game__content-tasks__task[data-type="steam_game_wishlist"] .task-link a',
-        steamKeys: '.game__content-tasks__get-message__content .message',
+        steamKeys: '.game__content-tasks__get-message.active .message',
         conditions: [
           {
-            element: '.game__content-tasks__task .task-check',
+            elementAnd: ['.game__content-tasks__task .task-check', '!.game__content-tasks__get-message.active'],
             buttons: [
               {
                 type: 'tasks',
                 cancellable: true,
                 click(params) {
-                  const tasks = $J(params.self.element);
+                  const tasks = $J(params.self.elementAnd[0]);
 
                   log.debug(`tasks found : ${tasks.length}`);
 
