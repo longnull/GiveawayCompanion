@@ -4,7 +4,7 @@
 // @description:ru Экономит ваше время на сайтах с раздачами игр
 // @author longnull
 // @namespace longnull
-// @version 1.9.1
+// @version 1.9.2
 // @homepage https://github.com/longnull/GiveawayCompanion
 // @supportURL https://github.com/longnull/GiveawayCompanion/issues
 // @updateURL https://raw.githubusercontent.com/longnull/GiveawayCompanion/master/GiveawayCompanion.user.js
@@ -20,7 +20,7 @@
 // @match *://*.key-hub.eu/giveaway/*
 // @match *://*.givee.club/*/event/*
 // @match *://*.opquests.com/*
-// @match *://*.freeanywhere.net/game*
+// @match *://give.gamesforfarm.com/game*
 // @connect steamcommunity.com
 // @connect grabfreegame.com
 // @connect bananatic.com
@@ -41,15 +41,15 @@
   'use strict';
 
   const version = {
-    string: '1.9.1',
+    string: '1.9.2',
     changes: {
       default:
         `<ul>
-          <li>Freeanywhere: now the task confirmation button is not displayed if the key has already been received.</li>
+          <li>Updated freeanywhere.net domain to give.gamesforfarm.com.</li>
         </ul>`,
       ru:
         `<ul>
-          <li>Freeanywhere: теперь кнопка подтверждения заданий не отображается, если ключ уже получен.</li>
+          <li>Обновлён домен freeanywhere.net на give.gamesforfarm.com.</li>
         </ul>`
     }
   };
@@ -912,7 +912,7 @@
         ]
       },
       {
-        host: 'freeanywhere.net',
+        host: 'give.gamesforfarm.com',
         element: 'a[href="?steam_logout"]',
         steamGroups: '.game__content-tasks__task[data-type="steam_group_sub"] .task-link a',
         steamAppWishlist: '.game__content-tasks__task[data-type="steam_game_wishlist"] .task-link a',
