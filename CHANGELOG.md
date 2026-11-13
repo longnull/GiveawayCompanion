@@ -1,4 +1,6 @@
 ## Changelog
+### v1.9.2 (2026-11-13)
+* Updated freeanywhere.net domain to give.gamesforfarm.com.
 ### v1.9.1 (2026-01-25)
 * Freeanywhere: now the task confirmation button is not displayed if the key has already been received.
 ### v1.9 (2026-01-13)
@@ -99,6 +101,8 @@
 ***
 
 ## Список изменений
+### v1.9.2 (2026-11-13)
+* Обновлен домен freeanywhere.net на give.gamesforfarm.com.
 ### v1.9.1 (2026-01-25)
 * Freeanywhere: теперь кнопка подтверждения заданий не отображается, если ключ уже получен.
 ### v1.9 (2026-01-13)
