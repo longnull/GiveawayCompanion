@@ -49,7 +49,7 @@
         </ul>`,
       ru:
         `<ul>
-          <li>Обновлен домен freeanywhere.net на give.gamesforfarm.com.</li>
+          <li>Обновлён домен freeanywhere.net на give.gamesforfarm.com.</li>
         </ul>`
     }
   };
